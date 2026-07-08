@@ -1,0 +1,104 @@
+{
+	"club": {
+		"id": "12345",
+		"name": "MSC Musterstadt e.V."
+	},
+	"events": [
+		{
+			"id": "evt-2026-0912",
+			"date": "2026-09-12",
+			"title": "Herbstlauf 1:8 Verbrenner",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "1:8 Buggy Nitro", "1:8 Truggy" ],
+			"status": "Nennung geöffnet",
+			"participant_count": 18,
+			"links": {
+				"registration": "https://www.myrcm.ch/myrcm/main?dsp=event&pLa=de&pRoot=00001",
+				"announcement": "https://example.com/ausschreibung-herbstlauf.pdf",
+				"regulations": "https://example.com/reglement-2026.pdf"
+			}
+		},
+		{
+			"id": "evt-2026-0829",
+			"date": "2026-08-29",
+			"title": "Clubmeisterschaft Lauf 4",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "2WD Buggy", "4WD Buggy", "Short Course" ],
+			"status": "Nennung geöffnet",
+			"participant_count": 24,
+			"links": {
+				"registration": "https://www.myrcm.ch/myrcm/main?dsp=event&pLa=de&pRoot=00002",
+				"announcement": "https://example.com/ausschreibung-cm4.pdf"
+			}
+		},
+		{
+			"id": "evt-2026-0801",
+			"date": "2026-08-01",
+			"title": "RaceMap Cup – Regionalfinale",
+			"organizer": "Bezirksverband Süd",
+			"track": "Sportpark Nord, 54321 Beispielheim",
+			"classes": [ "1:10 Elektro Buggy", "1:10 Stadium Truck" ],
+			"status": "Wenige Startplätze frei",
+			"links": {
+				"registration": "https://www.myrcm.ch/myrcm/main?dsp=event&pLa=de&pRoot=00003",
+				"regulations": "https://example.com/reglement-cup.pdf"
+			}
+		},
+		{
+			"id": "evt-2026-0718",
+			"date": "2026-07-18",
+			"title": "Sommer-Nachtrennen",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "1:8 Buggy Nitro" ],
+			"status": "Nennung geöffnet",
+			"participant_count": 12,
+			"links": {
+				"registration": "https://www.myrcm.ch/myrcm/main?dsp=event&pLa=de&pRoot=00004",
+				"announcement": "https://example.com/ausschreibung-nacht.pdf"
+			}
+		},
+		{
+			"id": "evt-2026-0620",
+			"date": "2026-06-20",
+			"title": "Clubmeisterschaft Lauf 3",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "2WD Buggy", "4WD Buggy" ],
+			"status": "Abgeschlossen",
+			"participant_count": 21,
+			"links": {
+				"participants": "https://www.myrcm.ch/myrcm/main?dsp=result&pLa=de&pRoot=00005",
+				"announcement": "https://example.com/ausschreibung-cm3.pdf"
+			}
+		},
+		{
+			"id": "evt-2026-0523",
+			"date": "2026-05-23",
+			"title": "Frühjahrspokal",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "1:8 Buggy Nitro", "1:8 Truggy" ],
+			"status": "Abgeschlossen",
+			"participant_count": 30,
+			"links": {
+				"participants": "https://www.myrcm.ch/myrcm/main?dsp=result&pLa=de&pRoot=00006"
+			}
+		},
+		{
+			"id": "evt-2026-0419",
+			"date": "2026-04-19",
+			"title": "Saisonauftakt 2026",
+			"organizer": "MSC Musterstadt e.V.",
+			"track": "Am Rennweg 1, 12345 Musterstadt",
+			"classes": [ "2WD Buggy", "4WD Buggy", "Short Course" ],
+			"status": "Abgeschlossen",
+			"participant_count": 27,
+			"links": {
+				"participants": "https://www.myrcm.ch/myrcm/main?dsp=result&pLa=de&pRoot=00007"
+			}
+		}
+	]
+}

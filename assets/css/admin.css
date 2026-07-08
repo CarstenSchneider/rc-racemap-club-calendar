@@ -1,0 +1,22 @@
+/**
+ * RC RaceMap Club Calendar – Admin-Layout.
+ *
+ * Minimale Ergänzungen zum WordPress-Admin-Stil; keine eigene Farbwelt.
+ */
+
+.rc-rcc-admin .rc-rcc-races-table {
+	margin-top: 1rem;
+}
+
+.rc-rcc-admin .rc-rcc-races-table td,
+.rc-rcc-admin .rc-rcc-races-table th {
+	vertical-align: middle;
+}
+
+.rc-rcc-admin .rc-rcc-races-table .check-column {
+	text-align: center;
+}
+
+.rc-rcc-admin code {
+	font-size: 0.95em;
+}

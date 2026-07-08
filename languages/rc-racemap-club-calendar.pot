@@ -1,0 +1,164 @@
+# Copyright (C) 2026 RC RaceMap
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.0\n"
+"Report-Msgid-Bugs-To: https://rc-racemap.com/\n"
+"Language-Team: RC RaceMap\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: rc-racemap-club-calendar\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Menütitel / Marken-Alt-Text
+msgid "RC RaceMap"
+msgstr ""
+
+msgid "Einstellungen"
+msgstr ""
+
+msgid "Rennen verwalten"
+msgstr ""
+
+msgid "Kalender-Einstellungen"
+msgstr ""
+
+msgid "Lege fest, wie dein Vereinskalender abgerufen und angezeigt wird."
+msgstr ""
+
+msgid "MyRCM Organisator-ID"
+msgstr ""
+
+msgid "Anzahl kommender Rennen"
+msgstr ""
+
+msgid "Anzahl Archiv-Rennen"
+msgstr ""
+
+msgid "Cache-Dauer"
+msgstr ""
+
+msgid "RC RaceMap Logo anzeigen"
+msgstr ""
+
+msgid "Die Organisator-ID deines Vereins, wie sie MyRCM / RC RaceMap verwendet."
+msgstr ""
+
+msgid "0 zeigt alle an."
+msgstr ""
+
+msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
+msgstr ""
+
+msgid "5 Minuten"
+msgstr ""
+
+msgid "15 Minuten"
+msgstr ""
+
+msgid "30 Minuten"
+msgstr ""
+
+msgid "1 Stunde"
+msgstr ""
+
+msgid "6 Stunden"
+msgstr ""
+
+msgid "24 Stunden"
+msgstr ""
+
+msgid "Wie lange abgerufene Renndaten zwischengespeichert werden, bevor sie aktualisiert werden."
+msgstr ""
+
+msgid "RC RaceMap Club Calendar"
+msgstr ""
+
+msgid "Shortcode"
+msgstr ""
+
+msgid "Füge diesen Shortcode auf einer beliebigen Seite ein, um den Kalender anzuzeigen:"
+msgstr ""
+
+msgid "Dazu bist du nicht berechtigt."
+msgstr ""
+
+msgid "Sichtbarkeit der Rennen gespeichert."
+msgstr ""
+
+msgid "Daten aktualisieren"
+msgstr ""
+
+msgid "Entferne den Haken, um ein Rennen im Kalender auszublenden. Neue Rennen werden automatisch angezeigt. Die Sichtbarkeit wird pro Event-ID gespeichert – ein umbenanntes Rennen behält also seinen Zustand."
+msgstr ""
+
+msgid "Noch keine Rennen gefunden. Prüfe die Organisator-ID in den Einstellungen und aktualisiere dann."
+msgstr ""
+
+msgid "Anzeigen"
+msgstr ""
+
+msgid "Datum"
+msgstr ""
+
+msgid "Titel"
+msgstr ""
+
+msgid "Veranstalter"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Sichtbarkeit speichern"
+msgstr ""
+
+msgid "Rennkalender"
+msgstr ""
+
+msgid "Kommende Rennen"
+msgstr ""
+
+msgid "Archiv"
+msgstr ""
+
+msgid "Aktuell sind keine kommenden Rennen geplant."
+msgstr ""
+
+msgid "Es sind noch keine vergangenen Rennen vorhanden."
+msgstr ""
+
+#, php-format
+msgid "%d Teilnehmer"
+msgid_plural "%d Teilnehmer"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Nennung"
+msgstr ""
+
+msgid "Teilnehmerliste"
+msgstr ""
+
+msgid "Ausschreibung"
+msgstr ""
+
+msgid "Reglement"
+msgstr ""
+
+msgid "Keine Club-ID konfiguriert."
+msgstr ""
+
+#, php-format
+msgid "Die RC-RaceMap-API hat mit HTTP-Status %d geantwortet."
+msgstr ""
+
+msgid "Die RC-RaceMap-API hat ungültiges JSON zurückgegeben."
+msgstr ""
+
+msgid "Die Datei mit Beispieldaten fehlt."
+msgstr ""
+
+msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
+msgstr ""

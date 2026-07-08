@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 24" width="120" height="24" role="img" aria-label="RC RaceMap">
+	<g fill="currentColor">
+		<!-- Zielflagge -->
+		<path d="M3 2h2v20H3z"/>
+		<path d="M5 3h4v3H5zM9 6h4v3H9zM5 9h4v3H5zM9 3h4V0h-.5A3.5 3.5 0 0 0 9 3zM13 6h3.5V3H13zM13 9V6h-4v3zM5 6H1.5A3.5 3.5 0 0 0 5 9V6z" opacity=".9"/>
+	</g>
+	<text x="20" y="17" fill="currentColor" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700">RC RaceMap</text>
+</svg>
