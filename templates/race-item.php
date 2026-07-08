@@ -44,7 +44,18 @@ $link_labels = array(
 
 			<?php if ( '' !== $race->track ) : ?>
 				<span class="rc-rcc__meta-item rc-rcc__track">
-					<?php echo esc_html( $race->track ); ?>
+					<?php
+					$track_text = $race->track;
+					if ( '' !== $race->location && false === mb_stripos( $race->track, $race->location ) ) {
+						/* translators: 1: venue name, 2: town/location. */
+						$track_text = sprintf( __( '%1$s, %2$s', 'rc-racemap-club-calendar' ), $race->track, $race->location );
+					}
+					echo esc_html( $track_text );
+					?>
+				</span>
+			<?php elseif ( '' !== $race->location ) : ?>
+				<span class="rc-rcc__meta-item rc-rcc__track">
+					<?php echo esc_html( $race->location ); ?>
 				</span>
 			<?php endif; ?>
 
@@ -65,12 +76,25 @@ $link_labels = array(
 					?>
 				</span>
 			<?php endif; ?>
+
+			<?php if ( ! empty( $race->series ) ) : ?>
+				<?php foreach ( $race->series as $series_name ) : ?>
+					<span class="rc-rcc__meta-item rc-rcc__series">
+						<?php echo esc_html( $series_name ); ?>
+					</span>
+				<?php endforeach; ?>
+			<?php endif; ?>
 		</div>
 
 		<?php if ( ! empty( $race->classes ) ) : ?>
 			<ul class="rc-rcc__classes">
 				<?php foreach ( $race->classes as $class ) : ?>
-					<li class="rc-rcc__class"><?php echo esc_html( $class ); ?></li>
+					<li class="rc-rcc__class">
+						<?php echo esc_html( $class['name'] ); ?>
+						<?php if ( null !== $class['entries'] ) : ?>
+							<span class="rc-rcc__class-entries"><?php echo esc_html( (string) $class['entries'] ); ?></span>
+						<?php endif; ?>
+					</li>
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>

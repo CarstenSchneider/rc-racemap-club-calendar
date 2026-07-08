@@ -59,7 +59,7 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 
 ## Offene TODOs
 
-- [ ] Datenmodell (`class-race.php`, `class-api.php`, `sample-data.json`, Templates) an `docs/rc-racemap-data-model.md` angleichen → **v1.0.1**.
+- [x] Datenmodell (`class-race.php`, `sample-data.json`, Templates) an `docs/rc-racemap-data-model.md` angleicht → **v1.0.1** (real: `name`/`hostName`/`venueName`+`venueLocation`, `from`/`to`-Bereich, `series[]`, gemischte `classes` mit `entries`, `documents[]`→Links, `registrationStatus`+`note`; Slug-Club-ID; alte Sample-Keys bleiben als Fallback lesbar). `class-api.php` toleriert bereits `{events:[]}` und bare Liste.
 - [ ] Auto-Update-Ablauf einmal real testen (Token + v1.0.1).
 - [ ] Später (nicht jetzt): iCal/Export, Serien-Filter, Ergebnisse, Countdown, Gutenberg-Block.
 

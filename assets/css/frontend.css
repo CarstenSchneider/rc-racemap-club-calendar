@@ -154,11 +154,25 @@
 }
 
 .rc-rcc__class {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
 	font-size: 0.8em;
 	line-height: 1;
 	padding: 0.3em 0.6em;
 	border: 1px solid var(--rc-rcc-border);
 	border-radius: var(--rc-rcc-radius);
+}
+
+/* Teilnehmerzahl je Klasse. */
+.rc-rcc__class-entries {
+	font-variant-numeric: tabular-nums;
+	opacity: 0.7;
+}
+
+/* Serien-Angabe in der Meta-Zeile, hervorgehoben ohne eigene Farbe. */
+.rc-rcc__series {
+	font-weight: 600;
 }
 
 /* --- Aktionslinks -------------------------------------------------------- */

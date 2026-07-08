@@ -134,7 +134,7 @@ class RC_RCC_Admin {
 		);
 
 		$fields = array(
-			'club_id'        => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
+			'club_id'        => __( 'RC RaceMap Club-ID', 'rc-racemap-club-calendar' ),
 			'upcoming_count' => __( 'Anzahl kommender Rennen', 'rc-racemap-club-calendar' ),
 			'archive_count'  => __( 'Anzahl Archiv-Rennen', 'rc-racemap-club-calendar' ),
 			'cache_ttl'      => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
@@ -231,7 +231,7 @@ class RC_RCC_Admin {
 					esc_attr( $name ),
 					esc_attr( (string) $value )
 				);
-				echo '<p class="description">' . esc_html__( 'Die Organisator-ID deines Vereins, wie sie MyRCM / RC RaceMap verwendet.', 'rc-racemap-club-calendar' ) . '</p>';
+				echo '<p class="description">' . esc_html__( 'Die Club-ID (Slug) deines Vereins bei RC RaceMap, z. B. „rcsf-singen-e-v".', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'upcoming_count':
