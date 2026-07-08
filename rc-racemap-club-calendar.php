@@ -12,6 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       rc-racemap-club-calendar
  * Domain Path:       /languages
+ * Update URI:        https://github.com/CarstenSchneider/rc-racemap-club-calendar
  *
  * @package RC_RaceMap_Club_Calendar
  */

@@ -154,6 +154,28 @@ class RC_RCC_Admin {
 				)
 			);
 		}
+
+		// Separater Abschnitt für die (technischen) Update-Einstellungen.
+		add_settings_section(
+			'rc_rcc_updates_section',
+			__( 'Automatische Updates', 'rc-racemap-club-calendar' ),
+			static function () {
+				echo '<p>' . esc_html__( 'Dieses Plugin bezieht Updates aus seinem privaten GitHub-Repository. Dafür wird ein Zugriffstoken benötigt.', 'rc-racemap-club-calendar' ) . '</p>';
+			},
+			self::PAGE_SETTINGS
+		);
+
+		add_settings_field(
+			'rc_rcc_field_update_token',
+			__( 'GitHub-Token für Updates', 'rc-racemap-club-calendar' ),
+			array( $this, 'render_field' ),
+			self::PAGE_SETTINGS,
+			'rc_rcc_updates_section',
+			array(
+				'key'       => 'update_token',
+				'label_for' => 'rc_rcc_field_update_token',
+			)
+		);
 	}
 
 	/**
@@ -173,6 +195,13 @@ class RC_RCC_Admin {
 		$clean['archive_count']  = isset( $input['archive_count'] ) ? absint( $input['archive_count'] ) : $defaults['archive_count'];
 		$clean['cache_ttl']      = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
 		$clean['show_logo']      = ! empty( $input['show_logo'] );
+
+		// Update-Token: nur unbedenkliche Token-Zeichen zulassen.
+		$token                  = isset( $input['update_token'] ) ? (string) $input['update_token'] : '';
+		$clean['update_token']  = trim( (string) preg_replace( '/[^A-Za-z0-9_]/', '', $token ) );
+
+		// Eine per Konstante gesetzte Kennung hat Vorrang; das Feld dient nur
+		// als Fallback und wird nicht benötigt, wenn RC_RCC_UPDATE_TOKEN gilt.
 
 		// Ein Cache von 0 würde die API überlasten; sinnvolles Minimum erzwingen.
 		if ( $clean['cache_ttl'] < MINUTE_IN_SECONDS ) {
@@ -228,6 +257,24 @@ class RC_RCC_Admin {
 					checked( (bool) $value, true, false ),
 					esc_html__( 'Das RC RaceMap Logo im Kalender-Fußbereich anzeigen.', 'rc-racemap-club-calendar' )
 				);
+				break;
+
+			case 'update_token':
+				$const_set = defined( 'RC_RCC_UPDATE_TOKEN' ) && '' !== trim( (string) RC_RCC_UPDATE_TOKEN );
+
+				printf(
+					'<input type="password" autocomplete="off" id="%1$s" name="%2$s" value="%3$s" class="regular-text" %4$s />',
+					esc_attr( $id ),
+					esc_attr( $name ),
+					esc_attr( (string) $value ),
+					$const_set ? 'disabled' : ''
+				);
+
+				if ( $const_set ) {
+					echo '<p class="description">' . esc_html__( 'Ein Token ist bereits über die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php gesetzt. Dieses Feld wird daher ignoriert.', 'rc-racemap-club-calendar' ) . '</p>';
+				} else {
+					echo '<p class="description">' . esc_html__( 'Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php.', 'rc-racemap-club-calendar' ) . '</p>';
+				}
 				break;
 		}
 	}

@@ -162,3 +162,18 @@ msgstr ""
 
 msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
 msgstr ""
+
+msgid "Automatische Updates"
+msgstr ""
+
+msgid "Dieses Plugin bezieht Updates aus seinem privaten GitHub-Repository. Dafür wird ein Zugriffstoken benötigt."
+msgstr ""
+
+msgid "GitHub-Token für Updates"
+msgstr ""
+
+msgid "Ein Token ist bereits über die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php gesetzt. Dieses Feld wird daher ignoriert."
+msgstr ""
+
+msgid "Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php."
+msgstr ""

@@ -90,6 +90,7 @@ final class RC_RCC_Plugin {
 		require_once RC_RCC_PATH . 'includes/class-calendar.php';
 		require_once RC_RCC_PATH . 'includes/class-admin.php';
 		require_once RC_RCC_PATH . 'includes/class-shortcode.php';
+		require_once RC_RCC_PATH . 'includes/class-updater.php';
 	}
 
 	/**
@@ -99,6 +100,10 @@ final class RC_RCC_Plugin {
 	 */
 	public function init(): void {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+
+		// GitHub-basierte Auto-Updates (läuft auch bei Cron-Update-Checks,
+		// daher unabhängig vom Admin-Kontext registrieren).
+		( new RC_RCC_Updater() )->register();
 
 		// Admin UI only in wp-admin.
 		if ( is_admin() ) {
@@ -161,6 +166,7 @@ final class RC_RCC_Plugin {
 			'archive_count'  => 20,
 			'cache_ttl'      => HOUR_IN_SECONDS,
 			'show_logo'      => true,
+			'update_token'   => '',
 		);
 	}
 
