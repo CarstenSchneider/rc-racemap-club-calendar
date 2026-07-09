@@ -81,11 +81,10 @@ msgstr ""
 
 #: includes/class-admin.php:264
 msgid ""
-"Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer lassen = "
-"automatisch die Linkfarbe deines Themes."
+"Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-Textfarbe)."
 msgstr ""
-"Color for the date, title, class pills and the registration button. Leave "
-"empty to use your theme's link color automatically."
+"Color of the registration button. Leave empty for a subtle default (theme "
+"text color)."
 
 #: includes/class-admin.php:273
 msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
@@ -305,7 +304,7 @@ msgid "Reglement"
 msgstr "Regulations"
 
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:95
+#: templates/race-item.php:74
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
@@ -315,6 +314,13 @@ msgstr[1] "%d participants"
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr "Select year"
+
+#~ msgid ""
+#~ "Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer "
+#~ "lassen = automatisch die Linkfarbe deines Themes."
+#~ msgstr ""
+#~ "Color for the date, title, class pills and the registration button. Leave "
+#~ "empty to use your theme's link color automatically."
 
 #~ msgid "Teilnehmerliste"
 #~ msgstr "Entry list"

@@ -14,8 +14,8 @@
 	--rc-rcc-radius: 6px;
 	--rc-rcc-border: color-mix( in srgb, currentColor 20%, transparent );
 	--rc-rcc-muted: color-mix( in srgb, currentColor 55%, transparent );
-	/* Akzentfarbe: Default = Theme-Textfarbe; frontend.js setzt sie auf die
-	   Theme-Linkfarbe, der Admin kann sie fest überschreiben. */
+	/* Akzentfarbe (nur der Nennung-Button): Default = Theme-Textfarbe für einen
+	   dezenten, kräftigen Button. Im Admin per Farbwähler überschreibbar. */
 	--rc-rcc-accent: currentColor;
 
 	font: inherit;
@@ -34,9 +34,7 @@
    auf genau den Elementen, die der Kalender rendert. */
 .rc-rcc .rc-rcc__list,
 .rc-rcc .rc-rcc__years,
-.rc-rcc .rc-rcc__classes,
-.rc-rcc .rc-rcc__docs,
-.rc-rcc .rc-rcc__status {
+.rc-rcc .rc-rcc__classes {
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -45,8 +43,11 @@
 
 .rc-rcc .rc-rcc__item,
 .rc-rcc .rc-rcc__title,
+.rc-rcc .rc-rcc__meta,
+.rc-rcc .rc-rcc__action,
 .rc-rcc .rc-rcc__class {
 	margin: 0;
+	padding: 0;
 }
 
 .rc-rcc__icon {
@@ -148,27 +149,28 @@
 	display: none;
 }
 
-/* --- Einzelnes Rennen (Zeile: Datum · Info · Status) --------------------- */
+/* --- Einzelnes Rennen (Zeile: Datum · Info · Aktion) -------------------- */
 
 .rc-rcc .rc-rcc__item {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 0.5rem;
-	padding: 1.1rem 0;
-	border-bottom: 1px solid var(--rc-rcc-border);
+	gap: 0.55rem;
+	padding: 1.25rem 0;
+	border-top: 1px solid var(--rc-rcc-border);
 }
 
-.rc-rcc .rc-rcc__list > .rc-rcc__item:last-child {
-	border-bottom: 0;
-	padding-bottom: 0;
+.rc-rcc .rc-rcc__list > .rc-rcc__item:first-child {
+	border-top: 0;
+	padding-top: 0.25rem;
 }
 
-/* Datum: numerisch, fett. Kommend = Akzent, vergangen = grau. */
+/* Datum: numerisch, dezent (gedämpfte Sekundärfarbe). */
 .rc-rcc .rc-rcc__date {
-	font-size: 0.95em;
-	font-weight: 700;
+	font-size: 0.9em;
+	font-weight: 600;
 	font-variant-numeric: tabular-nums;
-	line-height: 1.35;
+	line-height: 1.5;
+	color: var(--rc-rcc-muted);
 }
 
 .rc-rcc__date time {
@@ -176,105 +178,48 @@
 	text-decoration: none;
 }
 
-.rc-rcc__item--upcoming .rc-rcc__date {
-	color: var(--rc-rcc-accent);
-}
-
-.rc-rcc__item--past .rc-rcc__date {
-	color: var(--rc-rcc-muted);
-}
-
-/* Info-Spalte: Titel, Klassen, Dokumente. */
+/* Info-Spalte: Titel, Meta, Klassen. */
 .rc-rcc .rc-rcc__info {
 	display: flex;
 	flex-direction: column;
-	gap: 0.55rem;
+	gap: 0.5rem;
 	min-width: 0;
 }
 
+/* Titel: die einzige prominente Zeile – normale Schreibweise, Theme-Farbe. */
 .rc-rcc .rc-rcc__title {
-	font-size: 1.05em;
-	font-weight: 700;
-	line-height: 1.25;
-	text-transform: uppercase;
-	letter-spacing: 0.02em;
+	font-size: 1.12em;
+	font-weight: 600;
+	line-height: 1.3;
+	color: inherit;
 	overflow-wrap: anywhere;
-}
-
-.rc-rcc__item--upcoming .rc-rcc__title {
-	color: var(--rc-rcc-accent);
 }
 
 .rc-rcc__item--past .rc-rcc__title {
 	color: var(--rc-rcc-muted);
 }
 
-/* Klassen als gefüllte Pillen (Akzent bzw. grau, heller Text). */
-.rc-rcc .rc-rcc__classes {
+/* Meta-Zeile: Teilnehmer + Dokumente, ruhig und klein, ·-getrennt. */
+.rc-rcc .rc-rcc__meta {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.4rem;
-}
-
-.rc-rcc .rc-rcc__class {
-	display: inline-flex;
-	align-items: baseline;
-	gap: 0.35em;
-	font-size: 0.8em;
-	line-height: 1;
-	padding: 0.4em 0.75em;
-	border-radius: 999px;
-	color: var(--rc-rcc-on-accent, Canvas);
-}
-
-.rc-rcc__item--upcoming .rc-rcc__class {
-	background: var(--rc-rcc-accent);
-}
-
-.rc-rcc__item--past .rc-rcc__class {
-	background: var(--rc-rcc-muted);
-}
-
-.rc-rcc__class-entries {
-	font-variant-numeric: tabular-nums;
-	opacity: 0.8;
-}
-
-/* Dokumente: Text-Links untereinander. */
-.rc-rcc .rc-rcc__docs {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 0.15rem;
-	font-size: 0.9em;
-}
-
-.rc-rcc .rc-rcc__doc {
-	text-decoration: underline;
-}
-
-.rc-rcc__item--upcoming .rc-rcc__doc {
-	color: var(--rc-rcc-accent);
-}
-
-.rc-rcc__item--past .rc-rcc__doc {
+	align-items: center;
+	gap: 0.25rem 0.75rem;
+	font-size: 0.85em;
 	color: var(--rc-rcc-muted);
 }
 
-/* Status-Spalte: Teilnehmer + Button, gestapelt. */
-.rc-rcc .rc-rcc__status {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 0.6rem;
+.rc-rcc .rc-rcc__meta > * + *::before {
+	content: "·";
+	margin-right: 0.75rem;
+	opacity: 0.45;
 }
 
-.rc-rcc .rc-rcc__ppl-link {
+.rc-rcc .rc-rcc__ppl {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4em;
-	font-size: 1.05em;
-	font-weight: 700;
+	gap: 0.35em;
+	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 	color: inherit;
@@ -283,45 +228,81 @@
 
 .rc-rcc__ppl-count {
 	text-decoration: underline;
+	text-underline-offset: 2px;
 }
 
-.rc-rcc__item--past .rc-rcc__ppl-link {
+.rc-rcc .rc-rcc__doc {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Klassen als leichte Outline-Chips (kein schwerer Farbwall). */
+.rc-rcc .rc-rcc__classes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.rc-rcc .rc-rcc__class {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.35em;
+	font-size: 0.78em;
+	line-height: 1;
+	padding: 0.35em 0.65em;
+	border: 1px solid var(--rc-rcc-border);
+	border-radius: 5px;
 	color: var(--rc-rcc-muted);
 }
 
-/* Aktions-Button: Nennung (Akzent) bzw. Ergebnisse/Zum Rennen (grau). */
+.rc-rcc__class-entries {
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	opacity: 0.75;
+}
+
+/* Aktion: nur der primäre Button. Kommend = gefüllter Akzent (die einzige
+   farbige Fläche), vergangen = leiser Ghost-Button. */
 .rc-rcc .rc-rcc__cta {
 	display: inline-block;
-	padding: 0.5em 1.1em;
-	font-size: 0.9em;
-	font-weight: 700;
+	padding: 0.5em 1.15em;
+	font-size: 0.86em;
+	font-weight: 600;
 	line-height: 1.2;
+	border: 1px solid transparent;
 	border-radius: var(--rc-rcc-radius);
 	white-space: nowrap;
 	text-decoration: none;
-	color: var(--rc-rcc-on-accent, Canvas);
 }
 
 .rc-rcc__cta--upcoming {
 	background: var(--rc-rcc-accent);
+	color: var(--rc-rcc-on-accent, Canvas);
 }
 
 .rc-rcc__cta--past {
-	background: var(--rc-rcc-muted);
+	background: transparent;
+	border-color: var(--rc-rcc-border);
+	color: inherit;
 }
 
-.rc-rcc__cta:hover,
-.rc-rcc__cta:focus-visible {
+.rc-rcc__cta--upcoming:hover,
+.rc-rcc__cta--upcoming:focus-visible {
 	filter: brightness( 1.1 );
-	text-decoration: none;
+}
+
+.rc-rcc__cta--past:hover,
+.rc-rcc__cta--past:focus-visible {
+	background: color-mix( in srgb, currentColor 8%, transparent );
 }
 
 /* Desktop: drei Spalten. Datum fix (fluchtet zeilenübergreifend), Info
-   flexibel, Status rechtsbündig. */
+   flexibel, Button rechtsbündig. */
 @media ( min-width: 600px ) {
 	.rc-rcc .rc-rcc__item {
 		grid-template-columns: 8.5rem minmax( 0, 1fr ) auto;
-		grid-template-areas: "date info status";
+		grid-template-areas: "date info action";
 		align-items: start;
 		column-gap: 1.5rem;
 		row-gap: 0.5rem;
@@ -335,10 +316,9 @@
 		grid-area: info;
 	}
 
-	.rc-rcc .rc-rcc__status {
-		grid-area: status;
-		align-items: flex-end;
-		text-align: right;
+	.rc-rcc__action {
+		grid-area: action;
+		justify-self: end;
 	}
 }
 

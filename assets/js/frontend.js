@@ -87,52 +87,11 @@
 	}
 
 	/**
-	 * Derive the accent colour from the active theme's link colour and expose
-	 * it as --rc-rcc-accent on the calendar root. This lets the calendar "inherit"
-	 * the club's brand colour (link colour) without hard-coding a value. Falls
-	 * back silently to the CSS default (currentColor) if anything is off.
-	 *
-	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
-	 */
-	function applyThemeAccent( root ) {
-		try {
-			// An explicit accent from the admin setting (inline style) wins –
-			// don't override it with the theme link colour.
-			if ( root.style && '' !== root.style.getPropertyValue( '--rc-rcc-accent' ) ) {
-				return;
-			}
-
-			var probe = document.createElement( 'a' );
-			probe.href = '#';
-			probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
-			root.appendChild( probe );
-
-			var color = window.getComputedStyle( probe ).color;
-			root.removeChild( probe );
-
-			if ( color ) {
-				root.style.setProperty( '--rc-rcc-accent', color );
-
-				// Passenden Textkontrast auf gefüllten Flächen (Pillen/Button)
-				// aus der Helligkeit der Akzentfarbe ableiten.
-				var m = color.match( /(\d+)[,\s]+(\d+)[,\s]+(\d+)/ );
-				if ( m ) {
-					var brightness = ( m[1] * 299 + m[2] * 587 + m[3] * 114 ) / 1000;
-					root.style.setProperty( '--rc-rcc-on-accent', brightness < 150 ? '#ffffff' : '#111111' );
-				}
-			}
-		} catch ( e ) {
-			// Ignore – CSS fallback (currentColor) stays in effect.
-		}
-	}
-
-	/**
 	 * Initialise a single calendar instance.
 	 *
 	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
 	 */
 	function initCalendar( root ) {
-		applyThemeAccent( root );
 
 		// Level 1: main tabs.
 		wireGroup(

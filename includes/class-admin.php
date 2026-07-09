@@ -261,7 +261,7 @@ class RC_RCC_Admin {
 					esc_attr( $name ),
 					esc_attr( (string) $value )
 				);
-				echo '<p class="description">' . esc_html__( 'Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer lassen = automatisch die Linkfarbe deines Themes.', 'rc-racemap-club-calendar' ) . '</p>';
+				echo '<p class="description">' . esc_html__( 'Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-Textfarbe).', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'show_logo':

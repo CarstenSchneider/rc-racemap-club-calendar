@@ -65,6 +65,37 @@ $has_participants = ( null !== $race->participant_count );
 	<div class="rc-rcc__info">
 		<h3 class="rc-rcc__title"><?php echo esc_html( $race->title ); ?></h3>
 
+		<?php if ( $has_participants || ! empty( $documents ) ) : ?>
+			<div class="rc-rcc__meta">
+				<?php if ( $has_participants ) : ?>
+					<?php
+					$ppl_label = sprintf(
+						/* translators: %d: Anzahl der Teilnehmer. */
+						_n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ),
+						(int) $race->participant_count
+					);
+					$ppl_icon  = RC_RCC_Shortcode::icon( 'users' );
+					$ppl_count = (string) (int) $race->participant_count;
+					?>
+					<?php if ( '' !== $participants_url ) : ?>
+						<a class="rc-rcc__ppl" href="<?php echo esc_url( $participants_url ); ?>" title="<?php echo esc_attr( $ppl_label ); ?>" rel="noopener noreferrer" target="_blank">
+							<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
+							<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
+						</a>
+					<?php else : ?>
+						<span class="rc-rcc__ppl" title="<?php echo esc_attr( $ppl_label ); ?>">
+							<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
+							<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
+						</span>
+					<?php endif; ?>
+				<?php endif; ?>
+
+				<?php foreach ( $documents as $doc ) : ?>
+					<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $doc[0] ); ?></a>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
+
 		<?php if ( ! empty( $race->classes ) ) : ?>
 			<ul class="rc-rcc__classes">
 				<?php foreach ( $race->classes as $class ) : ?>
@@ -77,40 +108,9 @@ $has_participants = ( null !== $race->participant_count );
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
-
-		<?php if ( ! empty( $documents ) ) : ?>
-			<div class="rc-rcc__docs">
-				<?php foreach ( $documents as $doc ) : ?>
-					<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $doc[0] ); ?></a>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
 	</div>
 
-	<div class="rc-rcc__status">
-		<?php if ( $has_participants ) : ?>
-			<?php
-			$ppl_label = sprintf(
-				/* translators: %d: Anzahl der Teilnehmer. */
-				_n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ),
-				(int) $race->participant_count
-			);
-			$ppl_icon  = RC_RCC_Shortcode::icon( 'users' );
-			$ppl_count = (string) (int) $race->participant_count;
-			?>
-			<?php if ( '' !== $participants_url ) : ?>
-				<a class="rc-rcc__ppl-link" href="<?php echo esc_url( $participants_url ); ?>" title="<?php echo esc_attr( $ppl_label ); ?>" rel="noopener noreferrer" target="_blank">
-					<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-					<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
-				</a>
-			<?php else : ?>
-				<span class="rc-rcc__ppl-link" title="<?php echo esc_attr( $ppl_label ); ?>">
-					<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-					<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
-				</span>
-			<?php endif; ?>
-		<?php endif; ?>
-
+	<div class="rc-rcc__action">
 		<?php if ( '' !== $cta_url ) : ?>
 			<a class="rc-rcc__cta rc-rcc__cta--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $cta_label ); ?></a>
 		<?php endif; ?>

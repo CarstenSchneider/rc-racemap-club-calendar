@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.16\n"
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.19\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
 "Language-Team: RC RaceMap\n"
 "MIME-Version: 1.0\n"
@@ -76,8 +76,7 @@ msgstr ""
 
 #: includes/class-admin.php:264
 msgid ""
-"Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer lassen = "
-"automatisch die Linkfarbe deines Themes."
+"Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-Textfarbe)."
 msgstr ""
 
 #: includes/class-admin.php:273
@@ -287,7 +286,7 @@ msgid "Reglement"
 msgstr ""
 
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:95
+#: templates/race-item.php:74
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
