@@ -62,7 +62,7 @@ $has_participants = ( null !== $race->participant_count );
 		<?php endif; ?>
 	</div>
 
-	<div class="rc-rcc__main">
+	<div class="rc-rcc__info">
 		<h3 class="rc-rcc__title"><?php echo esc_html( $race->title ); ?></h3>
 
 		<?php if ( ! empty( $race->classes ) ) : ?>
@@ -87,7 +87,7 @@ $has_participants = ( null !== $race->participant_count );
 		<?php endif; ?>
 	</div>
 
-	<div class="rc-rcc__ppl">
+	<div class="rc-rcc__status">
 		<?php if ( $has_participants ) : ?>
 			<?php
 			$ppl_label = sprintf(
@@ -110,9 +110,7 @@ $has_participants = ( null !== $race->participant_count );
 				</span>
 			<?php endif; ?>
 		<?php endif; ?>
-	</div>
 
-	<div class="rc-rcc__action">
 		<?php if ( '' !== $cta_url ) : ?>
 			<a class="rc-rcc__cta rc-rcc__cta--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $cta_label ); ?></a>
 		<?php endif; ?>

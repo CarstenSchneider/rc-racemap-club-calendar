@@ -1,28 +1,27 @@
 /**
  * RC RaceMap Club Calendar – Frontend-Layout.
  *
- * Bewusst nur Layout: Abstände, Tab- und Listenaufbau, responsives Verhalten.
- * Farben, Schriften und Linkfarben kommen vom aktiven Theme (inherit /
- * currentColor). Optional lassen sich alle Werte über die --rc-rcc-*
- * Custom-Properties feinjustieren, ohne eigene Farbwelt mitzubringen.
+ * Selbsttragend und theme-unabhängig: Layout-Regeln sind mit dem
+ * .rc-rcc-Vorfahren geschrieben (Spezifität 0,2,0), damit Theme-Content-Regeln
+ * wie `.entry-content h3 { margin: … }` (0,1,1) keine Abstände/Einrückungen
+ * durchdrücken. Farben kommen weiter vom Theme (currentColor / Akzent).
  *
- * Mobile First: Basis = einspaltig; ab 600px zweispaltige Listenansicht.
+ * Dreispaltige Zeile (ab 600px): Datum · Info (Titel/Klassen/Dokumente) · Status
+ * (Teilnehmer + Button). Mobil gestapelt.
  */
 
 .rc-rcc {
-	--rc-rcc-gap: 1rem;
-	--rc-rcc-radius: 4px;
-	/* Dezente, aus der Theme-Textfarbe abgeleitete Trennlinien. */
+	--rc-rcc-radius: 6px;
 	--rc-rcc-border: color-mix( in srgb, currentColor 20%, transparent );
 	--rc-rcc-muted: color-mix( in srgb, currentColor 55%, transparent );
-	/* Akzentfarbe: standardmäßig die Theme-Textfarbe; frontend.js setzt sie zur
-	   Laufzeit auf die Theme-Linkfarbe (so „erbt" der Kalender die Vereinsfarbe).
-	   Per --rc-rcc-accent überschreibbar. --rc-rcc-on-accent = Text auf Fläche. */
+	/* Akzentfarbe: Default = Theme-Textfarbe; frontend.js setzt sie auf die
+	   Theme-Linkfarbe, der Admin kann sie fest überschreiben. */
 	--rc-rcc-accent: currentColor;
 
 	font: inherit;
 	color: inherit;
 	box-sizing: border-box;
+	max-width: 100%;
 }
 
 .rc-rcc *,
@@ -31,15 +30,23 @@
 	box-sizing: inherit;
 }
 
-/* Listen-Reset mit erhöhter Spezifität, damit Theme-Regeln wie
-   `.entry-content ul { padding-left: 2em }` die Kalenderlisten nicht einrücken. */
+/* Reset mit erhöhter Spezifität (0,2,0) – neutralisiert Theme-Margins/Padding
+   auf genau den Elementen, die der Kalender rendert. */
 .rc-rcc .rc-rcc__list,
 .rc-rcc .rc-rcc__years,
-.rc-rcc .rc-rcc__classes {
+.rc-rcc .rc-rcc__classes,
+.rc-rcc .rc-rcc__docs,
+.rc-rcc .rc-rcc__status {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	text-indent: 0;
+}
+
+.rc-rcc .rc-rcc__item,
+.rc-rcc .rc-rcc__title,
+.rc-rcc .rc-rcc__class {
+	margin: 0;
 }
 
 .rc-rcc__icon {
@@ -53,12 +60,12 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.25rem;
-	margin: 0 0 var(--rc-rcc-gap);
+	margin: 0 0 1rem;
 	padding: 0;
 	border-bottom: 1px solid var(--rc-rcc-border);
 }
 
-.rc-rcc__tab {
+.rc-rcc .rc-rcc__tab {
 	appearance: none;
 	background: transparent;
 	border: 0;
@@ -89,13 +96,10 @@
 	display: none;
 }
 
-.rc-rcc__list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+.rc-rcc .rc-rcc__list {
 	display: flex;
 	flex-direction: column;
-	gap: 1.75rem;
+	gap: 0;
 }
 
 .rc-rcc__empty {
@@ -110,16 +114,17 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.4rem;
-	margin: 0 0 var(--rc-rcc-gap);
+	margin: 0 0 1rem;
 }
 
-.rc-rcc__year-btn {
+.rc-rcc .rc-rcc__year-btn {
 	appearance: none;
 	background: transparent;
 	color: inherit;
 	font: inherit;
 	font-weight: 600;
 	line-height: 1;
+	margin: 0;
 	padding: 0.35em 0.8em;
 	border: 1px solid var(--rc-rcc-border);
 	border-radius: 999px;
@@ -143,21 +148,27 @@
 	display: none;
 }
 
-/* --- Einzelnes Rennen (Zeile: Datum · Inhalt · Teilnehmer · Aktion) ------- */
+/* --- Einzelnes Rennen (Zeile: Datum · Info · Status) --------------------- */
 
-.rc-rcc__item {
+.rc-rcc .rc-rcc__item {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 0.6rem;
+	gap: 0.5rem;
+	padding: 1.1rem 0;
+	border-bottom: 1px solid var(--rc-rcc-border);
+}
+
+.rc-rcc .rc-rcc__list > .rc-rcc__item:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
 }
 
 /* Datum: numerisch, fett. Kommend = Akzent, vergangen = grau. */
-.rc-rcc__date {
+.rc-rcc .rc-rcc__date {
 	font-size: 0.95em;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
-	white-space: nowrap;
-	line-height: 1.3;
+	line-height: 1.35;
 }
 
 .rc-rcc__date time {
@@ -173,27 +184,21 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* Leere Teilnehmer-/Aktionsspalten erzeugen keine Abstände. */
-.rc-rcc__ppl:empty,
-.rc-rcc__action:empty {
-	display: none;
-}
-
-/* Hauptspalte: Titel, Klassen, Dokumente. */
-.rc-rcc__main {
+/* Info-Spalte: Titel, Klassen, Dokumente. */
+.rc-rcc .rc-rcc__info {
 	display: flex;
 	flex-direction: column;
-	gap: 0.6rem;
+	gap: 0.55rem;
 	min-width: 0;
 }
 
-.rc-rcc__title {
-	margin: 0;
+.rc-rcc .rc-rcc__title {
 	font-size: 1.05em;
 	font-weight: 700;
 	line-height: 1.25;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
+	overflow-wrap: anywhere;
 }
 
 .rc-rcc__item--upcoming .rc-rcc__title {
@@ -205,13 +210,13 @@
 }
 
 /* Klassen als gefüllte Pillen (Akzent bzw. grau, heller Text). */
-.rc-rcc__classes {
+.rc-rcc .rc-rcc__classes {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.4rem;
 }
 
-.rc-rcc__class {
+.rc-rcc .rc-rcc__class {
 	display: inline-flex;
 	align-items: baseline;
 	gap: 0.35em;
@@ -236,7 +241,7 @@
 }
 
 /* Dokumente: Text-Links untereinander. */
-.rc-rcc__docs {
+.rc-rcc .rc-rcc__docs {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -244,7 +249,7 @@
 	font-size: 0.9em;
 }
 
-.rc-rcc__doc {
+.rc-rcc .rc-rcc__doc {
 	text-decoration: underline;
 }
 
@@ -256,8 +261,15 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* Teilnehmerzahl (Icon + Zahl); die Zahl verlinkt die Teilnehmerliste. */
-.rc-rcc__ppl-link {
+/* Status-Spalte: Teilnehmer + Button, gestapelt. */
+.rc-rcc .rc-rcc__status {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.6rem;
+}
+
+.rc-rcc .rc-rcc__ppl-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4em;
@@ -277,16 +289,16 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* Aktions-Button rechts: Nennung (Akzent) bzw. Ergebnis/Zum Rennen (grau). */
-.rc-rcc__cta {
+/* Aktions-Button: Nennung (Akzent) bzw. Ergebnisse/Zum Rennen (grau). */
+.rc-rcc .rc-rcc__cta {
 	display: inline-block;
-	padding: 0.5em 1em;
+	padding: 0.5em 1.1em;
 	font-size: 0.9em;
 	font-weight: 700;
 	line-height: 1.2;
-	border-radius: 6px;
+	border-radius: var(--rc-rcc-radius);
 	white-space: nowrap;
-	text-decoration: underline;
+	text-decoration: none;
 	color: var(--rc-rcc-on-accent, Canvas);
 }
 
@@ -301,40 +313,39 @@
 .rc-rcc__cta:hover,
 .rc-rcc__cta:focus-visible {
 	filter: brightness( 1.1 );
+	text-decoration: none;
 }
 
-/* Desktop: vierspaltige Zeile. Datum, Teilnehmer und Button oben ausgerichtet. */
-@media ( min-width: 720px ) {
-	.rc-rcc__item {
-		grid-template-columns: 9rem minmax( 0, 1fr ) auto auto;
-		grid-template-areas: "date main ppl action";
+/* Desktop: drei Spalten. Datum fix (fluchtet zeilenübergreifend), Info
+   flexibel, Status rechtsbündig. */
+@media ( min-width: 600px ) {
+	.rc-rcc .rc-rcc__item {
+		grid-template-columns: 8.5rem minmax( 0, 1fr ) auto;
+		grid-template-areas: "date info status";
 		align-items: start;
 		column-gap: 1.5rem;
-		gap: 1.5rem;
+		row-gap: 0.5rem;
 	}
 
 	.rc-rcc__date {
 		grid-area: date;
 	}
 
-	.rc-rcc__main {
-		grid-area: main;
+	.rc-rcc__info {
+		grid-area: info;
 	}
 
-	.rc-rcc__ppl {
-		grid-area: ppl;
+	.rc-rcc .rc-rcc__status {
+		grid-area: status;
+		align-items: flex-end;
 		text-align: right;
-	}
-
-	.rc-rcc__action {
-		grid-area: action;
 	}
 }
 
 /* --- Footer / Logo ------------------------------------------------------- */
 
 .rc-rcc__footer {
-	margin-top: var(--rc-rcc-gap);
+	margin-top: 1rem;
 	padding-top: 0.75rem;
 	border-top: 1px solid var(--rc-rcc-border);
 	text-align: right;
@@ -356,8 +367,7 @@
 	max-width: 100%;
 }
 
-/* Ältere Browser ohne color-mix: sichtbare Fallbacks für Linien, Flächen und
-   die gefüllten Buttons/Badges (sonst wären sie transparent/unsichtbar). */
+/* Ältere Browser ohne color-mix: sichtbare Fallbacks für Linien/Flächen. */
 @supports not ( color: color-mix( in srgb, currentColor 20%, transparent ) ) {
 	.rc-rcc {
 		--rc-rcc-border: rgba( 128, 128, 128, 0.35 );

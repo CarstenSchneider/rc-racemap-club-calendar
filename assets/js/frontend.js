@@ -112,6 +112,14 @@
 
 			if ( color ) {
 				root.style.setProperty( '--rc-rcc-accent', color );
+
+				// Passenden Textkontrast auf gefüllten Flächen (Pillen/Button)
+				// aus der Helligkeit der Akzentfarbe ableiten.
+				var m = color.match( /(\d+)[,\s]+(\d+)[,\s]+(\d+)/ );
+				if ( m ) {
+					var brightness = ( m[1] * 299 + m[2] * 587 + m[3] * 114 ) / 1000;
+					root.style.setProperty( '--rc-rcc-on-accent', brightness < 150 ? '#ffffff' : '#111111' );
+				}
 			}
 		} catch ( e ) {
 			// Ignore – CSS fallback (currentColor) stays in effect.
