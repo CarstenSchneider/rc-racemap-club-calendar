@@ -121,8 +121,8 @@ class RC_RCC_Shortcode {
 		// Optional per-instance club override (see filter_club_id()).
 		$this->club_override = sanitize_text_field( (string) $atts['club'] );
 
-		$upcoming = $this->calendar->upcoming_races();
-		$archived = $this->calendar->archived_races();
+		$current_groups = $this->calendar->current_groups();
+		$archive_groups = $this->calendar->archive_groups();
 
 		$this->club_override = '';
 
@@ -145,7 +145,7 @@ class RC_RCC_Shortcode {
 	 * Themes can override any template by placing a file at
 	 * wp-content/themes/{theme}/rc-racemap-club-calendar/{name}.php
 	 *
-	 * @param string $name Template file name (e.g. "upcoming.php").
+	 * @param string $name Template file name (e.g. "race-item.php").
 	 * @return string Absolute path to the template to load.
 	 */
 	public static function locate_template( string $name ): string {

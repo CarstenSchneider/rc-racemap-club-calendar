@@ -33,7 +33,7 @@ WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Mod
 | `class-shortcode.php` | Frontend-Rendering über `templates/` |
 | `class-updater.php` (+ `lib/plugin-update-checker/`) | GitHub-Auto-Updates |
 
-Shortcode: `[rc_racemap_club_calendar]` (optionaler künftiger Parameter `club="…"` bereits vorbereitet). Zwei Tabs (kommende/Archiv), serverseitig gerendert, Umschaltung per Vanilla-JS ohne Reload.
+Shortcode: `[rc_racemap_club_calendar]` (optionaler künftiger Parameter `club="…"` bereits vorbereitet). **Zweistufige Navigation** (serverseitig gerendert, Umschaltung per Vanilla-JS ohne Reload): Haupt-Tabs **„Aktuelle Termine"** (dieses Jahr + Zukunft, aufsteigend) / **„Archiv"** (frühere Jahre, absteigend); innerhalb jedes Tabs eine **Jahres-Navigation** (Pills, `templates/year-groups.php`). Aktions-Link/Status richten sich **pro Rennen am Datum** (vergangen → Ergebnisse, kommend → Nennung), nicht am Tab. Kalender-Logik: `current_groups()` / `archive_groups()` (nach Jahr gruppiert).
 
 ## Sichtbarkeit von Rennen
 

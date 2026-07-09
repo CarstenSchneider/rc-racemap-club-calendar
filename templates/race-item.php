@@ -13,16 +13,16 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 	return;
 }
 
-// Kontext: 'archive' blendet Nennung/Status aus und zeigt stattdessen Ergebnisse.
-$rc_context    = isset( $context ) ? (string) $context : 'upcoming';
-$rc_is_archive = ( 'archive' === $rc_context );
+// Kontext pro Rennen am Datum (nicht am Tab): vergangene Rennen zeigen
+// „Ergebnisse"/„Zum Rennen" und keinen Status, kommende „Nennung" + Status.
+$rc_is_past = ! $race->is_upcoming();
 
-// Primärer Aktionslink – kontextabhängig:
-//   kommend        → „Nennung"    (Event-/Buchungsseite)
-//   Archiv (MyRCM) → „Ergebnisse" (MyRCM-Ergebnisansicht)
-//   Archiv (RCK)   → „Zum Rennen" (Ergebnisse bei RCK unklar)
+// Primärer Aktionslink:
+//   kommend         → „Nennung"    (Event-/Buchungsseite)
+//   vergangen MyRCM → „Ergebnisse" (MyRCM-Ergebnisansicht)
+//   vergangen RCK   → „Zum Rennen" (Ergebnisse bei RCK unklar)
 $event_url = $race->links['registration'] ?? '';
-if ( $rc_is_archive ) {
+if ( $rc_is_past ) {
 	if ( $race->is_rck() ) {
 		$primary_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
 		$primary_url   = $event_url;
@@ -80,7 +80,7 @@ $link_labels = array(
 				</span>
 			<?php endif; ?>
 
-			<?php if ( '' !== $race->status && ! $rc_is_archive ) : ?>
+			<?php if ( '' !== $race->status && ! $rc_is_past ) : ?>
 				<span class="rc-rcc__meta-item rc-rcc__status">
 					<?php echo esc_html( $race->status ); ?>
 				</span>

@@ -84,23 +84,43 @@
 	font-style: italic;
 }
 
-/* --- Archiv: Gruppierung nach Jahr --------------------------------------- */
+/* --- Jahres-Navigation (Pills) ------------------------------------------- */
 
-.rc-rcc__year {
-	margin: calc( var(--rc-rcc-gap) * 1.5 ) 0 var(--rc-rcc-gap);
-	padding-bottom: 0.3rem;
-	font-size: 1.15em;
+.rc-rcc__years {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin: 0 0 var(--rc-rcc-gap);
+}
+
+.rc-rcc__year-btn {
+	appearance: none;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-weight: 600;
+	line-height: 1;
+	padding: 0.35em 0.8em;
+	border: 1px solid var(--rc-rcc-border);
+	border-radius: 999px;
+	cursor: pointer;
+	opacity: 0.7;
+	transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.rc-rcc__year-btn:hover,
+.rc-rcc__year-btn:focus-visible {
+	opacity: 1;
+}
+
+.rc-rcc__year-btn.is-active {
+	opacity: 1;
+	border-color: currentColor;
 	font-weight: 700;
-	line-height: 1.2;
-	border-bottom: 2px solid var(--rc-rcc-border);
 }
 
-.rc-rcc__year:first-child {
-	margin-top: 0;
-}
-
-.rc-rcc__list--archive {
-	margin-bottom: var(--rc-rcc-gap);
+.rc-rcc__year-panel[hidden] {
+	display: none;
 }
 
 /* --- Einzelnes Rennen ---------------------------------------------------- */

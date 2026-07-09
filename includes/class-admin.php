@@ -134,11 +134,9 @@ class RC_RCC_Admin {
 		);
 
 		$fields = array(
-			'club_id'        => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
-			'upcoming_count' => __( 'Anzahl kommender Rennen', 'rc-racemap-club-calendar' ),
-			'archive_count'  => __( 'Anzahl Archiv-Rennen', 'rc-racemap-club-calendar' ),
-			'cache_ttl'      => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
-			'show_logo'      => __( 'RC RaceMap Logo anzeigen', 'rc-racemap-club-calendar' ),
+			'club_id'   => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
+			'cache_ttl' => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
+			'show_logo' => __( 'RC RaceMap Logo anzeigen', 'rc-racemap-club-calendar' ),
 		);
 
 		foreach ( $fields as $key => $label ) {
@@ -202,11 +200,9 @@ class RC_RCC_Admin {
 
 		$clean = array();
 
-		$clean['club_id']        = isset( $input['club_id'] ) ? sanitize_text_field( $input['club_id'] ) : '';
-		$clean['upcoming_count'] = isset( $input['upcoming_count'] ) ? absint( $input['upcoming_count'] ) : $defaults['upcoming_count'];
-		$clean['archive_count']  = isset( $input['archive_count'] ) ? absint( $input['archive_count'] ) : $defaults['archive_count'];
-		$clean['cache_ttl']      = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
-		$clean['show_logo']      = ! empty( $input['show_logo'] );
+		$clean['club_id']   = isset( $input['club_id'] ) ? sanitize_text_field( $input['club_id'] ) : '';
+		$clean['cache_ttl'] = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
+		$clean['show_logo'] = ! empty( $input['show_logo'] );
 
 		$clean['auto_update'] = ! empty( $input['auto_update'] );
 
@@ -246,17 +242,6 @@ class RC_RCC_Admin {
 					esc_attr( (string) $value )
 				);
 				echo '<p class="description">' . esc_html__( 'Die Organisator-ID deines Vereins bei MyRCM – die Nummer, die MyRCM deinem Verein zuweist (z. B. „16961"). Sie steht u. a. in der MyRCM-Adresse deiner Vereinsseite.', 'rc-racemap-club-calendar' ) . '</p>';
-				break;
-
-			case 'upcoming_count':
-			case 'archive_count':
-				printf(
-					'<input type="number" min="0" step="1" id="%1$s" name="%2$s" value="%3$s" class="small-text" />',
-					esc_attr( $id ),
-					esc_attr( $name ),
-					esc_attr( (string) (int) $value )
-				);
-				echo '<p class="description">' . esc_html__( '0 zeigt alle an.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'cache_ttl':

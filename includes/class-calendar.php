@@ -73,49 +73,72 @@ class RC_RCC_Calendar {
 	}
 
 	/**
-	 * Upcoming races, visibility-filtered, sorted ascending, limited.
+	 * Races of the current and future years, grouped by year.
 	 *
-	 * @return RC_RCC_Race[]
+	 * Years ascending (2026, 2027, …); each year's races ascending. Undated
+	 * races are treated as current-year so they still appear. For the
+	 * "Aktuelle Termine" tab.
+	 *
+	 * @return array<int, RC_RCC_Race[]> Year => races.
 	 */
-	public function upcoming_races(): array {
-		$limit = (int) RC_RCC_Plugin::get_setting( 'upcoming_count', 10 );
-		$races = $this->visible_races();
-
-		$upcoming = array_filter(
-			$races,
-			static fn( RC_RCC_Race $race ) => $race->is_upcoming()
-		);
-
-		// Soonest first.
-		usort(
-			$upcoming,
-			static fn( RC_RCC_Race $a, RC_RCC_Race $b ) => ( $a->timestamp ?? PHP_INT_MAX ) <=> ( $b->timestamp ?? PHP_INT_MAX )
-		);
-
-		return $this->limit( $upcoming, $limit );
+	public function current_groups(): array {
+		return $this->grouped_by_year( true );
 	}
 
 	/**
-	 * Past races (archive), visibility-filtered, sorted descending, limited.
+	 * Races of past years, grouped by year.
 	 *
-	 * @return RC_RCC_Race[]
+	 * Years descending (2025, 2024, …); each year's races descending. For the
+	 * archive tab.
+	 *
+	 * @return array<int, RC_RCC_Race[]> Year => races.
 	 */
-	public function archived_races(): array {
-		$limit = (int) RC_RCC_Plugin::get_setting( 'archive_count', 20 );
-		$races = $this->visible_races();
+	public function archive_groups(): array {
+		return $this->grouped_by_year( false );
+	}
 
-		$past = array_filter(
-			$races,
-			static fn( RC_RCC_Race $race ) => ! $race->is_upcoming()
-		);
+	/**
+	 * Group visible races into current-and-future years, or past years.
+	 *
+	 * @param bool $future True = current year and later; false = earlier years.
+	 * @return array<int, RC_RCC_Race[]>
+	 */
+	private function grouped_by_year( bool $future ): array {
+		$current = (int) wp_date( 'Y' );
+		$groups  = array();
 
-		// Most recent first.
-		usort(
-			$past,
-			static fn( RC_RCC_Race $a, RC_RCC_Race $b ) => ( $b->timestamp ?? 0 ) <=> ( $a->timestamp ?? 0 )
-		);
+		foreach ( $this->visible_races() as $race ) {
+			$year     = $race->year();
+			$year_int = ( '' === $year ) ? $current : (int) $year;
 
-		return $this->limit( $past, $limit );
+			if ( ( $year_int >= $current ) !== $future ) {
+				continue;
+			}
+
+			$groups[ $year_int ][] = $race;
+		}
+
+		// Ascending within current/future years, descending within past years.
+		foreach ( $groups as &$year_races ) {
+			usort(
+				$year_races,
+				static function ( RC_RCC_Race $a, RC_RCC_Race $b ) use ( $future ) {
+					$ta = $a->timestamp ?? ( $future ? PHP_INT_MAX : 0 );
+					$tb = $b->timestamp ?? ( $future ? PHP_INT_MAX : 0 );
+
+					return $future ? ( $ta <=> $tb ) : ( $tb <=> $ta );
+				}
+			);
+		}
+		unset( $year_races );
+
+		if ( $future ) {
+			ksort( $groups );
+		} else {
+			krsort( $groups );
+		}
+
+		return $groups;
 	}
 
 	/**
@@ -165,20 +188,5 @@ class RC_RCC_Calendar {
 				fn( RC_RCC_Race $race ) => $this->is_visible( $race->id )
 			)
 		);
-	}
-
-	/**
-	 * Limit a list, treating a non-positive limit as "no limit".
-	 *
-	 * @param RC_RCC_Race[] $races List of races.
-	 * @param int           $limit Maximum count.
-	 * @return RC_RCC_Race[]
-	 */
-	private function limit( array $races, int $limit ): array {
-		if ( $limit <= 0 ) {
-			return $races;
-		}
-
-		return array_slice( $races, 0, $limit );
 	}
 }

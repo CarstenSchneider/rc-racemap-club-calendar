@@ -1,17 +1,18 @@
 <?php
 /**
- * Template: Kalender-Wrapper mit zwei Tabs.
+ * Template: Kalender-Wrapper mit zwei Tabs und Jahres-Navigation.
  *
- * Beide Tabs werden serverseitig gerendert; das Umschalten passiert per JS
- * ohne Seitenreload. Ohne JavaScript bleiben beide Panels sichtbar (Fallback).
+ * Zwei Haupt-Tabs ("Aktuelle Termine" / "Archiv"); innerhalb jedes Tabs eine
+ * Jahres-Navigation (siehe year-groups.php). Alles serverseitig gerendert,
+ * Umschalten per JS ohne Reload.
  *
  * Vom Shortcode bereitgestellte Variablen:
  *
- * @var string          $uid       Eindeutige DOM-ID dieser Instanz.
- * @var RC_RCC_Race[]   $upcoming  Kommende Rennen.
- * @var RC_RCC_Race[]   $archived  Vergangene Rennen (Archiv).
- * @var bool            $show_logo RC-RaceMap-Logo anzeigen.
- * @var string          $logo_url  URL des Logos.
+ * @var string                     $uid            Eindeutige DOM-ID dieser Instanz.
+ * @var array<int, RC_RCC_Race[]>  $current_groups Aktuelle/künftige Jahre → Rennen.
+ * @var array<int, RC_RCC_Race[]>  $archive_groups Frühere Jahre → Rennen.
+ * @var bool                       $show_logo      RC-RaceMap-Logo anzeigen.
+ * @var string                     $logo_url       URL des Logos.
  *
  * @package RC_RaceMap_Club_Calendar
  */
@@ -24,12 +25,12 @@ defined( 'ABSPATH' ) || exit;
 			type="button"
 			class="rc-rcc__tab is-active"
 			role="tab"
-			id="<?php echo esc_attr( $uid ); ?>-tab-upcoming"
-			aria-controls="<?php echo esc_attr( $uid ); ?>-panel-upcoming"
+			id="<?php echo esc_attr( $uid ); ?>-tab-current"
+			aria-controls="<?php echo esc_attr( $uid ); ?>-panel-current"
 			aria-selected="true"
-			data-rc-rcc-tab="upcoming"
+			data-rc-rcc-tab="current"
 		>
-			<?php echo esc_html__( 'Kommende Rennen', 'rc-racemap-club-calendar' ); ?>
+			<?php echo esc_html__( 'Aktuelle Termine', 'rc-racemap-club-calendar' ); ?>
 		</button>
 		<button
 			type="button"
@@ -48,14 +49,15 @@ defined( 'ABSPATH' ) || exit;
 	<div
 		class="rc-rcc__panel is-active"
 		role="tabpanel"
-		id="<?php echo esc_attr( $uid ); ?>-panel-upcoming"
-		aria-labelledby="<?php echo esc_attr( $uid ); ?>-tab-upcoming"
-		data-rc-rcc-panel="upcoming"
+		id="<?php echo esc_attr( $uid ); ?>-panel-current"
+		aria-labelledby="<?php echo esc_attr( $uid ); ?>-tab-current"
+		data-rc-rcc-panel="current"
 	>
 		<?php
-		$races      = $upcoming;
-		$empty_text = __( 'Aktuell sind keine kommenden Rennen geplant.', 'rc-racemap-club-calendar' );
-		require RC_RCC_Shortcode::locate_template( 'upcoming.php' );
+		$groups      = $current_groups;
+		$group_scope = 'current';
+		$empty_text  = __( 'Aktuell sind keine Termine vorhanden.', 'rc-racemap-club-calendar' );
+		require RC_RCC_Shortcode::locate_template( 'year-groups.php' );
 		?>
 	</div>
 
@@ -68,9 +70,10 @@ defined( 'ABSPATH' ) || exit;
 		hidden
 	>
 		<?php
-		$races      = $archived;
-		$empty_text = __( 'Es sind noch keine vergangenen Rennen vorhanden.', 'rc-racemap-club-calendar' );
-		require RC_RCC_Shortcode::locate_template( 'archive.php' );
+		$groups      = $archive_groups;
+		$group_scope = 'archive';
+		$empty_text  = __( 'Es sind noch keine vergangenen Rennen vorhanden.', 'rc-racemap-club-calendar' );
+		require RC_RCC_Shortcode::locate_template( 'year-groups.php' );
 		?>
 	</div>
 

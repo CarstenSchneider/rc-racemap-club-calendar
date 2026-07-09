@@ -1,51 +1,49 @@
 /**
  * RC RaceMap Club Calendar – Frontend-Interaktion.
  *
- * Schaltet zwischen den Tabs "Kommende Rennen" und "Archiv" um, ohne die Seite
- * neu zu laden. Keine externen Abhängigkeiten. Mehrere Kalender-Instanzen auf
- * einer Seite werden unabhängig voneinander behandelt.
+ * Zwei Ebenen ohne Seitenreload:
+ *   1. Haupt-Tabs   „Aktuelle Termine" / „Archiv"
+ *   2. Jahres-Pills innerhalb jedes Tabs
+ *
+ * Keine externen Abhängigkeiten. Mehrere Kalender-Instanzen pro Seite werden
+ * unabhängig behandelt; die Jahres-Navigation ist auf ihr Tab-Panel begrenzt.
  *
  * @package RC_RaceMap_Club_Calendar
  */
 ( function () {
 	'use strict';
 
-	/**
-	 * Einen einzelnen Kalender initialisieren.
-	 *
-	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
-	 */
-	function initCalendar( root ) {
-		var tabs = Array.prototype.slice.call(
-			root.querySelectorAll( '[data-rc-rcc-tab]' )
-		);
-		var panels = Array.prototype.slice.call(
-			root.querySelectorAll( '[data-rc-rcc-panel]' )
-		);
+	function slice( nodeList ) {
+		return Array.prototype.slice.call( nodeList );
+	}
 
-		if ( ! tabs.length || ! panels.length ) {
+	/**
+	 * Wire a set of tab-like buttons to their panels (generic, reused for the
+	 * main tabs and the year navigation).
+	 *
+	 * @param {HTMLElement[]} buttons   Buttons carrying btnAttr.
+	 * @param {HTMLElement[]} panels    Panels carrying panelAttr.
+	 * @param {string}        btnAttr   Attribute holding a button's key.
+	 * @param {string}        panelAttr Attribute holding a panel's key.
+	 */
+	function wireGroup( buttons, panels, btnAttr, panelAttr ) {
+		if ( ! buttons.length || ! panels.length ) {
 			return;
 		}
 
-		/**
-		 * Einen Tab aktivieren und das zugehörige Panel anzeigen.
-		 *
-		 * @param {string}  name        Name des Ziel-Tabs.
-		 * @param {boolean} focusTab    Fokus auf den aktiven Tab setzen.
-		 */
-		function activate( name, focusTab ) {
-			tabs.forEach( function ( tab ) {
-				var isActive = tab.getAttribute( 'data-rc-rcc-tab' ) === name;
-				tab.classList.toggle( 'is-active', isActive );
-				tab.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
-				tab.setAttribute( 'tabindex', isActive ? '0' : '-1' );
-				if ( isActive && focusTab ) {
-					tab.focus();
+		function activate( name, focusButton ) {
+			buttons.forEach( function ( button ) {
+				var isActive = button.getAttribute( btnAttr ) === name;
+				button.classList.toggle( 'is-active', isActive );
+				button.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
+				button.setAttribute( 'tabindex', isActive ? '0' : '-1' );
+				if ( isActive && focusButton ) {
+					button.focus();
 				}
 			} );
 
 			panels.forEach( function ( panel ) {
-				var isActive = panel.getAttribute( 'data-rc-rcc-panel' ) === name;
+				var isActive = panel.getAttribute( panelAttr ) === name;
 				panel.classList.toggle( 'is-active', isActive );
 				if ( isActive ) {
 					panel.removeAttribute( 'hidden' );
@@ -55,46 +53,66 @@
 			} );
 		}
 
-		tabs.forEach( function ( tab, index ) {
-			tab.addEventListener( 'click', function () {
-				activate( tab.getAttribute( 'data-rc-rcc-tab' ), false );
+		buttons.forEach( function ( button, index ) {
+			button.addEventListener( 'click', function () {
+				activate( button.getAttribute( btnAttr ), false );
 			} );
 
-			// Tastaturnavigation (Pfeiltasten, Home/End) für ARIA-Tabs.
-			tab.addEventListener( 'keydown', function ( event ) {
+			button.addEventListener( 'keydown', function ( event ) {
 				var newIndex = null;
 
 				switch ( event.key ) {
 					case 'ArrowRight':
 					case 'ArrowDown':
-						newIndex = ( index + 1 ) % tabs.length;
+						newIndex = ( index + 1 ) % buttons.length;
 						break;
 					case 'ArrowLeft':
 					case 'ArrowUp':
-						newIndex = ( index - 1 + tabs.length ) % tabs.length;
+						newIndex = ( index - 1 + buttons.length ) % buttons.length;
 						break;
 					case 'Home':
 						newIndex = 0;
 						break;
 					case 'End':
-						newIndex = tabs.length - 1;
+						newIndex = buttons.length - 1;
 						break;
 					default:
 						return;
 				}
 
 				event.preventDefault();
-				activate( tabs[ newIndex ].getAttribute( 'data-rc-rcc-tab' ), true );
+				activate( buttons[ newIndex ].getAttribute( btnAttr ), true );
 			} );
 		} );
 	}
 
 	/**
-	 * Alle Kalender auf der Seite initialisieren.
+	 * Initialise a single calendar instance.
+	 *
+	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
 	 */
+	function initCalendar( root ) {
+		// Level 1: main tabs.
+		wireGroup(
+			slice( root.querySelectorAll( '[data-rc-rcc-tab]' ) ),
+			slice( root.querySelectorAll( '[data-rc-rcc-panel]' ) ),
+			'data-rc-rcc-tab',
+			'data-rc-rcc-panel'
+		);
+
+		// Level 2: year navigation, scoped to each main panel.
+		slice( root.querySelectorAll( '[data-rc-rcc-panel]' ) ).forEach( function ( panel ) {
+			wireGroup(
+				slice( panel.querySelectorAll( '[data-rc-rcc-year]' ) ),
+				slice( panel.querySelectorAll( '[data-rc-rcc-year-panel]' ) ),
+				'data-rc-rcc-year',
+				'data-rc-rcc-year-panel'
+			);
+		} );
+	}
+
 	function init() {
-		var roots = document.querySelectorAll( '[data-rc-rcc]' );
-		Array.prototype.forEach.call( roots, initCalendar );
+		slice( document.querySelectorAll( '[data-rc-rcc]' ) ).forEach( initCalendar );
 	}
 
 	if ( 'loading' === document.readyState ) {

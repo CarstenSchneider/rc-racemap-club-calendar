@@ -162,8 +162,6 @@ final class RC_RCC_Plugin {
 	public static function default_settings(): array {
 		return array(
 			'club_id'        => '',
-			'upcoming_count' => 10,
-			'archive_count'  => 0,
 			'cache_ttl'      => HOUR_IN_SECONDS,
 			'show_logo'      => true,
 			'update_token'   => '',
