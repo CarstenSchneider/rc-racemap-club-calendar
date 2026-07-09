@@ -310,61 +310,41 @@ class RC_RCC_Race {
 	}
 
 	/**
-	 * Compact date parts for the "date tile" UI.
+	 * Compact, single-line date for the list UI.
 	 *
-	 * Returns a big top line (day or day range) and a smaller sub line
-	 * (month + year), locale-aware via wp_date(). Keeps multi-day events on a
-	 * single readable line instead of an awkward two-line full-date range:
-	 *   - single day               → ["9",            "Juli 2026"]
-	 *   - multi-day, same month     → ["9–10",         "Juli 2026"]
-	 *   - multi-day, same year      → ["29 Jul – 2 Aug","2026"]
-	 *   - multi-day, spanning years → ["29 Dez 2025 –", "2 Jan 2026"]
+	 * Locale-aware via wp_date() with a short month, collapsing the shared
+	 * parts of a multi-day range so it stays on one readable line:
+	 *   - single day                → "24. Jan 2026"
+	 *   - multi-day, same month     → "24.–25. Jan 2026"
+	 *   - multi-day, same year      → "29. Jan – 2. Feb 2026"
+	 *   - multi-day, spanning years → "29. Dez 2025 – 2. Jan 2026"
 	 *
-	 * @return array{top: string, sub: string}
+	 * @return string
 	 */
-	public function date_tile(): array {
+	public function date_compact(): string {
 		if ( null === $this->timestamp ) {
-			return array(
-				'top' => $this->date_raw,
-				'sub' => '',
-			);
+			return $this->date_raw;
 		}
 
 		$start = $this->timestamp;
 		$end   = $this->timestamp_to ?? $this->timestamp;
 
-		$day_start   = wp_date( 'j', $start );
-		$month_start = wp_date( 'F', $start );
-		$year_start  = wp_date( 'Y', $start );
-
 		if ( ! $this->is_multi_day() ) {
-			return array(
-				'top' => $day_start,
-				'sub' => trim( $month_start . ' ' . $year_start ),
-			);
+			return wp_date( 'j. M Y', $start );
 		}
 
-		$month_end = wp_date( 'F', $end );
-		$year_end  = wp_date( 'Y', $end );
+		$same_month = wp_date( 'Y-m', $start ) === wp_date( 'Y-m', $end );
+		$same_year  = wp_date( 'Y', $start ) === wp_date( 'Y', $end );
 
-		if ( $month_start === $month_end && $year_start === $year_end ) {
-			return array(
-				'top' => $day_start . '–' . wp_date( 'j', $end ),
-				'sub' => trim( $month_start . ' ' . $year_start ),
-			);
+		if ( $same_month ) {
+			return wp_date( 'j', $start ) . '.–' . wp_date( 'j. M Y', $end );
 		}
 
-		if ( $year_start === $year_end ) {
-			return array(
-				'top' => wp_date( 'j M', $start ) . ' – ' . wp_date( 'j M', $end ),
-				'sub' => $year_start,
-			);
+		if ( $same_year ) {
+			return wp_date( 'j. M', $start ) . ' – ' . wp_date( 'j. M Y', $end );
 		}
 
-		return array(
-			'top' => wp_date( 'j M Y', $start ) . ' –',
-			'sub' => wp_date( 'j M Y', $end ),
-		);
+		return wp_date( 'j. M Y', $start ) . ' – ' . wp_date( 'j. M Y', $end );
 	}
 
 	/**
