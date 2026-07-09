@@ -67,12 +67,11 @@ class RC_RCC_Api {
 		$this->last_error = null;
 		$club_id          = trim( $club_id );
 
-		if ( '' === $club_id ) {
-			$this->last_error = new WP_Error( 'rc_rcc_missing_club', __( 'Keine Club-ID konfiguriert.', 'rc-racemap-club-calendar' ) );
-			return array();
-		}
-
-		$cache_key = 'events_' . $club_id;
+		// Note: an empty club ID is deliberately NOT rejected here. While the
+		// bundled sample data is active (RC RaceMap API not live yet) the
+		// calendar must still render, so the "missing club" error is only
+		// raised on the real-API path inside request_events().
+		$cache_key = 'events_' . ( '' !== $club_id ? $club_id : 'sample' );
 
 		if ( ! $force_refresh ) {
 			$cached = $this->cache->get( $cache_key );
@@ -125,6 +124,11 @@ class RC_RCC_Api {
 
 		if ( $use_sample ) {
 			return $this->load_sample_data();
+		}
+
+		// Real API path: a club ID is required.
+		if ( '' === $club_id ) {
+			return new WP_Error( 'rc_rcc_missing_club', __( 'Keine Club-ID konfiguriert.', 'rc-racemap-club-calendar' ) );
 		}
 
 		$url = trailingslashit( $this->base_url() ) . 'api/clubs/' . rawurlencode( $club_id );
@@ -268,6 +272,66 @@ class RC_RCC_Api {
 			return new WP_Error( 'rc_rcc_bad_sample', __( 'Die Beispieldaten-Datei enthält kein gültiges JSON.', 'rc-racemap-club-calendar' ) );
 		}
 
-		return $this->extract_events( $data );
+		return $this->relative_sample_dates( $this->extract_events( $data ) );
+	}
+
+	/**
+	 * Spread the sample events' dates around "today".
+	 *
+	 * The bundled sample data has fixed calendar dates, so depending on the
+	 * server clock every event could end up in the past (empty "upcoming" tab)
+	 * or the future (empty "archive"). To keep the demo meaningful on any date,
+	 * the events are re-dated symmetrically around the current day while
+	 * preserving each event's own duration (single- vs multi-day).
+	 *
+	 * Only affects the bundled sample data, never the live API.
+	 *
+	 * @param array<int, array<string, mixed>> $events Extracted sample events.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function relative_sample_dates( array $events ): array {
+		$count = count( $events );
+		if ( 0 === $count ) {
+			return $events;
+		}
+
+		// Sort event indexes by their original start date (ascending), so the
+		// original chronological order is preserved after re-dating.
+		$order = array();
+		foreach ( $events as $i => $event ) {
+			$from       = isset( $event['from'] ) ? strtotime( (string) $event['from'] ) : false;
+			$order[ $i ] = ( false !== $from ) ? $from : 0;
+		}
+		asort( $order );
+		$sorted_indexes = array_keys( $order );
+
+		// Offsets in days, evenly spread from -75 (past) to +60 (future).
+		$start_offset = -75;
+		$end_offset   = 60;
+		$span         = $end_offset - $start_offset;
+
+		$position = 0;
+		foreach ( $sorted_indexes as $index ) {
+			$offset_days = ( $count > 1 )
+				? (int) round( $start_offset + ( $span * $position / ( $count - 1 ) ) )
+				: 0;
+
+			// Preserve the event's own duration.
+			$from_ts  = isset( $events[ $index ]['from'] ) ? strtotime( (string) $events[ $index ]['from'] ) : false;
+			$to_ts    = isset( $events[ $index ]['to'] ) ? strtotime( (string) $events[ $index ]['to'] ) : false;
+			$duration = ( false !== $from_ts && false !== $to_ts && $to_ts > $from_ts )
+				? (int) round( ( $to_ts - $from_ts ) / DAY_IN_SECONDS )
+				: 0;
+
+			$new_from = strtotime( $offset_days . ' days', current_time( 'timestamp' ) ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Sample data only.
+			$new_to   = strtotime( '+' . $duration . ' days', $new_from );
+
+			$events[ $index ]['from'] = gmdate( 'Y-m-d', $new_from );
+			$events[ $index ]['to']   = gmdate( 'Y-m-d', $new_to );
+
+			$position++;
+		}
+
+		return $events;
 	}
 }

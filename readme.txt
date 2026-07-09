@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,10 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.4 =
+* Fehlerbehebung: Der Kalender zeigte ohne eingetragene Club-ID gar keine Rennen. Im Beispieldaten-Modus wird jetzt immer gerendert; der „Keine Club-ID"-Fehler greift nur noch beim echten API-Zugriff.
+* Beispieldaten erhalten datumsrelative Termine (immer einige kommende und vergangene Rennen, unabhängig vom Serverdatum).
 
 = 1.0.3 =
 * Einstellungsfeld korrekt als „MyRCM Organisator-ID" beschriftet (Vereine kennen ihre MyRCM-ID, keine RaceMap-Slugs). Beschreibung mit Beispiel ergänzt.
