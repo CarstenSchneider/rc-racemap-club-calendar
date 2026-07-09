@@ -101,7 +101,9 @@
 
 .rc-rcc__date {
 	font-weight: 700;
-	white-space: nowrap;
+	/* Lange Datumsbereiche (mehrtägige Rennen) umbrechen lassen, statt in die
+	   Titelspalte zu laufen. */
+	overflow-wrap: break-word;
 }
 
 .rc-rcc__body {
@@ -233,8 +235,8 @@
 	}
 
 	.rc-rcc__date {
-		flex: 0 0 8rem;
-		max-width: 8rem;
+		flex: 0 0 10rem;
+		max-width: 10rem;
 	}
 
 	.rc-rcc__body {
