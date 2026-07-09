@@ -155,6 +155,45 @@ class RC_RCC_Shortcode {
 	}
 
 	/**
+	 * Return an inline SVG icon by name.
+	 *
+	 * Icons are theme-neutral line icons that inherit the surrounding text
+	 * colour via `currentColor`. Kept inline (no external icon library) per the
+	 * plugin's "no frontend dependencies" rule. The returned markup is a fixed,
+	 * developer-authored constant and therefore safe to echo unescaped.
+	 *
+	 * @param string $name Icon name.
+	 * @return string SVG markup, or '' for an unknown name.
+	 */
+	public static function icon( string $name ): string {
+		$open  = '<svg class="rc-rcc__icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
+		$close = '</svg>';
+
+		$paths = array(
+			// Nennung / registration – clipboard with a check.
+			'registration' => '<path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 6H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2"/><path d="m9 14 2 2 4-4"/>',
+			// Ergebnisse / results – trophy.
+			'results'      => '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+			// Zum Rennen – external link.
+			'external'     => '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+			// Teilnehmer / participants – people.
+			'users'        => '<path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3"/><path d="M21 20v-1a4 4 0 0 0-3-3.87M16 5.13A3 3 0 0 1 16 11"/>',
+			// Ausschreibung / announcement – document with lines.
+			'announcement' => '<path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h6M9 9h1"/>',
+			// Reglement / regulations – book.
+			'regulations'  => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 0 2 2h13"/><path d="M9 7h6"/>',
+			// Sonstiges Dokument – file.
+			'document'     => '<path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/>',
+		);
+
+		if ( ! isset( $paths[ $name ] ) ) {
+			return '';
+		}
+
+		return $open . $paths[ $name ] . $close;
+	}
+
+	/**
 	 * Locate a template, allowing themes to override it.
 	 *
 	 * Themes can override any template by placing a file at

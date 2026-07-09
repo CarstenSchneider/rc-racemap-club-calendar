@@ -27,6 +27,23 @@
 	box-sizing: inherit;
 }
 
+/* Listen-Reset mit erhöhter Spezifität, damit Theme-Regeln wie
+   `.entry-content ul { padding-left: 2em }` die Kalenderlisten nicht einrücken. */
+.rc-rcc .rc-rcc__list,
+.rc-rcc .rc-rcc__years,
+.rc-rcc .rc-rcc__classes,
+.rc-rcc .rc-rcc__links {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-indent: 0;
+}
+
+.rc-rcc__icon {
+	flex: 0 0 auto;
+	vertical-align: -0.15em;
+}
+
 /* --- Tabs ---------------------------------------------------------------- */
 
 .rc-rcc__tabs {
@@ -138,11 +155,26 @@
 	padding-bottom: 0;
 }
 
-.rc-rcc__date {
+/* Kompakte Datums-Kachel: Tag(-Bereich) groß, Monat/Jahr klein darunter. */
+.rc-rcc__date-tile {
+	display: inline-flex;
+	flex-direction: column;
+	line-height: 1.1;
+	text-decoration: none;
+	color: inherit;
+}
+
+.rc-rcc__date-top {
+	font-size: 1.4em;
 	font-weight: 700;
-	/* Lange Datumsbereiche (mehrtägige Rennen) umbrechen lassen, statt in die
-	   Titelspalte zu laufen. */
-	overflow-wrap: break-word;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+}
+
+.rc-rcc__date-sub {
+	font-size: 0.82em;
+	font-weight: 600;
+	color: var(--rc-rcc-muted);
 }
 
 .rc-rcc__body {
@@ -152,16 +184,61 @@
 	min-width: 0;
 }
 
+/* Titelzeile + Status-Badge nebeneinander. */
+.rc-rcc__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.35rem 0.6rem;
+}
+
 .rc-rcc__title {
 	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
 	font-size: 1.05em;
 	line-height: 1.3;
+}
+
+/* --- Status-Badge (vorbei / aktiv) --------------------------------------- */
+
+.rc-rcc__badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	flex: 0 0 auto;
+	font-size: 0.72em;
+	font-weight: 700;
+	line-height: 1;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	padding: 0.35em 0.6em;
+	border-radius: 999px;
+	white-space: nowrap;
+}
+
+/* Aktive Nennung: kräftig gefüllt – zieht den Blick auf laufende Rennen. */
+.rc-rcc__badge--open {
+	background: var(--rc-rcc-accent, currentColor);
+	color: var(--rc-rcc-on-accent, Canvas);
+}
+
+.rc-rcc__badge--closed,
+.rc-rcc__badge--soon {
+	background: color-mix( in srgb, currentColor 12%, transparent );
+	color: var(--rc-rcc-muted);
+}
+
+.rc-rcc__badge--past {
+	border: 1px solid var(--rc-rcc-border);
+	color: var(--rc-rcc-muted);
 }
 
 .rc-rcc__meta {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.35rem 0.75rem;
+	align-items: center;
+	gap: 0.35rem 0.6rem;
 	font-size: 0.9em;
 	color: var(--rc-rcc-muted);
 }
@@ -169,18 +246,20 @@
 .rc-rcc__meta-item {
 	display: inline-flex;
 	align-items: center;
+	gap: 0.3em;
 }
 
-/* Trennpunkt zwischen Meta-Angaben, ohne eigene Farben. */
-.rc-rcc__meta-item + .rc-rcc__meta-item::before {
-	content: "";
-	display: inline-block;
-	width: 3px;
-	height: 3px;
-	margin-right: 0.75rem;
-	border-radius: 50%;
-	background: currentColor;
-	opacity: 0.5;
+.rc-rcc__participants-count {
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+}
+
+/* Serie als dezenter Chip. */
+.rc-rcc__series {
+	font-weight: 600;
+	padding: 0.15em 0.5em;
+	border: 1px solid var(--rc-rcc-border);
+	border-radius: 999px;
 }
 
 /* --- Rennklassen --------------------------------------------------------- */
@@ -211,11 +290,6 @@
 	opacity: 0.7;
 }
 
-/* Serien-Angabe in der Meta-Zeile, hervorgehoben ohne eigene Farbe. */
-.rc-rcc__series {
-	font-weight: 600;
-}
-
 /* --- Aktionslinks -------------------------------------------------------- */
 
 .rc-rcc__links {
@@ -225,19 +299,53 @@
 	margin-top: 0.15rem;
 }
 
+/* Basis: gefüllter Button (dezent getönt), nicht mehr nur heller Rahmen. */
 .rc-rcc__link {
-	display: inline-block;
-	padding: 0.4em 0.85em;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+	padding: 0.5em 0.85em;
 	font-size: 0.9em;
-	line-height: 1.2;
-	border: 1px solid currentColor;
+	font-weight: 600;
+	line-height: 1.15;
+	border: 1px solid transparent;
 	border-radius: var(--rc-rcc-radius);
+	background: color-mix( in srgb, currentColor 10%, transparent );
+	color: inherit;
 	text-decoration: none;
+	transition: background-color 0.15s ease, filter 0.15s ease;
 }
 
 .rc-rcc__link:hover,
 .rc-rcc__link:focus-visible {
-	text-decoration: underline;
+	background: color-mix( in srgb, currentColor 20%, transparent );
+	text-decoration: none;
+}
+
+/* Primär (vergangene Rennen: Ergebnisse / Zum Rennen) – etwas kräftiger. */
+.rc-rcc__link--primary {
+	background: color-mix( in srgb, currentColor 18%, transparent );
+}
+
+/* Call-to-Action: der Nennung-Button – voll gefüllt, sticht klar heraus. */
+.rc-rcc__link--cta {
+	background: var(--rc-rcc-accent, currentColor);
+	color: var(--rc-rcc-on-accent, Canvas);
+}
+
+.rc-rcc__link--cta:hover,
+.rc-rcc__link--cta:focus-visible {
+	background: var(--rc-rcc-accent, currentColor);
+	filter: brightness( 1.12 );
+}
+
+/* --- Zustand: vergangene vs. aktive Rennen ------------------------------- */
+
+/* Vergangene Rennen dezent zurücknehmen (Aktionen bleiben lesbar). */
+.rc-rcc__item--past .rc-rcc__date-tile,
+.rc-rcc__item--past .rc-rcc__title,
+.rc-rcc__item--past .rc-rcc__meta {
+	opacity: 0.6;
 }
 
 /* --- Footer / Logo ------------------------------------------------------- */
@@ -274,8 +382,8 @@
 	}
 
 	.rc-rcc__date {
-		flex: 0 0 10rem;
-		max-width: 10rem;
+		flex: 0 0 6rem;
+		max-width: 6rem;
 	}
 
 	.rc-rcc__body {
@@ -283,10 +391,36 @@
 	}
 }
 
-/* Ältere Browser ohne color-mix: sichtbarer Fallback für Trennlinien. */
+/* Ältere Browser ohne color-mix: sichtbare Fallbacks für Linien, Flächen und
+   die gefüllten Buttons/Badges (sonst wären sie transparent/unsichtbar). */
 @supports not ( color: color-mix( in srgb, currentColor 20%, transparent ) ) {
 	.rc-rcc {
 		--rc-rcc-border: rgba( 128, 128, 128, 0.35 );
 		--rc-rcc-muted: rgba( 128, 128, 128, 0.9 );
+	}
+
+	.rc-rcc__link,
+	.rc-rcc__link--primary {
+		background: rgba( 128, 128, 128, 0.14 );
+		border-color: var(--rc-rcc-border);
+	}
+
+	.rc-rcc__link:hover,
+	.rc-rcc__link:focus-visible {
+		background: rgba( 128, 128, 128, 0.24 );
+	}
+
+	.rc-rcc__badge--closed,
+	.rc-rcc__badge--soon {
+		background: rgba( 128, 128, 128, 0.14 );
+	}
+}
+
+/* Ältere Browser ohne die System-Farbe „Canvas": CTA/Badge bekommen dennoch
+   lesbaren Kontrast (heller Text auf currentColor-Fläche). */
+@supports not ( color: Canvas ) {
+	.rc-rcc__link--cta,
+	.rc-rcc__badge--open {
+		color: #fff;
 	}
 }

@@ -104,6 +104,15 @@ class RC_RCC_Race {
 	public string $status = '';
 
 	/**
+	 * Raw registration status enum: "open" | "closed" | "upcoming" | "".
+	 * Kept separate from the human-readable {@see $status} so the UI can style
+	 * states (open/closed) independently of the display text/locale.
+	 *
+	 * @var string
+	 */
+	public string $registration_status = '';
+
+	/**
 	 * Participant count (optional). Null when unknown.
 	 *
 	 * @var int|null
@@ -187,9 +196,10 @@ class RC_RCC_Race {
 			$race->timestamp_to = $race->timestamp;
 		}
 
-		$race->series            = self::normalise_series( $data['series'] ?? null );
-		$race->classes           = self::normalise_classes( $data['classes'] ?? null );
-		$race->status            = self::derive_status( $data );
+		$race->series               = self::normalise_series( $data['series'] ?? null );
+		$race->classes              = self::normalise_classes( $data['classes'] ?? null );
+		$race->status               = self::derive_status( $data );
+		$race->registration_status  = strtolower( self::first_string( $data, array( 'registrationStatus' ) ) );
 		$race->participant_count = self::derive_participant_count( $data );
 		$race->links             = self::derive_links( $data );
 		$race->extra_links       = self::derive_extra_documents( $data );
@@ -288,6 +298,73 @@ class RC_RCC_Race {
 		return null !== $this->timestamp
 			&& null !== $this->timestamp_to
 			&& $this->timestamp_to > $this->timestamp;
+	}
+
+	/**
+	 * Whether registration is currently open.
+	 *
+	 * @return bool
+	 */
+	public function is_registration_open(): bool {
+		return 'open' === $this->registration_status;
+	}
+
+	/**
+	 * Compact date parts for the "date tile" UI.
+	 *
+	 * Returns a big top line (day or day range) and a smaller sub line
+	 * (month + year), locale-aware via wp_date(). Keeps multi-day events on a
+	 * single readable line instead of an awkward two-line full-date range:
+	 *   - single day               → ["9",            "Juli 2026"]
+	 *   - multi-day, same month     → ["9–10",         "Juli 2026"]
+	 *   - multi-day, same year      → ["29 Jul – 2 Aug","2026"]
+	 *   - multi-day, spanning years → ["29 Dez 2025 –", "2 Jan 2026"]
+	 *
+	 * @return array{top: string, sub: string}
+	 */
+	public function date_tile(): array {
+		if ( null === $this->timestamp ) {
+			return array(
+				'top' => $this->date_raw,
+				'sub' => '',
+			);
+		}
+
+		$start = $this->timestamp;
+		$end   = $this->timestamp_to ?? $this->timestamp;
+
+		$day_start   = wp_date( 'j', $start );
+		$month_start = wp_date( 'F', $start );
+		$year_start  = wp_date( 'Y', $start );
+
+		if ( ! $this->is_multi_day() ) {
+			return array(
+				'top' => $day_start,
+				'sub' => trim( $month_start . ' ' . $year_start ),
+			);
+		}
+
+		$month_end = wp_date( 'F', $end );
+		$year_end  = wp_date( 'Y', $end );
+
+		if ( $month_start === $month_end && $year_start === $year_end ) {
+			return array(
+				'top' => $day_start . '–' . wp_date( 'j', $end ),
+				'sub' => trim( $month_start . ' ' . $year_start ),
+			);
+		}
+
+		if ( $year_start === $year_end ) {
+			return array(
+				'top' => wp_date( 'j M', $start ) . ' – ' . wp_date( 'j M', $end ),
+				'sub' => $year_start,
+			);
+		}
+
+		return array(
+			'top' => wp_date( 'j M Y', $start ) . ' –',
+			'sub' => wp_date( 'j M Y', $end ),
+		);
 	}
 
 	/**
