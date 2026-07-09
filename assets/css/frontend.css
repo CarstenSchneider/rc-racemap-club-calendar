@@ -14,7 +14,11 @@
 	--rc-rcc-radius: 4px;
 	/* Dezente, aus der Theme-Textfarbe abgeleitete Trennlinien. */
 	--rc-rcc-border: color-mix( in srgb, currentColor 20%, transparent );
-	--rc-rcc-muted: color-mix( in srgb, currentColor 65%, transparent );
+	--rc-rcc-muted: color-mix( in srgb, currentColor 55%, transparent );
+	/* Akzentfarbe: standardmäßig die Theme-Textfarbe; frontend.js setzt sie zur
+	   Laufzeit auf die Theme-Linkfarbe (so „erbt" der Kalender die Vereinsfarbe).
+	   Per --rc-rcc-accent überschreibbar. --rc-rcc-on-accent = Text auf Fläche. */
+	--rc-rcc-accent: currentColor;
 
 	font: inherit;
 	color: inherit;
@@ -31,8 +35,7 @@
    `.entry-content ul { padding-left: 2em }` die Kalenderlisten nicht einrücken. */
 .rc-rcc .rc-rcc__list,
 .rc-rcc .rc-rcc__years,
-.rc-rcc .rc-rcc__classes,
-.rc-rcc .rc-rcc__links {
+.rc-rcc .rc-rcc__classes {
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -92,7 +95,7 @@
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 0.6rem;
+	gap: 1.75rem;
 }
 
 .rc-rcc__empty {
@@ -140,175 +143,192 @@
 	display: none;
 }
 
-/* --- Einzelnes Rennen (kompakte Karte) ----------------------------------- */
+/* --- Einzelnes Rennen (Zeile: Datum · Inhalt · Teilnehmer · Aktion) ------- */
 
 .rc-rcc__item {
-	display: flex;
-	flex-direction: column;
-	gap: 0.45rem;
-	padding: 0.85rem 1rem;
-	border: 1px solid var(--rc-rcc-border);
-	border-radius: 10px;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.6rem;
 }
 
-/* Oberzeile: Datum links, Status rechts – beide klein und ruhig. */
-.rc-rcc__top {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.5rem 0.75rem;
-	font-size: 0.8em;
-	font-weight: 600;
-}
-
+/* Datum: numerisch, fett. Kommend = Akzent, vergangen = grau. */
 .rc-rcc__date {
-	color: var(--rc-rcc-muted);
+	font-size: 0.95em;
+	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
+	line-height: 1.3;
 }
 
 .rc-rcc__date time {
-	text-decoration: none;
 	color: inherit;
+	text-decoration: none;
 }
 
-/* --- Status-Badge (vorbei / aktiv) --------------------------------------- */
-
-.rc-rcc__badge {
-	flex: 0 0 auto;
-	font-size: 0.92em;
-	font-weight: 700;
-	line-height: 1;
-	letter-spacing: 0.02em;
-	padding: 0.32em 0.6em;
-	border-radius: 999px;
-	white-space: nowrap;
+.rc-rcc__item--upcoming .rc-rcc__date {
+	color: var(--rc-rcc-accent);
 }
 
-/* Aktive Nennung: kräftig gefüllt – zieht den Blick auf laufende Rennen. */
-.rc-rcc__badge--open {
-	background: var(--rc-rcc-accent, currentColor);
-	color: var(--rc-rcc-on-accent, Canvas);
-}
-
-.rc-rcc__badge--closed,
-.rc-rcc__badge--soon {
-	background: color-mix( in srgb, currentColor 12%, transparent );
+.rc-rcc__item--past .rc-rcc__date {
 	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc__badge--past {
-	border: 1px solid var(--rc-rcc-border);
-	color: var(--rc-rcc-muted);
+/* Leere Teilnehmer-/Aktionsspalten erzeugen keine Abstände. */
+.rc-rcc__ppl:empty,
+.rc-rcc__action:empty {
+	display: none;
 }
 
-/* Titel: die einzige große, fette Zeile. */
+/* Hauptspalte: Titel, Klassen, Dokumente. */
+.rc-rcc__main {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	min-width: 0;
+}
+
 .rc-rcc__title {
 	margin: 0;
-	min-width: 0;
 	font-size: 1.05em;
 	font-weight: 700;
 	line-height: 1.25;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
 }
 
-/* Unterzeile: Teilnehmerzahl + Klassen als ruhige Textliste. */
-.rc-rcc__sub {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.2rem 0.5rem;
-	font-size: 0.85em;
+.rc-rcc__item--upcoming .rc-rcc__title {
+	color: var(--rc-rcc-accent);
+}
+
+.rc-rcc__item--past .rc-rcc__title {
 	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc__participants {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.3em;
-	font-weight: 600;
-	font-variant-numeric: tabular-nums;
-	white-space: nowrap;
-}
-
-.rc-rcc__sub-sep {
-	opacity: 0.5;
-}
-
-/* Klassen als Inline-Liste, durch Mittelpunkte getrennt (statt Chip-Kästchen). */
+/* Klassen als gefüllte Pillen (Akzent bzw. grau, heller Text). */
 .rc-rcc__classes {
-	display: inline;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
 }
 
 .rc-rcc__class {
-	display: inline;
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.35em;
+	font-size: 0.8em;
+	line-height: 1;
+	padding: 0.4em 0.75em;
+	border-radius: 999px;
+	color: var(--rc-rcc-on-accent, Canvas);
 }
 
-.rc-rcc__class + .rc-rcc__class::before {
-	content: "·";
-	margin: 0 0.35em;
-	opacity: 0.5;
+.rc-rcc__item--upcoming .rc-rcc__class {
+	background: var(--rc-rcc-accent);
+}
+
+.rc-rcc__item--past .rc-rcc__class {
+	background: var(--rc-rcc-muted);
 }
 
 .rc-rcc__class-entries {
 	font-variant-numeric: tabular-nums;
-	opacity: 0.65;
-	margin-left: 0.25em;
+	opacity: 0.8;
 }
 
-/* --- Aktionslinks -------------------------------------------------------- */
-
-.rc-rcc__links {
+/* Dokumente: Text-Links untereinander. */
+.rc-rcc__docs {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.45rem;
-	margin-top: 0.1rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
+	font-size: 0.9em;
 }
 
-/* Basis: gefüllter Button (dezent getönt), nicht mehr nur heller Rahmen. */
-.rc-rcc__link {
+.rc-rcc__doc {
+	text-decoration: underline;
+}
+
+.rc-rcc__item--upcoming .rc-rcc__doc {
+	color: var(--rc-rcc-accent);
+}
+
+.rc-rcc__item--past .rc-rcc__doc {
+	color: var(--rc-rcc-muted);
+}
+
+/* Teilnehmerzahl (Icon + Zahl); die Zahl verlinkt die Teilnehmerliste. */
+.rc-rcc__ppl-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4em;
-	padding: 0.45em 0.8em;
-	font-size: 0.85em;
-	font-weight: 600;
-	line-height: 1.15;
-	border: 1px solid transparent;
-	border-radius: 6px;
-	background: color-mix( in srgb, currentColor 9%, transparent );
+	font-size: 1.05em;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 	color: inherit;
 	text-decoration: none;
-	transition: background-color 0.15s ease, filter 0.15s ease;
 }
 
-.rc-rcc__link:hover,
-.rc-rcc__link:focus-visible {
-	background: color-mix( in srgb, currentColor 18%, transparent );
-	text-decoration: none;
+.rc-rcc__ppl-count {
+	text-decoration: underline;
 }
 
-/* Primär (vergangene Rennen: Ergebnisse / Zum Rennen) – etwas kräftiger. */
-.rc-rcc__link--primary {
-	background: color-mix( in srgb, currentColor 17%, transparent );
+.rc-rcc__item--past .rc-rcc__ppl-link {
+	color: var(--rc-rcc-muted);
 }
 
-/* Call-to-Action: der Nennung-Button – voll gefüllt, sticht klar heraus. */
-.rc-rcc__link--cta {
-	background: var(--rc-rcc-accent, currentColor);
+/* Aktions-Button rechts: Nennung (Akzent) bzw. Ergebnis/Zum Rennen (grau). */
+.rc-rcc__cta {
+	display: inline-block;
+	padding: 0.5em 1em;
+	font-size: 0.9em;
+	font-weight: 700;
+	line-height: 1.2;
+	border-radius: 6px;
+	white-space: nowrap;
+	text-decoration: underline;
 	color: var(--rc-rcc-on-accent, Canvas);
 }
 
-.rc-rcc__link--cta:hover,
-.rc-rcc__link--cta:focus-visible {
-	background: var(--rc-rcc-accent, currentColor);
-	filter: brightness( 1.12 );
+.rc-rcc__cta--upcoming {
+	background: var(--rc-rcc-accent);
 }
 
-/* --- Zustand: vergangene vs. aktive Rennen ------------------------------- */
+.rc-rcc__cta--past {
+	background: var(--rc-rcc-muted);
+}
 
-/* Vergangene Rennen dezent zurücknehmen (Aktionen bleiben lesbar). */
-.rc-rcc__item--past .rc-rcc__title {
-	opacity: 0.72;
+.rc-rcc__cta:hover,
+.rc-rcc__cta:focus-visible {
+	filter: brightness( 1.1 );
+}
+
+/* Desktop: vierspaltige Zeile. Datum, Teilnehmer und Button oben ausgerichtet. */
+@media ( min-width: 720px ) {
+	.rc-rcc__item {
+		grid-template-columns: 9rem minmax( 0, 1fr ) auto auto;
+		grid-template-areas: "date main ppl action";
+		align-items: start;
+		column-gap: 1.5rem;
+		gap: 1.5rem;
+	}
+
+	.rc-rcc__date {
+		grid-area: date;
+	}
+
+	.rc-rcc__main {
+		grid-area: main;
+	}
+
+	.rc-rcc__ppl {
+		grid-area: ppl;
+		text-align: right;
+	}
+
+	.rc-rcc__action {
+		grid-area: action;
+	}
 }
 
 /* --- Footer / Logo ------------------------------------------------------- */
@@ -343,29 +363,13 @@
 		--rc-rcc-border: rgba( 128, 128, 128, 0.35 );
 		--rc-rcc-muted: rgba( 128, 128, 128, 0.9 );
 	}
-
-	.rc-rcc__link,
-	.rc-rcc__link--primary {
-		background: rgba( 128, 128, 128, 0.14 );
-		border-color: var(--rc-rcc-border);
-	}
-
-	.rc-rcc__link:hover,
-	.rc-rcc__link:focus-visible {
-		background: rgba( 128, 128, 128, 0.24 );
-	}
-
-	.rc-rcc__badge--closed,
-	.rc-rcc__badge--soon {
-		background: rgba( 128, 128, 128, 0.14 );
-	}
 }
 
-/* Ältere Browser ohne die System-Farbe „Canvas": CTA/Badge bekommen dennoch
-   lesbaren Kontrast (heller Text auf currentColor-Fläche). */
+/* Ältere Browser ohne die System-Farbe „Canvas": heller Text auf den
+   gefüllten Flächen (Klassen-Pillen, Nennung-/Ergebnis-Button). */
 @supports not ( color: Canvas ) {
-	.rc-rcc__link--cta,
-	.rc-rcc__badge--open {
+	.rc-rcc__class,
+	.rc-rcc__cta {
 		color: #fff;
 	}
 }

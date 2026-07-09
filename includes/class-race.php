@@ -310,14 +310,13 @@ class RC_RCC_Race {
 	}
 
 	/**
-	 * Compact, single-line date for the list UI.
+	 * Compact, single-line numeric date for the list UI.
 	 *
-	 * Locale-aware via wp_date() with a short month, collapsing the shared
-	 * parts of a multi-day range so it stays on one readable line:
-	 *   - single day                → "24. Jan 2026"
-	 *   - multi-day, same month     → "24.–25. Jan 2026"
-	 *   - multi-day, same year      → "29. Jan – 2. Feb 2026"
-	 *   - multi-day, spanning years → "29. Dez 2025 – 2. Jan 2026"
+	 * Zero-padded day/month, collapsing the shared parts of a multi-day range:
+	 *   - single day                → "04.07.2026"
+	 *   - multi-day, same month     → "04-05.07.2026"
+	 *   - multi-day, same year      → "28.07.-02.08.2026"
+	 *   - multi-day, spanning years → "30.12.2025-02.01.2026"
 	 *
 	 * @return string
 	 */
@@ -330,21 +329,21 @@ class RC_RCC_Race {
 		$end   = $this->timestamp_to ?? $this->timestamp;
 
 		if ( ! $this->is_multi_day() ) {
-			return wp_date( 'j. M Y', $start );
+			return wp_date( 'd.m.Y', $start );
 		}
 
 		$same_month = wp_date( 'Y-m', $start ) === wp_date( 'Y-m', $end );
 		$same_year  = wp_date( 'Y', $start ) === wp_date( 'Y', $end );
 
 		if ( $same_month ) {
-			return wp_date( 'j', $start ) . '.–' . wp_date( 'j. M Y', $end );
+			return wp_date( 'd', $start ) . '-' . wp_date( 'd.m.Y', $end );
 		}
 
 		if ( $same_year ) {
-			return wp_date( 'j. M', $start ) . ' – ' . wp_date( 'j. M Y', $end );
+			return wp_date( 'd.m.', $start ) . '-' . wp_date( 'd.m.Y', $end );
 		}
 
-		return wp_date( 'j. M Y', $start ) . ' – ' . wp_date( 'j. M Y', $end );
+		return wp_date( 'd.m.Y', $start ) . '-' . wp_date( 'd.m.Y', $end );
 	}
 
 	/**

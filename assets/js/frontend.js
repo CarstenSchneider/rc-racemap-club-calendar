@@ -87,11 +87,39 @@
 	}
 
 	/**
+	 * Derive the accent colour from the active theme's link colour and expose
+	 * it as --rc-rcc-accent on the calendar root. This lets the calendar "inherit"
+	 * the club's brand colour (link colour) without hard-coding a value. Falls
+	 * back silently to the CSS default (currentColor) if anything is off.
+	 *
+	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
+	 */
+	function applyThemeAccent( root ) {
+		try {
+			var probe = document.createElement( 'a' );
+			probe.href = '#';
+			probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
+			root.appendChild( probe );
+
+			var color = window.getComputedStyle( probe ).color;
+			root.removeChild( probe );
+
+			if ( color ) {
+				root.style.setProperty( '--rc-rcc-accent', color );
+			}
+		} catch ( e ) {
+			// Ignore – CSS fallback (currentColor) stays in effect.
+		}
+	}
+
+	/**
 	 * Initialise a single calendar instance.
 	 *
 	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
 	 */
 	function initCalendar( root ) {
+		applyThemeAccent( root );
+
 		// Level 1: main tabs.
 		wireGroup(
 			slice( root.querySelectorAll( '[data-rc-rcc-tab]' ) ),

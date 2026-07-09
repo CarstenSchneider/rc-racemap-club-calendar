@@ -2,6 +2,10 @@
 /**
  * Template: Darstellung eines einzelnen Rennens.
  *
+ * Zeilen-Layout (Desktop, vierspaltig): Datum · Titel+Klassen+Dokumente ·
+ * Teilnehmer · Aktions-Button. Kommende Rennen in der Akzentfarbe (aus der
+ * Theme-Linkfarbe abgeleitet), vergangene gedämpft/grau.
+ *
  * @var RC_RCC_Race $race Das anzuzeigende Rennen.
  *
  * @package RC_RaceMap_Club_Calendar
@@ -13,154 +17,104 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 	return;
 }
 
-// Kontext pro Rennen am Datum (nicht am Tab): vergangene Rennen zeigen
-// „Ergebnisse"/„Zum Rennen", kommende „Nennung".
 $rc_is_past = ! $race->is_upcoming();
 
-// Primärer Aktionslink + Icon:
-//   kommend         → „Nennung"    (CTA, hebt sich klar ab)
-//   vergangen MyRCM → „Ergebnisse"
+// Primärer Aktions-Button rechts:
+//   kommend         → „Nennung"    (Event-/Buchungsseite)
+//   vergangen MyRCM → „Ergebnisse" (Ergebnisansicht)
 //   vergangen RCK   → „Zum Rennen"
 $event_url = $race->links['registration'] ?? '';
 if ( $rc_is_past ) {
 	if ( $race->is_rck() ) {
-		$primary_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
-		$primary_url   = $event_url;
-		$primary_icon  = 'external';
+		$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
+		$cta_url   = $event_url;
 	} else {
-		$primary_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
-		$primary_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
-		$primary_icon  = 'results';
+		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+		$cta_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
 	}
-	$primary_class = 'rc-rcc__link--primary';
 } else {
-	$primary_label = __( 'Nennung', 'rc-racemap-club-calendar' );
-	$primary_url   = $event_url;
-	$primary_icon  = 'registration';
-	// Der Nennung-Button ist der Haupt-Call-to-Action.
-	$primary_class = 'rc-rcc__link--cta';
+	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
+	$cta_url   = $event_url;
 }
 
-// Weitere Links (Primärlink wird separat gerendert): Label + Icon.
-$link_labels = array(
-	'participants' => array( __( 'Teilnehmerliste', 'rc-racemap-club-calendar' ), 'users' ),
-	'announcement' => array( __( 'Ausschreibung', 'rc-racemap-club-calendar' ), 'announcement' ),
-	'regulations'  => array( __( 'Reglement', 'rc-racemap-club-calendar' ), 'regulations' ),
-);
-
-// Status-Badge (macht sichtbar, welche Rennen vorbei bzw. aktiv sind).
-// Kurze, konsistente Labels aus dem Status-Enum – nicht aus dem freien
-// Notiztext, damit das Badge immer knapp und einheitlich bleibt.
-$badge_label = '';
-$badge_mod   = '';
-if ( $rc_is_past ) {
-	$badge_label = __( 'Beendet', 'rc-racemap-club-calendar' );
-	$badge_mod   = 'past';
-} else {
-	switch ( $race->registration_status ) {
-		case 'open':
-			$badge_label = __( 'Nennung geöffnet', 'rc-racemap-club-calendar' );
-			$badge_mod   = 'open';
-			break;
-		case 'closed':
-			$badge_label = __( 'Nennung geschlossen', 'rc-racemap-club-calendar' );
-			$badge_mod   = 'closed';
-			break;
-		case 'upcoming':
-			$badge_label = __( 'Nennung folgt', 'rc-racemap-club-calendar' );
-			$badge_mod   = 'soon';
-			break;
-	}
+// Dokument-Links (untereinander als Text-Links): Ausschreibung, Reglement,
+// weitere Dokumente.
+$documents = array();
+if ( ! empty( $race->links['announcement'] ) ) {
+	$documents[] = array( __( 'Ausschreibung', 'rc-racemap-club-calendar' ), $race->links['announcement'] );
+}
+if ( ! empty( $race->links['regulations'] ) ) {
+	$documents[] = array( __( 'Reglement', 'rc-racemap-club-calendar' ), $race->links['regulations'] );
+}
+foreach ( $race->extra_links as $doc ) {
+	$documents[] = array( $doc['label'], $doc['url'] );
 }
 
+$participants_url = $race->links['participants'] ?? '';
 $has_participants = ( null !== $race->participant_count );
-$has_classes      = ! empty( $race->classes );
 ?>
 <li class="rc-rcc__item rc-rcc__item--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>">
-	<div class="rc-rcc__top">
-		<span class="rc-rcc__date">
-			<?php if ( null !== $race->timestamp ) : ?>
-				<time
-					datetime="<?php echo esc_attr( wp_date( 'Y-m-d', $race->timestamp ) ); ?>"
-					title="<?php echo esc_attr( $race->formatted_date() ); ?>"
-				><?php echo esc_html( $race->date_compact() ); ?></time>
-			<?php else : ?>
-				<?php echo esc_html( $race->date_compact() ); ?>
-			<?php endif; ?>
-		</span>
-
-		<?php if ( '' !== $badge_label ) : ?>
-			<span class="rc-rcc__badge rc-rcc__badge--<?php echo esc_attr( $badge_mod ); ?>"><?php echo esc_html( $badge_label ); ?></span>
+	<div class="rc-rcc__date">
+		<?php if ( null !== $race->timestamp ) : ?>
+			<time datetime="<?php echo esc_attr( wp_date( 'Y-m-d', $race->timestamp ) ); ?>" title="<?php echo esc_attr( $race->formatted_date() ); ?>"><?php echo esc_html( $race->date_compact() ); ?></time>
+		<?php else : ?>
+			<?php echo esc_html( $race->date_compact() ); ?>
 		<?php endif; ?>
 	</div>
 
-	<h3 class="rc-rcc__title"><?php echo esc_html( $race->title ); ?></h3>
+	<div class="rc-rcc__main">
+		<h3 class="rc-rcc__title"><?php echo esc_html( $race->title ); ?></h3>
 
-	<?php if ( $has_participants || $has_classes ) : ?>
-		<div class="rc-rcc__sub">
-			<?php if ( $has_participants ) : ?>
-				<span
-					class="rc-rcc__participants"
-					title="<?php echo esc_attr( sprintf( /* translators: %d: Anzahl der Teilnehmer. */ _n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ), (int) $race->participant_count ) ); ?>"
-				>
-					<?php echo RC_RCC_Shortcode::icon( 'users' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-					<?php echo esc_html( (string) (int) $race->participant_count ); ?>
-				</span>
-			<?php endif; ?>
-
-			<?php if ( $has_participants && $has_classes ) : ?>
-				<span class="rc-rcc__sub-sep" aria-hidden="true">·</span>
-			<?php endif; ?>
-
-			<?php if ( $has_classes ) : ?>
-				<span class="rc-rcc__classes">
-					<?php foreach ( $race->classes as $class ) : ?>
-						<span class="rc-rcc__class"><?php echo esc_html( $class['name'] ); ?><?php if ( null !== $class['entries'] ) : ?><span class="rc-rcc__class-entries"><?php echo esc_html( (string) $class['entries'] ); ?></span><?php endif; ?></span>
-					<?php endforeach; ?>
-				</span>
-			<?php endif; ?>
-		</div>
-	<?php endif; ?>
-
-	<?php if ( $race->has_links() ) : ?>
-		<div class="rc-rcc__links">
-				<?php if ( '' !== $primary_url ) : ?>
-					<a
-						class="rc-rcc__link <?php echo esc_attr( $primary_class ); ?>"
-						href="<?php echo esc_url( $primary_url ); ?>"
-						rel="noopener noreferrer"
-						target="_blank"
-					>
-						<?php echo RC_RCC_Shortcode::icon( $primary_icon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-						<span><?php echo esc_html( $primary_label ); ?></span>
-					</a>
-				<?php endif; ?>
-
-				<?php foreach ( $link_labels as $key => $meta ) : ?>
-					<?php if ( ! empty( $race->links[ $key ] ) ) : ?>
-						<a
-							class="rc-rcc__link rc-rcc__link--<?php echo esc_attr( $key ); ?>"
-							href="<?php echo esc_url( $race->links[ $key ] ); ?>"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<?php echo RC_RCC_Shortcode::icon( $meta[1] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-							<span><?php echo esc_html( $meta[0] ); ?></span>
-						</a>
-					<?php endif; ?>
+		<?php if ( ! empty( $race->classes ) ) : ?>
+			<ul class="rc-rcc__classes">
+				<?php foreach ( $race->classes as $class ) : ?>
+					<li class="rc-rcc__class">
+						<span class="rc-rcc__class-name"><?php echo esc_html( $class['name'] ); ?></span>
+						<?php if ( null !== $class['entries'] ) : ?>
+							<span class="rc-rcc__class-entries"><?php echo esc_html( (string) $class['entries'] ); ?></span>
+						<?php endif; ?>
+					</li>
 				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
 
-				<?php foreach ( $race->extra_links as $doc ) : ?>
-					<a
-						class="rc-rcc__link rc-rcc__link--document"
-						href="<?php echo esc_url( $doc['url'] ); ?>"
-						rel="noopener noreferrer"
-						target="_blank"
-					>
-						<?php echo RC_RCC_Shortcode::icon( 'document' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-						<span><?php echo esc_html( $doc['label'] ); ?></span>
-					</a>
+		<?php if ( ! empty( $documents ) ) : ?>
+			<div class="rc-rcc__docs">
+				<?php foreach ( $documents as $doc ) : ?>
+					<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $doc[0] ); ?></a>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
+	</div>
+
+	<div class="rc-rcc__ppl">
+		<?php if ( $has_participants ) : ?>
+			<?php
+			$ppl_label = sprintf(
+				/* translators: %d: Anzahl der Teilnehmer. */
+				_n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ),
+				(int) $race->participant_count
+			);
+			$ppl_icon  = RC_RCC_Shortcode::icon( 'users' );
+			$ppl_count = (string) (int) $race->participant_count;
+			?>
+			<?php if ( '' !== $participants_url ) : ?>
+				<a class="rc-rcc__ppl-link" href="<?php echo esc_url( $participants_url ); ?>" title="<?php echo esc_attr( $ppl_label ); ?>" rel="noopener noreferrer" target="_blank">
+					<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
+					<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
+				</a>
+			<?php else : ?>
+				<span class="rc-rcc__ppl-link" title="<?php echo esc_attr( $ppl_label ); ?>">
+					<?php echo $ppl_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
+					<span class="rc-rcc__ppl-count"><?php echo esc_html( $ppl_count ); ?></span>
+				</span>
+			<?php endif; ?>
+		<?php endif; ?>
+	</div>
+
+	<div class="rc-rcc__action">
+		<?php if ( '' !== $cta_url ) : ?>
+			<a class="rc-rcc__cta rc-rcc__cta--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $cta_label ); ?></a>
+		<?php endif; ?>
+	</div>
 </li>
