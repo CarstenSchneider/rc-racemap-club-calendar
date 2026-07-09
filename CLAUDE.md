@@ -66,4 +66,4 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 ## Umgebung / Tooling-Hinweise
 
 - `gh` CLI wird genutzt (lokal unter `~/.local/bin/gh`). In einer neuen Umgebung ggf. `gh auth login` bzw. Git-Zugang neu herstellen.
-- Kein PHP/WP in der Entwicklungsumgebung → Plugin wird auf echten WP-Seiten (TSV Mariendorf, RC Speedracer) getestet, nicht lokal ausgeführt.
+- **PHP-CLI** liegt unter `~/.local/bin/php` (statischer Build von static-php.dev; in neuer Umgebung ggf. neu holen: `curl -sL https://dl.static-php.dev/static-php-cli/common/php-8.4.8-cli-macos-aarch64.tar.gz | tar xz`). **Vor jedem Release nutzen:** `php -l` auf alle geänderten Dateien **und** ein Stub-Test der Datenlogik (WP-Funktionen stubben, `RC_RCC_Race::from_array` + `RC_RCC_Calendar` gegen `sample-data.json` laufen lassen, prüfen dass beide Tabs Rennen erhalten). Voll ausführen lässt sich das Plugin nur auf echten WP-Seiten (TSV Mariendorf, RC Speedracer).
