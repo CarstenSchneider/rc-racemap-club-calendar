@@ -27,7 +27,7 @@ class RC_RCC_Api {
 	 * Default API base URL. Override via the `rc_rcc_api_base_url` filter or
 	 * the RC_RCC_API_BASE_URL constant.
 	 */
-	private const DEFAULT_BASE_URL = 'https://api.rc-racemap.com';
+	private const DEFAULT_BASE_URL = 'https://raw.githubusercontent.com/CarstenSchneider/rc-racemap-data/main';
 
 	/**
 	 * Cache component.
@@ -245,12 +245,13 @@ class RC_RCC_Api {
 	 * @return bool
 	 */
 	private function should_use_sample_data(): bool {
-		if ( defined( 'RC_RCC_API_BASE_URL' ) ) {
-			return false;
+		// Explicit opt-in for local development.
+		if ( defined( 'RC_RCC_USE_SAMPLE_DATA' ) ) {
+			return (bool) RC_RCC_USE_SAMPLE_DATA;
 		}
 
-		// While the default (not-yet-live) endpoint is in place, use samples.
-		return true;
+		// Default: use the real data source (per-club snapshots / live API).
+		return false;
 	}
 
 	/**

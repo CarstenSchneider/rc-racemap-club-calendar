@@ -119,6 +119,14 @@ class RC_RCC_Race {
 	public array $links = array();
 
 	/**
+	 * Additional documents that don't map to a known link type (e.g. generic
+	 * "PDF" attachments). Each item: ['label' => string, 'url' => string].
+	 *
+	 * @var array<int, array{label: string, url: string}>
+	 */
+	public array $extra_links = array();
+
+	/**
 	 * Build a Race from a raw associative array (as returned by the API).
 	 *
 	 * Unknown keys are ignored; missing keys fall back to safe defaults.
@@ -169,6 +177,7 @@ class RC_RCC_Race {
 		$race->status            = self::derive_status( $data );
 		$race->participant_count = self::derive_participant_count( $data );
 		$race->links             = self::derive_links( $data );
+		$race->extra_links       = self::derive_extra_documents( $data );
 
 		return $race;
 	}
@@ -237,7 +246,7 @@ class RC_RCC_Race {
 	 * @return bool
 	 */
 	public function has_links(): bool {
-		return ! empty( $this->links );
+		return ! empty( $this->links ) || ! empty( $this->extra_links );
 	}
 
 	/**
@@ -460,5 +469,49 @@ class RC_RCC_Race {
 		}
 
 		return $links;
+	}
+
+	/**
+	 * Collect documents that don't map to a known semantic link type.
+	 *
+	 * Known types (announcement, rules) are handled by {@see derive_links()}.
+	 * Everything else (e.g. a generic "PDF") is returned here with its own
+	 * label so nothing from the source data is silently dropped.
+	 *
+	 * @param array<string, mixed> $data Raw event data.
+	 * @return array<int, array{label: string, url: string}>
+	 */
+	private static function derive_extra_documents( array $data ): array {
+		if ( ! isset( $data['documents'] ) || ! is_array( $data['documents'] ) ) {
+			return array();
+		}
+
+		$mapped_types = array( 'announcement', 'rules' );
+		$extra        = array();
+
+		foreach ( $data['documents'] as $doc ) {
+			if ( ! is_array( $doc ) ) {
+				continue;
+			}
+
+			$type = isset( $doc['type'] ) ? (string) $doc['type'] : '';
+			$url  = isset( $doc['url'] ) ? (string) $doc['url'] : '';
+
+			if ( '' === $url || in_array( $type, $mapped_types, true ) ) {
+				continue;
+			}
+
+			$label = isset( $doc['label'] ) ? trim( (string) $doc['label'] ) : '';
+			if ( '' === $label ) {
+				$label = __( 'Dokument', 'rc-racemap-club-calendar' );
+			}
+
+			$extra[] = array(
+				'label' => $label,
+				'url'   => $url,
+			);
+		}
+
+		return $extra;
 	}
 }

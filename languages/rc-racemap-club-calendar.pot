@@ -138,6 +138,9 @@ msgstr[1] ""
 msgid "Nennung"
 msgstr ""
 
+msgid "Dokument"
+msgstr ""
+
 msgid "Teilnehmerliste"
 msgstr ""
 

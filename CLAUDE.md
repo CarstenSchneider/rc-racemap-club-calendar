@@ -41,7 +41,9 @@ Immer über **stabile Event-ID** (nie Titel). Neue Rennen sind automatisch sicht
 
 ## Datenquelle & echtes Datenmodell
 
-Die RC-RaceMap-API existiert **noch nicht**. Bis dahin: Fallback auf `sample-data.json` (Filter `rc_rcc_use_sample_data`). Echte API aktivieren via Konstante `RC_RCC_API_BASE_URL` oder Filter `rc_rcc_api_base_url`.
+**Datenquelle (Stand jetzt):** Standardmäßig **echte Daten** aus gehosteten Per-Verein-Snapshots. `class-api.php` lädt `GET {base}/api/clubs/{myrcmOrgId}`; `base` = `https://raw.githubusercontent.com/CarstenSchneider/rc-racemap-data/main` (Repo [rc-racemap-data](https://github.com/CarstenSchneider/rc-racemap-data), öffentlich). Eingabe = **MyRCM-Org-ID** (numerisch). Snapshots sind MyRCM+RCK gemerged, inkl. Vereinsmeta (name/website/lat/lng). Aktuell gehostet: **18244** (TSV Mariendorf), **45925** (RC Speedracer). Erzeugt aus `~/Documents/myrcm-rc-map` (`races.json` + `rck-races.json`, Join über `hosts.json`: `myrcmOrgId`→`hostId`, Koordinaten aus `venues.json`).
+
+Sample-Daten (`sample-data.json`) sind jetzt **Opt-in** für lokale Entwicklung: Konstante `RC_RCC_USE_SAMPLE_DATA` oder Filter `rc_rcc_use_sample_data`. Basis-URL überschreibbar via Konstante `RC_RCC_API_BASE_URL` / Filter `rc_rcc_api_base_url`.
 
 Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (`races.json`) → dokumentiert in **[`docs/rc-racemap-data-model.md`](docs/rc-racemap-data-model.md)**. Wichtige Abweichungen des aktuellen Plugin-Modells vom Realmodell (offener TODO):
 - Einzel-`date` → **`from`/`to`-Bereich**

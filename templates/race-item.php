@@ -113,6 +113,17 @@ $link_labels = array(
 						</a>
 					<?php endif; ?>
 				<?php endforeach; ?>
+
+				<?php foreach ( $race->extra_links as $doc ) : ?>
+					<a
+						class="rc-rcc__link rc-rcc__link--document"
+						href="<?php echo esc_url( $doc['url'] ); ?>"
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						<?php echo esc_html( $doc['label'] ); ?>
+					</a>
+				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
 	</div>
