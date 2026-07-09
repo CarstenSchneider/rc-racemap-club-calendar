@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.11 =
+* Ort wird wieder angezeigt: Das Feld `city` der API wird jetzt als Quelle für den Ort berücksichtigt (zusätzlich zu `venueLocation`).
 
 = 1.0.10 =
 * Archiv-Link „Ergebnisse" führt jetzt korrekt auf die MyRCM-Ergebnisansicht (statt auf die Nennseite).

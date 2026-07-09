@@ -162,7 +162,7 @@ class RC_RCC_Race {
 
 		// Venue: real model splits name and location; older samples use `track`.
 		$race->track    = self::first_string( $data, array( 'venueName', 'track' ) );
-		$race->location = self::first_string( $data, array( 'venueLocation' ) );
+		$race->location = self::first_string( $data, array( 'venueLocation', 'city' ) );
 
 		// Date range: real model uses `from`/`to`; older samples use `date`.
 		$race->date_raw = self::first_string( $data, array( 'from', 'date' ) );
