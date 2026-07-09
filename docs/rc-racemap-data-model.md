@@ -9,7 +9,7 @@ Referenz für die spätere API `GET /api/clubs/{club-id}` und für die Ausrichtu
 | Feld | Typ | Bedeutung / Hinweis |
 |---|---|---|
 | `id` | string | Stabiler Slug, z. B. `rcsf-singen-e-v-2025-06-14-myrcm-event-85896`. **Sichtbarkeits-Schlüssel im Plugin.** |
-| `hostId` | string | **Veranstalter-Slug** (z. B. `rcsf-singen-e-v`) → das ist die „club-id" |
+| `hostId` | string | **Veranstalter-Slug** (z. B. `rcsf-singen-e-v`). Nur ein Datenfeld der Antwort – **nicht** die Nutzereingabe (siehe Hinweis unten) |
 | `hostName` | string | Veranstalter-Anzeigename |
 | `venueId` | string | Strecken-Slug |
 | `venueName` | string | Streckenname |
@@ -78,4 +78,7 @@ Referenz für die spätere API `GET /api/clubs/{club-id}` und für die Ausrichtu
 | `links.announcement` / `.regulations` | `documents[]` nach `type` |
 | `links.registration` | `url` / `detailUrl` |
 | — (neu) | `series[]` → künftiger Serien-Filter |
-| club-id (numerisch angenommen) | **`hostId` (Slug)** |
+
+## Nutzereingabe „club-id" ≠ `hostId`
+
+Im Plugin trägt der Verein seine **MyRCM-Organisator-ID** ein (numerisch, z. B. `16961`) – Vereine kennen keine RaceMap-Slugs. Diese ID wird als `{club-id}` an `GET /api/clubs/{club-id}` gesendet; die RaceMap-Seite mappt sie auf den Verein und liefert dessen Rennen zurück. Der `hostId`-Slug in der Antwort ist ein **separates** Datenfeld und wird **nicht** als Eingabe verwendet.

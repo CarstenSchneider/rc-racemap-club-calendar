@@ -48,7 +48,7 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 - `organizer`/`track` flach → `hostId`(Slug)/`hostName` + `venueName`/`venueLocation`
 - `classes` als Strings → auch **Objekte `{name, entries}`**
 - fester `links{}`-Satz → **`documents[]`** mit `{type, label, url}`
-- club-id ist ein **Slug** (z. B. `rcsf-singen-e-v`), nicht numerisch
+- **Eingabe im Plugin = MyRCM-Organisator-ID** (numerisch, z. B. `16961`) – Vereine kennen nur ihre MyRCM-ID, keine RaceMap-Slugs. Diese ID geht als `{club-id}` an die API; die RaceMap-Seite mappt sie auf den Verein. Das Datenfeld `hostId` (Slug wie `rcsf-singen-e-v`) ist davon getrennt und nur Teil der Renn-Antwort, **nicht** die Nutzereingabe.
 
 ## Auto-Update-Workflow (GitHub Releases)
 
