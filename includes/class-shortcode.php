@@ -114,12 +114,27 @@ class RC_RCC_Shortcode {
 			self::TAG
 		);
 
-		// Assets are needed as soon as the shortcode is on the page.
-		wp_enqueue_style( 'rc-rcc-frontend' );
-		wp_enqueue_script( 'rc-rcc-frontend' );
-
 		// Optional per-instance club override (see filter_club_id()).
 		$this->club_override = sanitize_text_field( (string) $atts['club'] );
+
+		// Resolve the club ID exactly as the calendar does (setting + runtime
+		// filter, incl. this instance's `club=""` override).
+		$configured_club = (string) RC_RCC_Plugin::get_setting( 'club_id', '' );
+		$effective_club  = trim( (string) apply_filters( 'rc_rcc_runtime_club_id', $configured_club ) );
+
+		// No club configured → render nothing at all. This keeps sites that
+		// added the shortcode before entering their MyRCM ID from showing an
+		// empty calendar shell. Local sample-data development still works
+		// because it deliberately does not require an ID.
+		$use_sample = defined( 'RC_RCC_USE_SAMPLE_DATA' ) && RC_RCC_USE_SAMPLE_DATA;
+		if ( '' === $effective_club && ! $use_sample ) {
+			$this->club_override = '';
+			return '';
+		}
+
+		// Assets are needed as soon as the shortcode renders content.
+		wp_enqueue_style( 'rc-rcc-frontend' );
+		wp_enqueue_script( 'rc-rcc-frontend' );
 
 		$current_groups = $this->calendar->current_groups();
 		$archive_groups = $this->calendar->archive_groups();
