@@ -16,7 +16,7 @@ WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Mod
 ## Konventionen
 
 - **Sprache:** Deutsch als **Basissprache** im Quelltext, aber **immer** i18n-Funktionen (`__()`, `esc_html__()` …), Textdomain `rc-racemap-club-calendar`.
-- **PHP 8+**, WordPress Coding Standards, OOP mit klarer Schichtentrennung, keine God-Class.
+- **PHP 7.4+** (Mindestanforderung wegen Zielserver mit PHP 7.4; Ziel/Empfehlung bleibt 8.x). Daher **keine** PHP-8-only-Syntax verwenden: kein `match`, keine Union-Types/`mixed` in Signaturen, keine Constructor-Promotion, keine nachgestellten Kommas in Funktions-Parameterlisten, keine `str_contains`/`str_starts_with`/`str_ends_with`. WordPress Coding Standards, OOP mit klarer Schichtentrennung, keine God-Class.
 - **Sicherheit:** alle Ausgaben escapen, alle Eingaben sanitisieren, Nonces für Admin-Aktionen, minimale Rechte (`manage_options`).
 - **Design:** CSS nur Layout; Farben/Fonts vom Theme (`inherit`/`currentColor`). Keine externen Libs im Frontend. Templates unter `templates/` sind theme-überschreibbar.
 
