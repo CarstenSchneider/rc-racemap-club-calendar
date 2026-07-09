@@ -6,7 +6,7 @@ WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Mod
 
 ## Repo & Verteilung
 
-- GitHub (privat): `https://github.com/CarstenSchneider/rc-racemap-club-calendar` (Account `CarstenSchneider`, Default-Branch `main`).
+- GitHub (**öffentlich**): `https://github.com/CarstenSchneider/rc-racemap-club-calendar` (Account `CarstenSchneider`, Default-Branch `main`). Öffentlich, damit die Auto-Updates ohne Token laufen.
 - Installierbare ZIP bauen (aus dem **Elternordner** des Plugins):
   ```bash
   zip -rq rc-racemap-club-calendar.zip rc-racemap-club-calendar \
@@ -55,7 +55,7 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 1. Änderung umsetzen, **Versionsnummer** im Header von `rc-racemap-club-calendar.php` erhöhen (SemVer).
 2. `git commit` + `git push origin main`.
 3. `gh release create vX.Y.Z --title "vX.Y.Z" --notes "…" --latest` und die gebaute ZIP als Asset anhängen (`gh release upload`).
-4. Seiten zeigen das Update im Backend. Token-Quelle (Reihenfolge): Konstante `RC_RCC_UPDATE_TOKEN` in `wp-config.php` > Filter `rc_rcc_update_token` > Admin-Feld. Für das private Repo genügt ein fein granuliertes Token mit **Contents: Read**.
+4. Seiten zeigen das Update im Backend. **Kein Token nötig** – das Repo ist öffentlich, PUC liest Releases anonym. Das Token-Feld/​die Konstante `RC_RCC_UPDATE_TOKEN` bleiben optional (Altlast); ein auf einer Seite eingetragenes **ungültiges** Token führt aber zu 401 – dann Feld leeren.
 
 ## Offene TODOs
 
