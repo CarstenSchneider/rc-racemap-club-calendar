@@ -21,6 +21,7 @@ if ( empty( $races ) ) {
 ?>
 <ul class="rc-rcc__list">
 	<?php
+	$context = 'upcoming';
 	foreach ( $races as $race ) {
 		require RC_RCC_Shortcode::locate_template( 'race-item.php' );
 	}

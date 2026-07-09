@@ -13,9 +13,23 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 	return;
 }
 
-// Beschriftungen der optionalen Aktionslinks (Reihenfolge = Anzeigereihenfolge).
+// Kontext: 'archive' blendet Nennung/Status aus und zeigt stattdessen Ergebnisse.
+$rc_context    = isset( $context ) ? (string) $context : 'upcoming';
+$rc_is_archive = ( 'archive' === $rc_context );
+
+// Primärer Event-Link (führt auf die MyRCM-Event-Seite): im Archiv „Ergebnisse"
+// (bei RCK neutral „Zum Rennen", da dort Ergebnisse unklar sind), sonst „Nennung".
+if ( $rc_is_archive ) {
+	$primary_label = $race->is_rck()
+		? __( 'Zum Rennen', 'rc-racemap-club-calendar' )
+		: __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+} else {
+	$primary_label = __( 'Nennung', 'rc-racemap-club-calendar' );
+}
+
+// Beschriftungen der Aktionslinks (Reihenfolge = Anzeigereihenfolge).
 $link_labels = array(
-	'registration' => __( 'Nennung', 'rc-racemap-club-calendar' ),
+	'registration' => $primary_label,
 	'participants'  => __( 'Teilnehmerliste', 'rc-racemap-club-calendar' ),
 	'announcement'  => __( 'Ausschreibung', 'rc-racemap-club-calendar' ),
 	'regulations'   => __( 'Reglement', 'rc-racemap-club-calendar' ),
@@ -36,7 +50,7 @@ $link_labels = array(
 		<h3 class="rc-rcc__title"><?php echo esc_html( $race->title ); ?></h3>
 
 		<div class="rc-rcc__meta">
-			<?php if ( '' !== $race->organizer ) : ?>
+			<?php if ( '' !== $race->organizer && ( '' === $race->track || 0 !== strcasecmp( trim( $race->organizer ), trim( $race->track ) ) ) ) : ?>
 				<span class="rc-rcc__meta-item rc-rcc__organizer">
 					<?php echo esc_html( $race->organizer ); ?>
 				</span>
@@ -59,7 +73,7 @@ $link_labels = array(
 				</span>
 			<?php endif; ?>
 
-			<?php if ( '' !== $race->status ) : ?>
+			<?php if ( '' !== $race->status && ! $rc_is_archive ) : ?>
 				<span class="rc-rcc__meta-item rc-rcc__status">
 					<?php echo esc_html( $race->status ); ?>
 				</span>

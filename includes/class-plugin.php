@@ -163,7 +163,7 @@ final class RC_RCC_Plugin {
 		return array(
 			'club_id'        => '',
 			'upcoming_count' => 10,
-			'archive_count'  => 20,
+			'archive_count'  => 0,
 			'cache_ttl'      => HOUR_IN_SECONDS,
 			'show_logo'      => true,
 			'update_token'   => '',

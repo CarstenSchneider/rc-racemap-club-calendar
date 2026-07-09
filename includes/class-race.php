@@ -127,6 +127,13 @@ class RC_RCC_Race {
 	public array $extra_links = array();
 
 	/**
+	 * Data source of this event: "myrcm", "rck", … Empty when unknown.
+	 *
+	 * @var string
+	 */
+	public string $source = '';
+
+	/**
 	 * Build a Race from a raw associative array (as returned by the API).
 	 *
 	 * Unknown keys are ignored; missing keys fall back to safe defaults.
@@ -178,8 +185,31 @@ class RC_RCC_Race {
 		$race->participant_count = self::derive_participant_count( $data );
 		$race->links             = self::derive_links( $data );
 		$race->extra_links       = self::derive_extra_documents( $data );
+		$race->source            = self::first_string( $data, array( 'source' ) );
 
 		return $race;
+	}
+
+	/**
+	 * The event's start year (e.g. "2026"), or '' when the date is unknown.
+	 *
+	 * @return string
+	 */
+	public function year(): string {
+		if ( null === $this->timestamp ) {
+			return '';
+		}
+
+		return wp_date( 'Y', $this->timestamp );
+	}
+
+	/**
+	 * Whether this event originates from the RCK source.
+	 *
+	 * @return bool
+	 */
+	public function is_rck(): bool {
+		return '' !== $this->source && false !== stripos( $this->source, 'rck' );
 	}
 
 	/**

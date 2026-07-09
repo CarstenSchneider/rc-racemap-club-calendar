@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,11 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.8 =
+* Archiv jetzt nach Jahr gruppiert (neuestes Jahr zuerst); Standard zeigt alle vergangenen Rennen.
+* Kontextabhängige Links: im Archiv „Ergebnisse" (MyRCM) statt „Nennung"; RCK erhält „Zum Rennen".
+* Aufgeräumte Meta-Zeile: Veranstalter/Strecke werden bei Gleichheit nur einmal angezeigt; die Nennungs-Status-Zeile entfällt im Archiv.
 
 = 1.0.7 =
 * Echte Renndaten: Das Plugin bezieht die Rennen eines Vereins jetzt anhand seiner MyRCM-Organisator-ID aus der RC-RaceMap-Datenquelle (MyRCM + RCK zusammengeführt). Die Beispieldaten sind nur noch optional für die lokale Entwicklung.

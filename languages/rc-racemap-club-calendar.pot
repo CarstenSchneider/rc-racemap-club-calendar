@@ -138,6 +138,12 @@ msgstr[1] ""
 msgid "Nennung"
 msgstr ""
 
+msgid "Ergebnisse"
+msgstr ""
+
+msgid "Zum Rennen"
+msgstr ""
+
 msgid "Dokument"
 msgstr ""
 
