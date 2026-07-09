@@ -45,7 +45,7 @@ Immer über **stabile Event-ID** (nie Titel). Neue Rennen sind automatisch sicht
 
 Sample-Daten (`sample-data.json`) sind jetzt **Opt-in** für lokale Entwicklung: Konstante `RC_RCC_USE_SAMPLE_DATA` oder Filter `rc_rcc_use_sample_data`. Basis-URL überschreibbar via Konstante `RC_RCC_API_BASE_URL` / Filter `rc_rcc_api_base_url`.
 
-Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (`races.json`) → dokumentiert in **[`docs/rc-racemap-data-model.md`](docs/rc-racemap-data-model.md)**. Wichtige Abweichungen des aktuellen Plugin-Modells vom Realmodell (offener TODO):
+Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (`races.json`) → dokumentiert in **[`docs/rc-racemap-data-model.md`](docs/rc-racemap-data-model.md)**. Der **API-Vertrag** (Endpoint + Antwortform, den die Live-API erfüllen muss) steht in **[`docs/api-contract.md`](docs/api-contract.md)**; das Briefing an `myrcm-rc-map` (RCK-Namensfix + API bereitstellen) liegt dort als `BRIEF-rc-racemap-plugin.md`. Wichtige Abweichungen des aktuellen Plugin-Modells vom Realmodell (offener TODO):
 - Einzel-`date` → **`from`/`to`-Bereich**
 - `organizer`/`track` flach → `hostId`(Slug)/`hostName` + `venueName`/`venueLocation`
 - `classes` als Strings → auch **Objekte `{name, entries}`**
