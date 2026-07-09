@@ -134,6 +134,14 @@ class RC_RCC_Race {
 	public string $source = '';
 
 	/**
+	 * Direct link to the MyRCM results view (past MyRCM events). Empty for
+	 * non-MyRCM sources or when no event id is available.
+	 *
+	 * @var string
+	 */
+	public string $results_url = '';
+
+	/**
 	 * Build a Race from a raw associative array (as returned by the API).
 	 *
 	 * Unknown keys are ignored; missing keys fall back to safe defaults.
@@ -186,6 +194,18 @@ class RC_RCC_Race {
 		$race->links             = self::derive_links( $data );
 		$race->extra_links       = self::derive_extra_documents( $data );
 		$race->source            = self::first_string( $data, array( 'source' ) );
+
+		// MyRCM-Links auf die Seitensprache umstellen (pLa) und den
+		// Ergebnis-Link für vergangene MyRCM-Rennen ableiten.
+		$lang                = self::myrcm_language();
+		$race->links         = array_map(
+			static fn( $url ) => self::localize_myrcm_url( (string) $url, $lang ),
+			$race->links
+		);
+		foreach ( $race->extra_links as $i => $doc ) {
+			$race->extra_links[ $i ]['url'] = self::localize_myrcm_url( $doc['url'], $lang );
+		}
+		$race->results_url = self::derive_results_url( $race->links['registration'] ?? '', $race->organizer, $lang );
 
 		return $race;
 	}
@@ -543,5 +563,67 @@ class RC_RCC_Race {
 		}
 
 		return $extra;
+	}
+
+	/**
+	 * The MyRCM page language (`pLa`) derived from the site locale.
+	 *
+	 * @return string
+	 */
+	private static function myrcm_language(): string {
+		$locale = function_exists( 'get_locale' ) ? (string) get_locale() : 'de_DE';
+		$two    = strtolower( substr( $locale, 0, 2 ) );
+
+		return '' !== $two ? $two : 'en';
+	}
+
+	/**
+	 * Set the `pLa` (language) parameter on a myrcm.ch URL. Non-MyRCM URLs are
+	 * returned unchanged.
+	 *
+	 * @param string $url  URL.
+	 * @param string $lang Two-letter language code.
+	 * @return string
+	 */
+	private static function localize_myrcm_url( string $url, string $lang ): string {
+		if ( '' === $url || false === strpos( $url, 'myrcm.ch' ) ) {
+			return $url;
+		}
+
+		if ( preg_match( '/[?&]pLa=/', $url ) ) {
+			return (string) preg_replace( '/([?&]pLa=)[^&]*/', '${1}' . $lang, $url );
+		}
+
+		return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . 'pLa=' . $lang;
+	}
+
+	/**
+	 * Build the MyRCM results-view URL from an event (booking) URL.
+	 *
+	 * MyRCM zeigt Ergebnisse über den "search"-Kontext (`hId[1]=search`) mit
+	 * derselben Event-ID. Gibt '' zurück für Nicht-MyRCM-URLs oder wenn keine
+	 * Event-ID vorhanden ist.
+	 *
+	 * @param string $event_url Buchungs-/Event-URL (hId[1]=bkg&dId[E]=…).
+	 * @param string $host      Vereinsname (als Suchfilter `dFi`).
+	 * @param string $lang      Zweibuchstabiger Sprachcode.
+	 * @return string
+	 */
+	private static function derive_results_url( string $event_url, string $host, string $lang ): string {
+		if ( '' === $event_url || false === strpos( $event_url, 'myrcm.ch' ) ) {
+			return '';
+		}
+
+		if ( ! preg_match( '/dId(?:\[|%5B)E(?:\]|%5D)=(\d+)/i', $event_url, $m ) ) {
+			return '';
+		}
+
+		$url = 'https://www.myrcm.ch/myrcm/main?hId%5B1%5D=search&dId%5BE%5D=' . $m[1];
+		if ( '' !== $host ) {
+			$url .= '&dFi=' . rawurlencode( $host );
+		}
+		$url .= '&pLa=' . $lang;
+
+		return $url;
 	}
 }

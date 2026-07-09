@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,10 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.10 =
+* Archiv-Link „Ergebnisse" führt jetzt korrekt auf die MyRCM-Ergebnisansicht (statt auf die Nennseite).
+* MyRCM-Links werden in der Seitensprache geöffnet (pLa) – auf deutschen Seiten also auf Deutsch statt Englisch.
 
 = 1.0.9 =
 * Umstellung auf die Live-Datenquelle (rcracemap.com): Renndaten kommen jetzt direkt aus der RC-RaceMap-API statt aus statischen Snapshots – aktueller und vollständiger.

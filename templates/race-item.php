@@ -17,22 +17,29 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 $rc_context    = isset( $context ) ? (string) $context : 'upcoming';
 $rc_is_archive = ( 'archive' === $rc_context );
 
-// Primärer Event-Link (führt auf die MyRCM-Event-Seite): im Archiv „Ergebnisse"
-// (bei RCK neutral „Zum Rennen", da dort Ergebnisse unklar sind), sonst „Nennung".
+// Primärer Aktionslink – kontextabhängig:
+//   kommend        → „Nennung"    (Event-/Buchungsseite)
+//   Archiv (MyRCM) → „Ergebnisse" (MyRCM-Ergebnisansicht)
+//   Archiv (RCK)   → „Zum Rennen" (Ergebnisse bei RCK unklar)
+$event_url = $race->links['registration'] ?? '';
 if ( $rc_is_archive ) {
-	$primary_label = $race->is_rck()
-		? __( 'Zum Rennen', 'rc-racemap-club-calendar' )
-		: __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+	if ( $race->is_rck() ) {
+		$primary_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
+		$primary_url   = $event_url;
+	} else {
+		$primary_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+		$primary_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
+	}
 } else {
 	$primary_label = __( 'Nennung', 'rc-racemap-club-calendar' );
+	$primary_url   = $event_url;
 }
 
-// Beschriftungen der Aktionslinks (Reihenfolge = Anzeigereihenfolge).
+// Weitere Links (Primärlink wird separat gerendert).
 $link_labels = array(
-	'registration' => $primary_label,
-	'participants'  => __( 'Teilnehmerliste', 'rc-racemap-club-calendar' ),
-	'announcement'  => __( 'Ausschreibung', 'rc-racemap-club-calendar' ),
-	'regulations'   => __( 'Reglement', 'rc-racemap-club-calendar' ),
+	'participants' => __( 'Teilnehmerliste', 'rc-racemap-club-calendar' ),
+	'announcement' => __( 'Ausschreibung', 'rc-racemap-club-calendar' ),
+	'regulations'  => __( 'Reglement', 'rc-racemap-club-calendar' ),
 );
 ?>
 <li class="rc-rcc__item">
@@ -115,6 +122,16 @@ $link_labels = array(
 
 		<?php if ( $race->has_links() ) : ?>
 			<div class="rc-rcc__links">
+				<?php if ( '' !== $primary_url ) : ?>
+					<a
+						class="rc-rcc__link rc-rcc__link--primary"
+						href="<?php echo esc_url( $primary_url ); ?>"
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						<?php echo esc_html( $primary_label ); ?>
+					</a>
+				<?php endif; ?>
 				<?php foreach ( $link_labels as $key => $label ) : ?>
 					<?php if ( ! empty( $race->links[ $key ] ) ) : ?>
 						<a
