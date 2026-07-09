@@ -144,14 +144,51 @@ class RC_RCC_Shortcode {
 		$this->instance++;
 
 		// Variables consumed by the templates.
-		$uid       = 'rc-rcc-' . $this->instance;
-		$show_logo = (bool) RC_RCC_Plugin::get_setting( 'show_logo', true );
-		$logo_url  = RC_RCC_URL . 'assets/images/rc-racemap-logo.svg';
+		$uid             = 'rc-rcc-' . $this->instance;
+		$show_logo       = (bool) RC_RCC_Plugin::get_setting( 'show_logo', true );
+		$logo_url        = RC_RCC_URL . 'assets/images/rc-racemap-logo.svg';
+		$container_style = self::accent_inline_style( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
 
 		ob_start();
 		require RC_RCC_PATH . 'templates/calendar.php';
 
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Build the inline style that pins the accent colour on the calendar root.
+	 *
+	 * Given a configured hex colour, returns
+	 * "--rc-rcc-accent:#hex;--rc-rcc-on-accent:#contrast;" where the on-accent
+	 * text colour (used on filled pills/buttons) is black or white depending on
+	 * the accent's luminance. Returns '' when no (valid) colour is set, so the
+	 * CSS default / theme-derived accent stays in effect.
+	 *
+	 * @param string $hex Configured accent colour (e.g. "#a3a52c") or ''.
+	 * @return string
+	 */
+	public static function accent_inline_style( string $hex ): string {
+		$hex = sanitize_hex_color( trim( $hex ) );
+
+		if ( null === $hex || '' === $hex ) {
+			return '';
+		}
+
+		// Expand shorthand (#abc → #aabbcc) for the luminance calculation.
+		$raw = ltrim( $hex, '#' );
+		if ( 3 === strlen( $raw ) ) {
+			$raw = $raw[0] . $raw[0] . $raw[1] . $raw[1] . $raw[2] . $raw[2];
+		}
+
+		$r = hexdec( substr( $raw, 0, 2 ) );
+		$g = hexdec( substr( $raw, 2, 2 ) );
+		$b = hexdec( substr( $raw, 4, 2 ) );
+
+		// Perceived brightness (ITU-R BT.601); dark accents get white text.
+		$brightness = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
+		$on_accent  = ( $brightness < 150 ) ? '#ffffff' : '#111111';
+
+		return '--rc-rcc-accent:' . $hex . ';--rc-rcc-on-accent:' . $on_accent . ';';
 	}
 
 	/**

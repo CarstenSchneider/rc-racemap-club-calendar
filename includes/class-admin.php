@@ -134,9 +134,10 @@ class RC_RCC_Admin {
 		);
 
 		$fields = array(
-			'club_id'   => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
-			'cache_ttl' => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
-			'show_logo' => __( 'RC RaceMap Logo anzeigen', 'rc-racemap-club-calendar' ),
+			'club_id'      => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
+			'cache_ttl'    => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
+			'accent_color' => __( 'Akzentfarbe', 'rc-racemap-club-calendar' ),
+			'show_logo'    => __( 'RC RaceMap Logo anzeigen', 'rc-racemap-club-calendar' ),
 		);
 
 		foreach ( $fields as $key => $label ) {
@@ -204,6 +205,11 @@ class RC_RCC_Admin {
 		$clean['cache_ttl'] = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
 		$clean['show_logo'] = ! empty( $input['show_logo'] );
 
+		// Akzentfarbe: gültiger Hex oder leer (= automatisch aus dem Theme).
+		$clean['accent_color'] = isset( $input['accent_color'] )
+			? (string) sanitize_hex_color( trim( (string) $input['accent_color'] ) )
+			: '';
+
 		$clean['auto_update'] = ! empty( $input['auto_update'] );
 
 		// Update-Token: nur unbedenkliche Token-Zeichen zulassen.
@@ -246,6 +252,16 @@ class RC_RCC_Admin {
 
 			case 'cache_ttl':
 				$this->render_cache_field( $id, $name, (int) $value );
+				break;
+
+			case 'accent_color':
+				printf(
+					'<input type="text" id="%1$s" name="%2$s" value="%3$s" class="rc-rcc-color-field" data-default-color="" />',
+					esc_attr( $id ),
+					esc_attr( $name ),
+					esc_attr( (string) $value )
+				);
+				echo '<p class="description">' . esc_html__( 'Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer lassen = automatisch die Linkfarbe deines Themes.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'show_logo':
@@ -458,6 +474,18 @@ class RC_RCC_Admin {
 			array(),
 			RC_RCC_VERSION
 		);
+
+		// Farbwähler nur auf der Einstellungsseite.
+		if ( false !== strpos( $hook, self::PAGE_SETTINGS ) ) {
+			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_script(
+				'rc-rcc-admin',
+				RC_RCC_URL . 'assets/js/admin.js',
+				array( 'wp-color-picker', 'jquery' ),
+				RC_RCC_VERSION,
+				true
+			);
+		}
 	}
 
 	/**

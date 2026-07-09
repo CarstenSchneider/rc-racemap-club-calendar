@@ -15,12 +15,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: includes/class-admin.php:83 includes/class-admin.php:84
-#: templates/calendar.php:85
+#: templates/calendar.php:86
 msgid "RC RaceMap"
 msgstr "RC RaceMap"
 
 #: includes/class-admin.php:94 includes/class-admin.php:95
-#: includes/class-admin.php:473
+#: includes/class-admin.php:501
 msgid "Einstellungen"
 msgstr "Settings"
 
@@ -46,14 +46,18 @@ msgid "Cache-Dauer"
 msgstr "Cache duration"
 
 #: includes/class-admin.php:139
+msgid "Akzentfarbe"
+msgstr "Accent colour"
+
+#: includes/class-admin.php:140
 msgid "RC RaceMap Logo anzeigen"
 msgstr "Show RC RaceMap logo"
 
-#: includes/class-admin.php:159 includes/class-admin.php:168
+#: includes/class-admin.php:160 includes/class-admin.php:169
 msgid "Automatische Updates"
 msgstr "Automatic updates"
 
-#: includes/class-admin.php:161
+#: includes/class-admin.php:162
 msgid ""
 "Dieses Plugin bezieht Updates aus seinem privaten GitHub-Repository. Dafür "
 "wird ein Zugriffstoken benötigt."
@@ -61,11 +65,11 @@ msgstr ""
 "This plugin gets its updates from its private GitHub repository. This "
 "requires an access token."
 
-#: includes/class-admin.php:180
+#: includes/class-admin.php:181
 msgid "GitHub-Token für Updates"
 msgstr "GitHub token for updates"
 
-#: includes/class-admin.php:244
+#: includes/class-admin.php:250
 msgid ""
 "Die Organisator-ID deines Vereins bei MyRCM – die Nummer, die MyRCM deinem "
 "Verein zuweist (z. B. „16961\"). Sie steht u. a. in der MyRCM-Adresse deiner "
@@ -75,11 +79,19 @@ msgstr ""
 "(e.g. \"16961\"). You can find it, among other places, in the MyRCM address "
 "of your club page."
 
-#: includes/class-admin.php:257
+#: includes/class-admin.php:264
+msgid ""
+"Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer lassen = "
+"automatisch die Linkfarbe deines Themes."
+msgstr ""
+"Colour for the date, title, class pills and the registration button. Leave "
+"empty to use your theme's link colour automatically."
+
+#: includes/class-admin.php:273
 msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
 msgstr "Show the RC RaceMap logo in the calendar footer."
 
-#: includes/class-admin.php:267
+#: includes/class-admin.php:283
 msgid ""
 "Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar "
 "sind."
@@ -87,7 +99,7 @@ msgstr ""
 "Automatically install new versions of this plugin as soon as they are "
 "available."
 
-#: includes/class-admin.php:269
+#: includes/class-admin.php:285
 msgid ""
 "Betrifft ausschließlich dieses Plugin. Andere Plugins, Themes und der "
 "WordPress-Core bleiben unberührt."
@@ -95,7 +107,7 @@ msgstr ""
 "Affects only this plugin. Other plugins, themes and the WordPress core "
 "remain untouched."
 
-#: includes/class-admin.php:284
+#: includes/class-admin.php:300
 msgid ""
 "Ein Token ist bereits über die Konstante RC_RCC_UPDATE_TOKEN in der wp-"
 "config.php gesetzt. Dieses Feld wird daher ignoriert."
@@ -103,7 +115,7 @@ msgstr ""
 "A token is already set via the RC_RCC_UPDATE_TOKEN constant in wp-"
 "config.php. This field is therefore ignored."
 
-#: includes/class-admin.php:286
+#: includes/class-admin.php:302
 msgid ""
 "Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-"
 "Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-"
@@ -112,55 +124,55 @@ msgstr ""
 "Fine-grained GitHub token with read access (Contents) to the plugin "
 "repository. The RC_RCC_UPDATE_TOKEN constant in wp-config.php is more secure."
 
-#: includes/class-admin.php:302
+#: includes/class-admin.php:318
 msgid "5 Minuten"
 msgstr "5 minutes"
 
-#: includes/class-admin.php:303
+#: includes/class-admin.php:319
 msgid "15 Minuten"
 msgstr "15 minutes"
 
-#: includes/class-admin.php:304
+#: includes/class-admin.php:320
 msgid "30 Minuten"
 msgstr "30 minutes"
 
-#: includes/class-admin.php:305
+#: includes/class-admin.php:321
 msgid "1 Stunde"
 msgstr "1 hour"
 
-#: includes/class-admin.php:306
+#: includes/class-admin.php:322
 msgid "6 Stunden"
 msgstr "6 hours"
 
-#: includes/class-admin.php:307
+#: includes/class-admin.php:323
 msgid "24 Stunden"
 msgstr "24 hours"
 
-#: includes/class-admin.php:320
+#: includes/class-admin.php:336
 msgid ""
 "Wie lange abgerufene Renndaten zwischengespeichert werden, bevor sie "
 "aktualisiert werden."
 msgstr "How long fetched race data is cached before it is refreshed."
 
-#: includes/class-admin.php:334
+#: includes/class-admin.php:350
 msgid "RC RaceMap Club Calendar"
 msgstr "RC RaceMap Club Calendar"
 
-#: includes/class-admin.php:345
+#: includes/class-admin.php:361
 msgid "Shortcode"
 msgstr "Shortcode"
 
-#: includes/class-admin.php:346
+#: includes/class-admin.php:362
 msgid ""
 "Füge diesen Shortcode auf einer beliebigen Seite ein, um den Kalender "
 "anzuzeigen:"
 msgstr "Insert this shortcode on any page to display the calendar:"
 
-#: includes/class-admin.php:393
+#: includes/class-admin.php:409
 msgid "Dazu bist du nicht berechtigt."
 msgstr "You are not allowed to do this."
 
-#: includes/class-admin.php:439
+#: includes/class-admin.php:455
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr "Race visibility saved."
 
@@ -192,19 +204,19 @@ msgstr "The sample data file does not contain valid JSON."
 msgid "%1$s – %2$s"
 msgstr "%1$s – %2$s"
 
-#: includes/class-race.php:502
+#: includes/class-race.php:481
 msgid "Nennung geöffnet"
 msgstr "Registration open"
 
-#: includes/class-race.php:504
+#: includes/class-race.php:483
 msgid "Nennung geschlossen"
 msgstr "Registration closed"
 
-#: includes/class-race.php:506
+#: includes/class-race.php:485
 msgid "Nennung folgt"
 msgstr "Registration to follow"
 
-#: includes/class-race.php:633
+#: includes/class-race.php:612
 msgid "Dokument"
 msgstr "Document"
 
@@ -252,56 +264,48 @@ msgstr "Status"
 msgid "Sichtbarkeit speichern"
 msgstr "Save visibility"
 
-#: templates/calendar.php:23
+#: templates/calendar.php:24
 msgid "Rennkalender"
 msgstr "Race calendar"
 
-#: templates/calendar.php:33
+#: templates/calendar.php:34
 msgid "Aktuelle Termine"
 msgstr "Upcoming events"
 
-#: templates/calendar.php:45
+#: templates/calendar.php:46
 msgid "Archiv"
 msgstr "Archive"
 
-#: templates/calendar.php:59
+#: templates/calendar.php:60
 msgid "Aktuell sind keine Termine vorhanden."
 msgstr "There are currently no events."
 
-#: templates/calendar.php:75
+#: templates/calendar.php:76
 msgid "Es sind noch keine vergangenen Rennen vorhanden."
 msgstr "There are no past races yet."
 
-#: templates/race-item.php:27
+#: templates/race-item.php:29
 msgid "Zum Rennen"
 msgstr "View race"
 
-#: templates/race-item.php:31
+#: templates/race-item.php:32
 msgid "Ergebnisse"
 msgstr "Results"
 
-#: templates/race-item.php:37
+#: templates/race-item.php:36
 msgid "Nennung"
 msgstr "Registration"
 
-#: templates/race-item.php:46
-msgid "Teilnehmerliste"
-msgstr "Entry list"
-
-#: templates/race-item.php:47
+#: templates/race-item.php:44
 msgid "Ausschreibung"
 msgstr "Announcement"
 
-#: templates/race-item.php:48
+#: templates/race-item.php:47
 msgid "Reglement"
 msgstr "Regulations"
 
-#: templates/race-item.php:53
-msgid "Beendet"
-msgstr "Finished"
-
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:106
+#: templates/race-item.php:95
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
@@ -311,6 +315,12 @@ msgstr[1] "%d participants"
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr "Select year"
+
+#~ msgid "Teilnehmerliste"
+#~ msgstr "Entry list"
+
+#~ msgid "Beendet"
+#~ msgstr "Finished"
 
 #, php-format
 #~ msgid "%1$s, %2$s"

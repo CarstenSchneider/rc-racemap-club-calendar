@@ -164,6 +164,7 @@ final class RC_RCC_Plugin {
 			'club_id'        => '',
 			'cache_ttl'      => HOUR_IN_SECONDS,
 			'show_logo'      => true,
+			'accent_color'   => '',
 			'update_token'   => '',
 			'auto_update'    => true,
 		);

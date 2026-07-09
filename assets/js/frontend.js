@@ -96,6 +96,12 @@
 	 */
 	function applyThemeAccent( root ) {
 		try {
+			// An explicit accent from the admin setting (inline style) wins –
+			// don't override it with the theme link colour.
+			if ( root.style && '' !== root.style.getPropertyValue( '--rc-rcc-accent' ) ) {
+				return;
+			}
+
 			var probe = document.createElement( 'a' );
 			probe.href = '#';
 			probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';

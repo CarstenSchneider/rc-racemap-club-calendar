@@ -11,15 +11,16 @@
  * @var string                     $uid            Eindeutige DOM-ID dieser Instanz.
  * @var array<int, RC_RCC_Race[]>  $current_groups Aktuelle/künftige Jahre → Rennen.
  * @var array<int, RC_RCC_Race[]>  $archive_groups Frühere Jahre → Rennen.
- * @var bool                       $show_logo      RC-RaceMap-Logo anzeigen.
- * @var string                     $logo_url       URL des Logos.
+ * @var bool                       $show_logo       RC-RaceMap-Logo anzeigen.
+ * @var string                     $logo_url        URL des Logos.
+ * @var string                     $container_style Optionaler Inline-Style (Akzentfarbe).
  *
  * @package RC_RaceMap_Club_Calendar
  */
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<div class="rc-rcc" id="<?php echo esc_attr( $uid ); ?>" data-rc-rcc>
+<div class="rc-rcc" id="<?php echo esc_attr( $uid ); ?>" data-rc-rcc<?php echo ( ! empty( $container_style ) ) ? ' style="' . esc_attr( $container_style ) . '"' : ''; ?>>
 	<div class="rc-rcc__tabs" role="tablist" aria-label="<?php echo esc_attr__( 'Rennkalender', 'rc-racemap-club-calendar' ); ?>">
 		<button
 			type="button"
