@@ -4,6 +4,19 @@ WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Mod
 
 > Diese Datei ist der **verbindliche Einstieg** für jede Claude-Code-Sitzung (lokal oder Cloud). Repo = einzige Quelle der Wahrheit; Arbeit soll nahtlos über Rechner/Umgebungen hinweg weiterlaufen.
 
+## Aktueller Stand (Handoff · v1.0.12)
+
+**Live & fertig:** Echte Daten über die MyRCM-Org-ID (MyRCM + RCK, Endpoint `https://rcracemap.com/api/clubs/{id}`); zweistufige Navigation (Haupt-Tabs „Aktuelle Termine"/„Archiv" + Jahres-Pills, ohne Reload); Kontext-Links pro Rennen (vergangen → Ergebnisse, kommend → Nennung); MyRCM-Links in Seitensprache (`pLa=de`); Rennen-Sichtbarkeit im Backend; Auto-Updates (Default an, öffentliches Repo, kein Token nötig); PHP 7.4-kompatibel. Getestet mit **TSV Mariendorf `18244`** und **RC Speedracer `45925`**.
+
+**Roadmap – offen:**
+- **Schritt 1 – Branding + Kartenlink** (Design zugesagt, Umsetzung offen): Footer-Logo auf den eigenen Verein verlinken → `https://rcracemap.com/?club=<myrcmOrgId>`. Dabei **Domain-Fix** `rc-racemap.com` → `rcracemap.com` (steht noch im Footer von `templates/calendar.php` sowie in den Plugin-Header-URIs). Karten-Basis-URL als Filter/Konstante vorsehen. Logo/Optik-Feinschliff.
+- **Schritt 2 – Free/Paid + Ads:** „free" zeigt RC-RaceMap-Ads, „paid" nicht. Zum Testen faken: RC Speedracer = free, TSV Mariendorf = paid. Die API soll später `tier`/`ads` je Verein liefern.
+
+**Externe Abhängigkeiten** (Projekt `myrcm-rc-map`, gebrieft in dessen `BRIEF-rc-racemap-plugin.md`, Branch `dev`):
+- **RCK-`hostName`-Fix:** Code vorhanden, aber `rck-races.json` noch nicht neu importiert → RCK zeigt vorerst leicht abweichende Vereins-/Venue-Namen (kein Plugin-Fehler).
+- **Volle Adresse:** API liefert nur `city` (Stadt), keine Straße → Plugin zeigt „Verein, Ort". Volle Adresse bräuchte ein API-Feld.
+- **`?club=`-Deeplink (Task C):** auf der Karte noch nicht gebaut. Ein unbekannter `?club=`-Parameter wird ignoriert → der Link degradiert sauber auf die allgemeine Karte, springt automatisch auf den Verein, sobald Task C live ist.
+
 ## Repo & Verteilung
 
 - GitHub (**öffentlich**): `https://github.com/CarstenSchneider/rc-racemap-club-calendar` (Account `CarstenSchneider`, Default-Branch `main`). Öffentlich, damit die Auto-Updates ohne Token laufen.
@@ -28,7 +41,7 @@ WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Mod
 | `class-race.php` | Wertobjekt: normalisiert Rohdaten → typisiertes Rennen |
 | `class-api.php` | **Einzige** Datenquelle: `GET {base}/api/clubs/{club-id}` + Sample-Fallback |
 | `class-cache.php` | Transients-Wrapper |
-| `class-calendar.php` | Businesslogik: upcoming/archiv, Sichtbarkeit, Sortierung, Memo |
+| `class-calendar.php` | Businesslogik: Jahres-Gruppierung (`current_groups()`/`archive_groups()`), Sichtbarkeit, Memo |
 | `class-admin.php` (+ `views/`) | Einstellungen + Rennen-Sichtbarkeit |
 | `class-shortcode.php` | Frontend-Rendering über `templates/` |
 | `class-updater.php` (+ `lib/plugin-update-checker/`) | GitHub-Auto-Updates |
@@ -62,11 +75,11 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 4. Seiten zeigen das Update im Backend. **Kein Token nötig** – das Repo ist öffentlich, PUC liest Releases anonym. Das Token-Feld/​die Konstante `RC_RCC_UPDATE_TOKEN` bleiben optional (Altlast); ein auf einer Seite eingetragenes **ungültiges** Token führt aber zu 401 – dann Feld leeren.
 5. **Auto-Install:** Setting `auto_update` (Default **an**) installiert neue Releases selbstständig. Umgesetzt über den `auto_update_plugin`-Filter in `class-updater.php::filter_auto_update()`, **strikt auf `RC_RCC_BASENAME` begrenzt** – andere Plugins/Themes/Core bleiben unberührt. Pull-Modell: kein aktiver Push möglich; Verbreitung erfolgt automatisch im wp-cron-Fenster (~12 h).
 
-## Offene TODOs
+## Nächste Schritte & Ideen
 
-- [x] Datenmodell (`class-race.php`, `sample-data.json`, Templates) an `docs/rc-racemap-data-model.md` angleicht → **v1.0.1** (real: `name`/`hostName`/`venueName`+`venueLocation`, `from`/`to`-Bereich, `series[]`, gemischte `classes` mit `entries`, `documents[]`→Links, `registrationStatus`+`note`; Slug-Club-ID; alte Sample-Keys bleiben als Fallback lesbar). `class-api.php` toleriert bereits `{events:[]}` und bare Liste.
-- [ ] Auto-Update-Ablauf einmal real testen (Token + v1.0.1).
-- [ ] Später (nicht jetzt): iCal/Export, Serien-Filter, Ergebnisse, Countdown, Gutenberg-Block.
+Aktuelle Roadmap + offene Abhängigkeiten siehe **[Aktueller Stand](#aktueller-stand-handoff--v1012)** oben (Schritt 1 Branding/Kartenlink, Schritt 2 Free/Paid+Ads).
+
+Ideen für später (nicht beauftragt): iCal/Export, Serien-Filter, Countdown bis zum nächsten Rennen, Gutenberg-Block, volle Adresse (sobald API-Feld vorhanden).
 
 ## Umgebung / Tooling-Hinweise
 
