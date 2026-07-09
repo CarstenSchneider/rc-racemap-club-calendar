@@ -177,3 +177,9 @@ msgstr ""
 
 msgid "Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php."
 msgstr ""
+
+msgid "Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar sind."
+msgstr ""
+
+msgid "Betrifft ausschließlich dieses Plugin. Andere Plugins, Themes und der WordPress-Core bleiben unberührt."
+msgstr ""

@@ -56,6 +56,7 @@ Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (
 2. `git commit` + `git push origin main`.
 3. `gh release create vX.Y.Z --title "vX.Y.Z" --notes "…" --latest` und die gebaute ZIP als Asset anhängen (`gh release upload`).
 4. Seiten zeigen das Update im Backend. **Kein Token nötig** – das Repo ist öffentlich, PUC liest Releases anonym. Das Token-Feld/​die Konstante `RC_RCC_UPDATE_TOKEN` bleiben optional (Altlast); ein auf einer Seite eingetragenes **ungültiges** Token führt aber zu 401 – dann Feld leeren.
+5. **Auto-Install:** Setting `auto_update` (Default **an**) installiert neue Releases selbstständig. Umgesetzt über den `auto_update_plugin`-Filter in `class-updater.php::filter_auto_update()`, **strikt auf `RC_RCC_BASENAME` begrenzt** – andere Plugins/Themes/Core bleiben unberührt. Pull-Modell: kein aktiver Push möglich; Verbreitung erfolgt automatisch im wp-cron-Fenster (~12 h).
 
 ## Offene TODOs
 

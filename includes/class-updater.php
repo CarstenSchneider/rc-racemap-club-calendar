@@ -61,11 +61,35 @@ class RC_RCC_Updater {
 			$checker->getVcsApi()->setReleaseVersionFilter( '/^v?\d+\.\d+/' );
 		}
 
-		// Authentifizierung für das private Repo.
+		// Authentifizierung (nur nötig, falls das Repo privat ist – bei
+		// öffentlichem Repo bleibt das Token leer und wird nicht gesetzt).
 		$token = $this->token();
 		if ( '' !== $token ) {
 			$checker->setAuthentication( $token );
 		}
+
+		// Optionale automatische Installation von Updates – ausschließlich für
+		// dieses Plugin (siehe filter_auto_update).
+		add_filter( 'auto_update_plugin', array( $this, 'filter_auto_update' ), 10, 2 );
+	}
+
+	/**
+	 * Automatische Updates NUR für dieses Plugin steuern.
+	 *
+	 * Für jedes andere Plugin wird der eingehende Wert unverändert
+	 * zurückgegeben – andere Plugins, Themes und der WordPress-Core bleiben
+	 * völlig unberührt.
+	 *
+	 * @param bool|null $update Bisherige Entscheidung von WordPress.
+	 * @param object    $item   Update-Objekt (u. a. mit ->plugin = Basename).
+	 * @return bool|null
+	 */
+	public function filter_auto_update( $update, $item ) {
+		if ( is_object( $item ) && isset( $item->plugin ) && RC_RCC_BASENAME === $item->plugin ) {
+			return (bool) RC_RCC_Plugin::get_setting( 'auto_update', true );
+		}
+
+		return $update;
 	}
 
 	/**

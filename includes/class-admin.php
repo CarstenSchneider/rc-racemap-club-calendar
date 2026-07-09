@@ -166,6 +166,18 @@ class RC_RCC_Admin {
 		);
 
 		add_settings_field(
+			'rc_rcc_field_auto_update',
+			__( 'Automatische Updates', 'rc-racemap-club-calendar' ),
+			array( $this, 'render_field' ),
+			self::PAGE_SETTINGS,
+			'rc_rcc_updates_section',
+			array(
+				'key'       => 'auto_update',
+				'label_for' => 'rc_rcc_field_auto_update',
+			)
+		);
+
+		add_settings_field(
 			'rc_rcc_field_update_token',
 			__( 'GitHub-Token für Updates', 'rc-racemap-club-calendar' ),
 			array( $this, 'render_field' ),
@@ -195,6 +207,8 @@ class RC_RCC_Admin {
 		$clean['archive_count']  = isset( $input['archive_count'] ) ? absint( $input['archive_count'] ) : $defaults['archive_count'];
 		$clean['cache_ttl']      = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
 		$clean['show_logo']      = ! empty( $input['show_logo'] );
+
+		$clean['auto_update'] = ! empty( $input['auto_update'] );
 
 		// Update-Token: nur unbedenkliche Token-Zeichen zulassen.
 		$token                  = isset( $input['update_token'] ) ? (string) $input['update_token'] : '';
@@ -257,6 +271,17 @@ class RC_RCC_Admin {
 					checked( (bool) $value, true, false ),
 					esc_html__( 'Das RC RaceMap Logo im Kalender-Fußbereich anzeigen.', 'rc-racemap-club-calendar' )
 				);
+				break;
+
+			case 'auto_update':
+				printf(
+					'<label><input type="checkbox" id="%1$s" name="%2$s" value="1" %3$s /> %4$s</label>',
+					esc_attr( $id ),
+					esc_attr( $name ),
+					checked( (bool) $value, true, false ),
+					esc_html__( 'Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar sind.', 'rc-racemap-club-calendar' )
+				);
+				echo '<p class="description">' . esc_html__( 'Betrifft ausschließlich dieses Plugin. Andere Plugins, Themes und der WordPress-Core bleiben unberührt.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'update_token':

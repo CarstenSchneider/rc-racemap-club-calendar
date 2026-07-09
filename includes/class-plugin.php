@@ -167,6 +167,7 @@ final class RC_RCC_Plugin {
 			'cache_ttl'      => HOUR_IN_SECONDS,
 			'show_logo'      => true,
 			'update_token'   => '',
+			'auto_update'    => true,
 		);
 	}
 
