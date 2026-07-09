@@ -27,7 +27,7 @@ class RC_RCC_Api {
 	 * Default API base URL. Override via the `rc_rcc_api_base_url` filter or
 	 * the RC_RCC_API_BASE_URL constant.
 	 */
-	private const DEFAULT_BASE_URL = 'https://raw.githubusercontent.com/CarstenSchneider/rc-racemap-data/main';
+	private const DEFAULT_BASE_URL = 'https://rcracemap.com';
 
 	/**
 	 * Cache component.

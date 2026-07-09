@@ -41,7 +41,9 @@ Immer über **stabile Event-ID** (nie Titel). Neue Rennen sind automatisch sicht
 
 ## Datenquelle & echtes Datenmodell
 
-**Datenquelle (Stand jetzt):** Standardmäßig **echte Daten** aus gehosteten Per-Verein-Snapshots. `class-api.php` lädt `GET {base}/api/clubs/{myrcmOrgId}`; `base` = `https://raw.githubusercontent.com/CarstenSchneider/rc-racemap-data/main` (Repo [rc-racemap-data](https://github.com/CarstenSchneider/rc-racemap-data), öffentlich). Eingabe = **MyRCM-Org-ID** (numerisch). Snapshots sind MyRCM+RCK gemerged, inkl. Vereinsmeta (name/website/lat/lng). Aktuell gehostet: **18244** (TSV Mariendorf), **45925** (RC Speedracer). Erzeugt aus `~/Documents/myrcm-rc-map` (`races.json` + `rck-races.json`, Join über `hosts.json`: `myrcmOrgId`→`hostId`, Koordinaten aus `venues.json`).
+**Datenquelle (ab v1.0.9): Live-API.** `class-api.php` lädt `GET {base}/api/clubs/{myrcmOrgId}`; `base` = **`https://rcracemap.com`** (Endpoint `api/clubs.php` im Projekt `myrcm-rc-map`, deployt auf Hetzner, CORS offen). Eingabe = **MyRCM-Org-ID** (numerisch, z. B. 18244/45925). Antwort `{club, events}` (MyRCM+RCK gemerged, `source`-Feld je Event, Vereinsmeta name/website/lat/lng). **Domain ist `rcracemap.com` – NICHT `rc-racemap.com`** (der alte Footer-Link war falsch, für Schritt 1 relevant). Die statischen Snapshots (Repo rc-racemap-data) waren die Zwischenlösung und sind durch die Live-API abgelöst. Vertrag: [`docs/api-contract.md`](docs/api-contract.md).
+
+Offen (myrcm-rc-map-Seite): Der RCK-`hostName`-Fix ist im Code, aber der deployte `rck-races.json`-Stand ist noch nicht neu importiert → RCK zeigt vorerst weiter leicht abweichende Namen.
 
 Sample-Daten (`sample-data.json`) sind jetzt **Opt-in** für lokale Entwicklung: Konstante `RC_RCC_USE_SAMPLE_DATA` oder Filter `rc_rcc_use_sample_data`. Basis-URL überschreibbar via Konstante `RC_RCC_API_BASE_URL` / Filter `rc_rcc_api_base_url`.
 

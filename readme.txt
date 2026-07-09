@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.9 =
+* Umstellung auf die Live-Datenquelle (rcracemap.com): Renndaten kommen jetzt direkt aus der RC-RaceMap-API statt aus statischen Snapshots – aktueller und vollständiger.
 
 = 1.0.8 =
 * Archiv jetzt nach Jahr gruppiert (neuestes Jahr zuerst); Standard zeigt alle vergangenen Rennen.
