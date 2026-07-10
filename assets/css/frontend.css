@@ -231,7 +231,9 @@
 	text-decoration: none;
 }
 
-.rc-rcc__ppl-count {
+/* Teilnehmerzahl nur unterstreichen, wenn sie tatsächlich verlinkt ist
+   (Teilnehmerliste vorhanden) – sonst wirkt sie fälschlich klickbar. */
+a.rc-rcc__ppl .rc-rcc__ppl-count {
 	text-decoration: underline;
 	text-underline-offset: 2px;
 }

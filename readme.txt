@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.21
+Stable tag: 1.0.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.22 =
+* Teilnehmerzahl wird nur noch unterstrichen, wenn sie tatsächlich zur Teilnehmerliste verlinkt ist (z. B. bei RCK-Rennen ohne Liste ist sie nun nicht mehr fälschlich als Link markiert).
 
 = 1.0.21 =
 * Nennung-Button: Schrift und Icon jetzt zuverlässig lesbar (fester heller Farbwert statt Systemfarbe – vermeidet, dass die Schrift auf die Theme-Linkfarbe zurückfällt und unsichtbar wird).
