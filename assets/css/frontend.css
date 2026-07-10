@@ -164,12 +164,17 @@
 	padding-top: 0.25rem;
 }
 
-/* Datum: numerisch, dezent (gedämpfte Sekundärfarbe). */
+/* Datum: gleiche Größe wie der Titel; aktives (kommendes) Rennen in voller
+   Theme-Textfarbe, vergangene gedämpft. */
 .rc-rcc .rc-rcc__date {
-	font-size: 0.9em;
+	font-size: 1.12em;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
-	line-height: 1.5;
+	line-height: 1.3;
+	color: inherit;
+}
+
+.rc-rcc__item--past .rc-rcc__date {
 	color: var(--rc-rcc-muted);
 }
 
@@ -232,7 +237,14 @@
 }
 
 .rc-rcc .rc-rcc__doc {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3em;
 	color: inherit;
+	text-decoration: none;
+}
+
+.rc-rcc__doc-label {
 	text-decoration: underline;
 	text-underline-offset: 2px;
 }
@@ -265,7 +277,9 @@
 /* Aktion: nur der primäre Button. Kommend = gefüllter Akzent (die einzige
    farbige Fläche), vergangen = leiser Ghost-Button. */
 .rc-rcc .rc-rcc__cta {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45em;
 	padding: 0.5em 1.15em;
 	font-size: 0.86em;
 	font-weight: 600;

@@ -28,26 +28,29 @@ if ( $rc_is_past ) {
 	if ( $race->is_rck() ) {
 		$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
 		$cta_url   = $event_url;
+		$cta_icon  = 'external';
 	} else {
 		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
 		$cta_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
+		$cta_icon  = 'results';
 	}
 } else {
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
 	$cta_url   = $event_url;
+	$cta_icon  = 'pen';
 }
 
 // Dokument-Links (untereinander als Text-Links): Ausschreibung, Reglement,
 // weitere Dokumente.
 $documents = array();
 if ( ! empty( $race->links['announcement'] ) ) {
-	$documents[] = array( __( 'Ausschreibung', 'rc-racemap-club-calendar' ), $race->links['announcement'] );
+	$documents[] = array( __( 'Ausschreibung', 'rc-racemap-club-calendar' ), $race->links['announcement'], 'announcement' );
 }
 if ( ! empty( $race->links['regulations'] ) ) {
-	$documents[] = array( __( 'Reglement', 'rc-racemap-club-calendar' ), $race->links['regulations'] );
+	$documents[] = array( __( 'Reglement', 'rc-racemap-club-calendar' ), $race->links['regulations'], 'regulations' );
 }
 foreach ( $race->extra_links as $doc ) {
-	$documents[] = array( $doc['label'], $doc['url'] );
+	$documents[] = array( $doc['label'], $doc['url'], 'document' );
 }
 
 $participants_url = $race->links['participants'] ?? '';
@@ -91,7 +94,7 @@ $has_participants = ( null !== $race->participant_count );
 				<?php endif; ?>
 
 				<?php foreach ( $documents as $doc ) : ?>
-					<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $doc[0] ); ?></a>
+					<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><?php echo RC_RCC_Shortcode::icon( $doc[2] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?><span class="rc-rcc__doc-label"><?php echo esc_html( $doc[0] ); ?></span></a>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
@@ -112,7 +115,7 @@ $has_participants = ( null !== $race->participant_count );
 
 	<div class="rc-rcc__action">
 		<?php if ( '' !== $cta_url ) : ?>
-			<a class="rc-rcc__cta rc-rcc__cta--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( $cta_label ); ?></a>
+			<a class="rc-rcc__cta rc-rcc__cta--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><?php echo RC_RCC_Shortcode::icon( $cta_icon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?><span class="rc-rcc__cta-label"><?php echo esc_html( $cta_label ); ?></span></a>
 		<?php endif; ?>
 	</div>
 </li>

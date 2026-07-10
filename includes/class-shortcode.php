@@ -184,9 +184,11 @@ class RC_RCC_Shortcode {
 		$g = hexdec( substr( $raw, 2, 2 ) );
 		$b = hexdec( substr( $raw, 4, 2 ) );
 
-		// Perceived brightness (ITU-R BT.601); dark accents get white text.
+		// Text/Icon auf dem gefüllten Button = Seitenfarbe (`Canvas`), damit es
+		// sich klar vom Akzent abhebt. Nur bei sehr hellen Akzenten, wo die
+		// Seitenfarbe zu wenig Kontrast hätte, auf dunklen Text wechseln.
 		$brightness = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
-		$on_accent  = ( $brightness < 150 ) ? '#ffffff' : '#111111';
+		$on_accent  = ( $brightness > 200 ) ? '#111111' : 'Canvas';
 
 		return '--rc-rcc-accent:' . $hex . ';--rc-rcc-on-accent:' . $on_accent . ';';
 	}
@@ -209,6 +211,8 @@ class RC_RCC_Shortcode {
 		$paths = array(
 			// Nennung / registration – clipboard with a check.
 			'registration' => '<path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 6H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2"/><path d="m9 14 2 2 4-4"/>',
+			// Nennung – Stift (Bearbeiten).
+			'pen'          => '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
 			// Ergebnisse / results – trophy.
 			'results'      => '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
 			// Zum Rennen – external link.

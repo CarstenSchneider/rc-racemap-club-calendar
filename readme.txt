@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.19
+Stable tag: 1.0.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,14 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.20 =
+* Datum in Titelgröße; Datum des kommenden Rennens in voller Textfarbe (vergangene gedämpft).
+* Icons vor den Aktionen: Stift (Nennung), Pokal (Ergebnisse), Dokument (Ausschreibung).
+* Nennung-Button: Schrift und Icon in der Seitenfarbe, damit sie auf der Akzentfläche gut lesbar sind.
+
+= 1.0.13 – 1.0.19 =
+* Neues, ruhiges und theme-unabhängiges Kalender-Design (Zeilen-Layout, Inline-Icons); im Admin einstellbare Akzentfarbe; leere Musterdaten; englische Übersetzung (en_US/en_GB).
 
 = 1.0.12 =
 * Neue Aufteilung: „Aktuelle Termine" (dieses Jahr + Zukunft, aufsteigend) und „Archiv" (frühere Jahre, absteigend) – jeweils mit Jahres-Navigation (ohne Seitenreload).
