@@ -111,11 +111,11 @@
 
 /* --- Jahres-Navigation (Pills) ------------------------------------------- */
 
-.rc-rcc__years {
+.rc-rcc .rc-rcc__years {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.4rem;
-	margin: 0 0 1rem;
+	margin: 1.5rem 0;
 }
 
 .rc-rcc .rc-rcc__year-btn {
@@ -292,7 +292,7 @@
 
 .rc-rcc__cta--upcoming {
 	background: var(--rc-rcc-accent);
-	color: var(--rc-rcc-on-accent, Canvas);
+	color: var(--rc-rcc-on-accent, #fff);
 }
 
 .rc-rcc__cta--past {
@@ -369,11 +369,3 @@
 	}
 }
 
-/* Ältere Browser ohne die System-Farbe „Canvas": heller Text auf den
-   gefüllten Flächen (Klassen-Pillen, Nennung-/Ergebnis-Button). */
-@supports not ( color: Canvas ) {
-	.rc-rcc__class,
-	.rc-rcc__cta {
-		color: #fff;
-	}
-}

@@ -184,11 +184,12 @@ class RC_RCC_Shortcode {
 		$g = hexdec( substr( $raw, 2, 2 ) );
 		$b = hexdec( substr( $raw, 4, 2 ) );
 
-		// Text/Icon auf dem gefüllten Button = Seitenfarbe (`Canvas`), damit es
-		// sich klar vom Akzent abhebt. Nur bei sehr hellen Akzenten, wo die
-		// Seitenfarbe zu wenig Kontrast hätte, auf dunklen Text wechseln.
+		// Text/Icon auf dem gefüllten Button: helle Schrift (Weiß) auf dem Akzent,
+		// nur bei sehr hellen Akzenten dunkle Schrift. Bewusst ein fester
+		// Farbwert (kein `Canvas`), damit die Schrift nicht auf die Theme-
+		// Linkfarbe zurückfällt (die oft dem Akzent gleicht → unsichtbar).
 		$brightness = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
-		$on_accent  = ( $brightness > 200 ) ? '#111111' : 'Canvas';
+		$on_accent  = ( $brightness > 200 ) ? '#111111' : '#ffffff';
 
 		return '--rc-rcc-accent:' . $hex . ';--rc-rcc-on-accent:' . $on_accent . ';';
 	}
