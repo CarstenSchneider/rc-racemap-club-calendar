@@ -81,10 +81,11 @@ msgstr ""
 
 #: includes/class-admin.php:264
 msgid ""
-"Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-Textfarbe)."
+"Akzentfarbe für Links, aktive Navigation und die Teilnehmerzahl. Standard: "
+"neutrales Grau."
 msgstr ""
-"Color of the registration button. Leave empty for a subtle default (theme "
-"text color)."
+"Accent color for links, the active navigation and the participant count. "
+"Default: neutral gray."
 
 #: includes/class-admin.php:273
 msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
@@ -203,21 +204,31 @@ msgstr "The sample data file does not contain valid JSON."
 msgid "%1$s – %2$s"
 msgstr "%1$s – %2$s"
 
-#: includes/class-race.php:481
+#: includes/class-race.php:476
 msgid "Nennung geöffnet"
 msgstr "Registration open"
 
-#: includes/class-race.php:483
+#: includes/class-race.php:478
 msgid "Nennung geschlossen"
 msgstr "Registration closed"
 
-#: includes/class-race.php:485
+#: includes/class-race.php:480
 msgid "Nennung folgt"
 msgstr "Registration to follow"
 
-#: includes/class-race.php:612
+#: includes/class-race.php:607
 msgid "Dokument"
 msgstr "Document"
+
+#. translators: %d: Anzahl weiterer Rennklassen.
+#: includes/class-shortcode.php:104
+#, php-format
+msgid "+%d weitere"
+msgstr "+%d more"
+
+#: includes/class-shortcode.php:105
+msgid "weniger"
+msgstr "less"
 
 #: includes/views/manage-races.php:21
 msgid "Daten aktualisieren"
@@ -283,28 +294,28 @@ msgstr "There are currently no events."
 msgid "Es sind noch keine vergangenen Rennen vorhanden."
 msgstr "There are no past races yet."
 
-#: templates/race-item.php:29
+#: templates/race-item.php:26
 msgid "Zum Rennen"
 msgstr "View race"
 
-#: templates/race-item.php:32
+#: templates/race-item.php:29
 msgid "Ergebnisse"
 msgstr "Results"
 
-#: templates/race-item.php:36
+#: templates/race-item.php:34
 msgid "Nennung"
 msgstr "Registration"
 
-#: templates/race-item.php:44
+#: templates/race-item.php:42
 msgid "Ausschreibung"
 msgstr "Announcement"
 
-#: templates/race-item.php:47
+#: templates/race-item.php:45
 msgid "Reglement"
 msgstr "Regulations"
 
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:74
+#: templates/race-item.php:72
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
@@ -314,6 +325,13 @@ msgstr[1] "%d participants"
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr "Select year"
+
+#~ msgid ""
+#~ "Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-"
+#~ "Textfarbe)."
+#~ msgstr ""
+#~ "Color of the registration button. Leave empty for a subtle default (theme "
+#~ "text color)."
 
 #~ msgid ""
 #~ "Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer "
