@@ -1,27 +1,37 @@
 /**
- * RC RaceMap Club Calendar – Frontend-Layout.
+ * RC RaceMap Club Calendar – Frontend.
  *
- * Selbsttragend und theme-unabhängig: Layout-Regeln sind mit dem
- * .rc-rcc-Vorfahren geschrieben (Spezifität 0,2,0), damit Theme-Content-Regeln
- * wie `.entry-content h3 { margin: … }` (0,1,1) keine Abstände/Einrückungen
- * durchdrücken. Farben kommen weiter vom Theme (currentColor / Akzent).
+ * Eigenständiges, THEME-UNABHÄNGIGES Design: eigene Schrift (Inter/System),
+ * neutrale helle Karten. Farbe kommt nur als Akzent (eine Option, Standard =
+ * neutrales Dunkelgrau) – für Links, aktive Navigation und die Teilnehmerzahl.
+ * Karten selbst bleiben neutral (keine farbigen Kacheln).
  *
- * Dreispaltige Zeile (ab 600px): Datum · Info (Titel/Klassen/Dokumente) · Status
- * (Teilnehmer + Button). Mobil gestapelt.
+ * Erhöhte Spezifität (.rc-rcc.rc-rcc / .rc-rcc a…), damit das Theme nichts
+ * überschreibt.
  */
 
 .rc-rcc {
-	--rc-rcc-radius: 6px;
-	--rc-rcc-border: color-mix( in srgb, currentColor 20%, transparent );
-	--rc-rcc-muted: color-mix( in srgb, currentColor 55%, transparent );
-	/* Akzentfarbe (nur der Nennung-Button): Default = Theme-Textfarbe für einen
-	   dezenten, kräftigen Button. Im Admin per Farbwähler überschreibbar. */
-	--rc-rcc-accent: currentColor;
+	/* Einzige Farb-Option (Admin-Farbwähler). Standard = neutrales Slate. */
+	--rc-rcc-accent: #2c333f;
+	--rc-rcc-on-accent: #ffffff;
 
-	font: inherit;
-	color: inherit;
+	/* Feste, theme-unabhängige Tokens. */
+	--rc-rcc-text: #1f1d1a;
+	--rc-rcc-muted: #726f6a;
+	--rc-rcc-card: #ffffff;
+	--rc-rcc-card-past: #f6f5f2;
+	--rc-rcc-border: #e6e3de;
+	--rc-rcc-tag-bg: #f1efe9;
+	--rc-rcc-tag-text: #5f5d58;
+	--rc-rcc-open: #2f9e44;
+
+	font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: var(--rc-rcc-text);
+	text-align: left;
 	box-sizing: border-box;
-	max-width: 100%;
+	-webkit-font-smoothing: antialiased;
 }
 
 .rc-rcc *,
@@ -30,38 +40,36 @@
 	box-sizing: inherit;
 }
 
-/* Reset mit erhöhter Spezifität (0,2,0) – neutralisiert Theme-Margins/Padding
-   auf genau den Elementen, die der Kalender rendert. */
-.rc-rcc .rc-rcc__list,
-.rc-rcc .rc-rcc__years,
-.rc-rcc .rc-rcc__classes {
+/* Reset mit hoher Spezifität – ABER die Karte (li.rc-rcc__item) ausgenommen,
+   damit ihr Innenabstand nicht auf 0 gesetzt wird. */
+.rc-rcc.rc-rcc h1,
+.rc-rcc.rc-rcc h2,
+.rc-rcc.rc-rcc h3,
+.rc-rcc.rc-rcc h4,
+.rc-rcc.rc-rcc p,
+.rc-rcc.rc-rcc ul,
+.rc-rcc.rc-rcc ol,
+.rc-rcc.rc-rcc li:not(.rc-rcc__item) {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	text-indent: 0;
 }
 
-.rc-rcc .rc-rcc__item,
-.rc-rcc .rc-rcc__title,
-.rc-rcc .rc-rcc__classes,
-.rc-rcc .rc-rcc__links,
-.rc-rcc .rc-rcc__action {
-	margin: 0;
-	padding: 0;
-}
-
 .rc-rcc__icon {
 	flex: 0 0 auto;
+	width: 1em;
+	height: 1em;
 	vertical-align: -0.15em;
 }
 
-/* --- Tabs ---------------------------------------------------------------- */
+/* --- Haupt-Tabs ---------------------------------------------------------- */
 
-.rc-rcc__tabs {
+.rc-rcc .rc-rcc__tabs {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.25rem;
-	margin: 0 0 1rem;
+	gap: 2px;
+	margin: 0 0 18px;
 	padding: 0;
 	border-bottom: 1px solid var(--rc-rcc-border);
 }
@@ -72,136 +80,129 @@
 	border: 0;
 	border-bottom: 2px solid transparent;
 	margin: 0;
-	padding: 0.5rem 0.85rem;
-	font: inherit;
+	padding: 8px 14px;
+	font-family: inherit;
+	font-size: 15px;
 	font-weight: 600;
-	color: inherit;
+	line-height: 1.3;
+	color: var(--rc-rcc-muted);
 	cursor: pointer;
-	opacity: 0.65;
-	transition: opacity 0.15s ease, border-color 0.15s ease;
+	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.rc-rcc__tab:hover,
-.rc-rcc__tab:focus-visible {
-	opacity: 1;
+.rc-rcc .rc-rcc__tab:hover,
+.rc-rcc .rc-rcc__tab:focus-visible {
+	color: var(--rc-rcc-text);
 }
 
-.rc-rcc__tab.is-active {
-	opacity: 1;
-	border-bottom-color: currentColor;
+.rc-rcc .rc-rcc__tab.is-active {
+	color: var(--rc-rcc-text);
+	border-bottom-color: var(--rc-rcc-accent);
 }
 
-/* --- Panels / Liste ------------------------------------------------------ */
-
-.rc-rcc__panel[hidden] {
+.rc-rcc .rc-rcc__panel[hidden] {
 	display: none;
 }
 
-.rc-rcc .rc-rcc__list {
-	display: flex;
-	flex-direction: column;
-	gap: 0;
-}
-
-.rc-rcc__empty {
-	margin: 0;
-	opacity: 0.75;
-	font-style: italic;
-}
-
-/* --- Jahres-Navigation (dezente Text-Tabs, keine Pillen) ----------------- */
+/* --- Jahres-Navigation --------------------------------------------------- */
 
 .rc-rcc .rc-rcc__years {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.15rem 1rem;
-	margin: 1rem 0 1.25rem;
-	font-size: 0.9em;
+	gap: 2px 18px;
+	margin: 0 0 16px;
+	padding: 0;
 }
 
 .rc-rcc .rc-rcc__year-btn {
 	appearance: none;
 	background: transparent;
-	color: var(--rc-rcc-muted);
-	font: inherit;
-	font-weight: 600;
-	line-height: 1.2;
-	margin: 0;
-	padding: 0.15em 0;
 	border: 0;
 	border-bottom: 2px solid transparent;
+	margin: 0;
+	padding: 2px 0;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: var(--rc-rcc-muted);
 	cursor: pointer;
 	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.rc-rcc__year-btn:hover,
-.rc-rcc__year-btn:focus-visible {
-	color: inherit;
+.rc-rcc .rc-rcc__year-btn:hover,
+.rc-rcc .rc-rcc__year-btn:focus-visible {
+	color: var(--rc-rcc-text);
 }
 
-.rc-rcc__year-btn.is-active {
-	color: inherit;
+.rc-rcc .rc-rcc__year-btn.is-active {
+	color: var(--rc-rcc-text);
 	border-bottom-color: var(--rc-rcc-accent);
 }
 
-.rc-rcc__year-panel[hidden] {
+.rc-rcc .rc-rcc__year-panel[hidden] {
 	display: none;
 }
 
-/* --- Einzelnes Rennen (Zeile: Datum · Info · Aktion) --------------------
-   Klare Ebenen: Titel (groß) › Klassen (leise Textzeile) › Links (Akzent,
-   klickbar). Rechts genau ein Button. */
+/* --- Liste --------------------------------------------------------------- */
 
-.rc-rcc .rc-rcc__item {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 0.5rem;
-	padding: 1.4rem 0;
-	border-top: 1px solid var(--rc-rcc-border);
+.rc-rcc .rc-rcc__list {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
 }
 
-.rc-rcc .rc-rcc__list > .rc-rcc__item:first-child {
-	border-top: 0;
-}
-
-/* Mobil (gestapelt): Button linksbündig, mit etwas Abstand. */
-.rc-rcc .rc-rcc__action {
-	justify-self: start;
-	margin-top: 0.25rem;
-}
-
-/* Datum: gleiche Größe wie der Renntitel. Kommend volle Textfarbe,
-   vergangen gedämpft. Tag + 3-Buchstaben-Monat, ohne Jahr. */
-.rc-rcc .rc-rcc__date {
-	font-size: 1.35em;
-	font-weight: 700;
-	font-variant-numeric: tabular-nums;
-	line-height: 1.25;
+.rc-rcc .rc-rcc__empty {
+	margin: 0;
 	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc__item--upcoming .rc-rcc__date {
-	color: inherit;
+/* --- Renn-Karte (neutral, viel Padding) ---------------------------------- */
+
+.rc-rcc .rc-rcc__item {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin: 0;
+	padding: 24px 28px;
+	border: 1px solid var(--rc-rcc-border);
+	border-radius: 16px;
+	background: var(--rc-rcc-card);
+	box-shadow: 0 4px 14px rgba( 20, 20, 20, 0.05 );
 }
 
-.rc-rcc__date time {
+.rc-rcc .rc-rcc__item--past {
+	background: var(--rc-rcc-card-past);
+	box-shadow: none;
+}
+
+/* Datum (klein, gedämpft). */
+.rc-rcc .rc-rcc__date {
+	font-size: 14px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.3;
+	color: var(--rc-rcc-muted);
+}
+
+.rc-rcc .rc-rcc__date time {
 	color: inherit;
 	text-decoration: none;
 }
 
-.rc-rcc .rc-rcc__info {
+/* Titelzeile: Titel links, Teilnehmerzahl rechts (gleiche Typo). */
+.rc-rcc .rc-rcc__head {
 	display: flex;
-	flex-direction: column;
-	gap: 0.45rem;
-	min-width: 0;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px 20px;
 }
 
-/* Ebene 1 – Titel: die dominante Überschrift. */
 .rc-rcc .rc-rcc__title {
-	font-size: 1.35em;
+	font-size: 21px;
 	font-weight: 700;
 	line-height: 1.25;
-	color: inherit;
+	color: var(--rc-rcc-text);
 	overflow-wrap: anywhere;
 }
 
@@ -209,164 +210,153 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* Ebene 2 – Klassen: leise Textzeile, nur zum Lesen (·-getrennt). */
-.rc-rcc .rc-rcc__classes {
-	font-size: 0.9em;
-	line-height: 1.5;
-	color: var(--rc-rcc-muted);
-}
-
-.rc-rcc .rc-rcc__class {
-	white-space: nowrap;
-}
-
-.rc-rcc .rc-rcc__class + .rc-rcc__class::before {
-	content: "·";
-	margin: 0 0.45em;
-	opacity: 0.5;
-}
-
-.rc-rcc__class-entries {
-	font-variant-numeric: tabular-nums;
-	margin-left: 0.3em;
-	opacity: 0.6;
-}
-
-/* Ebene 3 – Links: klar klickbar (Akzentfarbe + Unterstrich). */
-.rc-rcc .rc-rcc__links {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.3rem 1.15rem;
-	font-size: 0.95em;
-}
-
-.rc-rcc .rc-rcc__link {
+.rc-rcc .rc-rcc__ppl {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.35em;
-	font-weight: 600;
+	gap: 6px;
+	flex: 0 0 auto;
+	font-size: 21px;
+	font-weight: 700;
 	font-variant-numeric: tabular-nums;
+	line-height: 1.25;
 	white-space: nowrap;
 	color: var(--rc-rcc-accent);
 	text-decoration: none;
 }
 
-.rc-rcc a.rc-rcc__link .rc-rcc__link-label {
+.rc-rcc .rc-rcc__ppl .rc-rcc__icon {
+	width: 0.85em;
+	height: 0.85em;
+}
+
+.rc-rcc .rc-rcc__ppl--static {
+	color: var(--rc-rcc-muted);
+}
+
+.rc-rcc a.rc-rcc__ppl:hover,
+.rc-rcc a.rc-rcc__ppl:focus-visible {
+	filter: brightness( 1.15 );
+}
+
+/* Aktions-/Dokumentzeile. */
+.rc-rcc .rc-rcc__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 20px;
+	font-size: 14.5px;
+}
+
+.rc-rcc .rc-rcc__action {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-weight: 700;
+	color: var(--rc-rcc-accent);
+	text-decoration: none;
+}
+
+.rc-rcc .rc-rcc__action--open {
+	color: var(--rc-rcc-open);
+}
+
+.rc-rcc .rc-rcc__action--open::before {
+	content: "";
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--rc-rcc-open);
+	margin-right: 2px;
+}
+
+.rc-rcc a.rc-rcc__action:hover .rc-rcc__action-label,
+.rc-rcc a.rc-rcc__action:focus-visible .rc-rcc__action-label {
 	text-decoration: underline;
 	text-underline-offset: 3px;
 }
 
-.rc-rcc a.rc-rcc__link:hover .rc-rcc__link-label,
-.rc-rcc a.rc-rcc__link:focus-visible .rc-rcc__link-label {
-	text-decoration-thickness: 2px;
+.rc-rcc .rc-rcc__doc {
+	font-weight: 600;
+	color: var(--rc-rcc-accent);
+	text-decoration: underline;
+	text-underline-offset: 3px;
 }
 
-/* Nicht verlinkte Teilnehmerzahl (keine Teilnehmerliste) = nicht klickbar. */
-.rc-rcc .rc-rcc__ppl--static {
+.rc-rcc a.rc-rcc__doc:hover,
+.rc-rcc a.rc-rcc__doc:focus-visible {
+	filter: brightness( 1.15 );
+}
+
+/* Rennklassen als dezente Tags; Zahl in Akzentfarbe. */
+.rc-rcc .rc-rcc__classes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.rc-rcc .rc-rcc__class {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.35em;
-	font-weight: 600;
-	font-variant-numeric: tabular-nums;
-	white-space: nowrap;
-	color: var(--rc-rcc-muted);
+	gap: 5px;
+	font-size: 12.5px;
+	font-weight: 500;
+	line-height: 1.4;
+	padding: 4px 11px;
+	border-radius: 999px;
+	background: var(--rc-rcc-tag-bg);
+	color: var(--rc-rcc-tag-text);
 }
 
-/* Aktion: ein Button. Kommend gefüllter Akzent, vergangen Akzent-Rahmen. */
-.rc-rcc .rc-rcc__cta {
-	display: inline-block;
-	padding: 0.6em 1.4em;
-	font-size: 0.95em;
+.rc-rcc .rc-rcc__class-entries {
 	font-weight: 700;
-	line-height: 1.2;
-	border: 2px solid transparent;
-	border-radius: var(--rc-rcc-radius);
-	white-space: nowrap;
-	text-decoration: none;
-}
-
-/* Farbregeln mit .rc-rcc-Präfix (0,2,x), sonst überschreibt die Theme-`a`-
-   Farbe den Button-Text (Akzent auf Akzent = unsichtbar). */
-.rc-rcc a.rc-rcc__cta--upcoming {
-	background: var(--rc-rcc-accent);
-	color: var(--rc-rcc-on-accent, #fff);
-}
-
-.rc-rcc a.rc-rcc__cta--past {
-	background: transparent;
-	border-color: var(--rc-rcc-accent);
+	font-variant-numeric: tabular-nums;
 	color: var(--rc-rcc-accent);
 }
 
-.rc-rcc a.rc-rcc__cta--upcoming:hover,
-.rc-rcc a.rc-rcc__cta--upcoming:focus-visible {
-	filter: brightness( 1.1 );
+.rc-rcc__item--past .rc-rcc__class-entries {
+	color: var(--rc-rcc-tag-text);
 }
 
-.rc-rcc a.rc-rcc__cta--past:hover,
-.rc-rcc a.rc-rcc__cta--past:focus-visible {
-	background: color-mix( in srgb, var(--rc-rcc-accent) 12%, transparent );
+.rc-rcc .rc-rcc__class[hidden] {
+	display: none;
 }
 
-/* Ab genügend Breite: drei Spalten. Datum fix (fluchtet zeilenübergreifend),
-   Info flexibel, Button rechtsbündig & vertikal zentriert. Darunter gestapelt
-   (kein Overlap). Breakpoint bewusst hoch, damit die drei Spalten nie klemmen. */
-@media ( min-width: 760px ) {
-	.rc-rcc .rc-rcc__item {
-		grid-template-columns: 8.5rem minmax( 0, 1fr ) minmax( max-content, auto );
-		grid-template-areas: "date info action";
-		align-items: center;
-		column-gap: 2rem;
-		row-gap: 0.4rem;
-	}
+/* „+N weitere"-Umschalter (von frontend.js eingefügt). */
+.rc-rcc .rc-rcc__class-more {
+	appearance: none;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 4px 11px;
+	border-radius: 999px;
+	border: 1px solid var(--rc-rcc-border);
+	background: transparent;
+	color: var(--rc-rcc-accent);
+}
 
-	.rc-rcc__date {
-		grid-area: date;
-		align-self: start;
-	}
-
-	.rc-rcc__info {
-		grid-area: info;
-	}
-
-	.rc-rcc .rc-rcc__action {
-		grid-area: action;
-		justify-self: end;
-		margin-top: 0;
-	}
+.rc-rcc .rc-rcc__class-more:hover,
+.rc-rcc .rc-rcc__class-more:focus-visible {
+	border-color: var(--rc-rcc-accent);
 }
 
 /* --- Footer / Logo ------------------------------------------------------- */
 
-.rc-rcc__footer {
-	margin-top: 1rem;
-	padding-top: 0.75rem;
+.rc-rcc .rc-rcc__footer {
+	margin: 18px 0 0;
+	padding-top: 12px;
 	border-top: 1px solid var(--rc-rcc-border);
 	text-align: right;
 }
 
-.rc-rcc__brand {
+.rc-rcc .rc-rcc__brand {
 	display: inline-block;
 	opacity: 0.7;
-	transition: opacity 0.15s ease;
 }
 
-.rc-rcc__brand:hover {
-	opacity: 1;
-}
-
-.rc-rcc__logo {
+.rc-rcc .rc-rcc__logo {
 	display: block;
 	height: auto;
 	max-width: 100%;
 }
-
-/* Ältere Browser ohne color-mix: sichtbare Fallbacks für Linien/Flächen. */
-@supports not ( color: color-mix( in srgb, currentColor 20%, transparent ) ) {
-	.rc-rcc {
-		--rc-rcc-border: rgba( 128, 128, 128, 0.35 );
-		--rc-rcc-muted: rgba( 128, 128, 128, 0.9 );
-	}
-}
-

@@ -87,11 +87,56 @@
 	}
 
 	/**
+	 * Klassen-Tags ab N Stück einklappen und einen „+X weitere"-Umschalter
+	 * anhängen (fällt ohne JS auf „alle sichtbar" zurück).
+	 *
+	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
+	 */
+	function collapseClasses( root ) {
+		var limit = 4;
+		var i18n = window.rcRccData || {};
+		var moreTpl = i18n.more || '+%d';
+		var lessTxt = i18n.less || '–';
+
+		slice( root.querySelectorAll( '[data-rc-rcc-classes]' ) ).forEach( function ( list ) {
+			var tags = slice( list.querySelectorAll( '.rc-rcc__class' ) );
+			if ( tags.length <= limit + 1 ) {
+				return;
+			}
+
+			var hidden = tags.slice( limit );
+			hidden.forEach( function ( tag ) {
+				tag.hidden = true;
+			} );
+
+			var moreLabel = moreTpl.replace( '%d', hidden.length );
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'rc-rcc__class-more';
+			btn.textContent = moreLabel;
+			btn.setAttribute( 'aria-expanded', 'false' );
+
+			btn.addEventListener( 'click', function () {
+				var expand = hidden[0].hidden;
+				hidden.forEach( function ( tag ) {
+					tag.hidden = ! expand;
+				} );
+				btn.textContent = expand ? lessTxt : moreLabel;
+				btn.setAttribute( 'aria-expanded', expand ? 'true' : 'false' );
+			} );
+
+			list.appendChild( btn );
+		} );
+	}
+
+	/**
 	 * Initialise a single calendar instance.
 	 *
 	 * @param {HTMLElement} root Wurzelelement ([data-rc-rcc]).
 	 */
 	function initCalendar( root ) {
+
+		collapseClasses( root );
 
 		// Level 1: main tabs.
 		wireGroup(

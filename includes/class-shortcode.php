@@ -95,6 +95,16 @@ class RC_RCC_Shortcode {
 			RC_RCC_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'rc-rcc-frontend',
+			'rcRccData',
+			array(
+				/* translators: %d: Anzahl weiterer Rennklassen. */
+				'more' => __( '+%d weitere', 'rc-racemap-club-calendar' ),
+				'less' => __( 'weniger', 'rc-racemap-club-calendar' ),
+			)
+		);
 	}
 
 	/**
@@ -220,6 +230,8 @@ class RC_RCC_Shortcode {
 			'external'     => '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
 			// Teilnehmer / participants – people.
 			'users'        => '<path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3"/><path d="M21 20v-1a4 4 0 0 0-3-3.87M16 5.13A3 3 0 0 1 16 11"/>',
+			// Externer Link – Pfeil nach oben rechts.
+			'arrow'        => '<path d="M7 17 17 7"/><path d="M9 7h8v8"/>',
 			// Ausschreibung / announcement – document with lines.
 			'announcement' => '<path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h6M9 9h1"/>',
 			// Reglement / regulations – book.
