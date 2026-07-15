@@ -43,9 +43,9 @@
 
 .rc-rcc .rc-rcc__item,
 .rc-rcc .rc-rcc__title,
-.rc-rcc .rc-rcc__meta,
-.rc-rcc .rc-rcc__action,
-.rc-rcc .rc-rcc__class {
+.rc-rcc .rc-rcc__classes,
+.rc-rcc .rc-rcc__links,
+.rc-rcc .rc-rcc__action {
 	margin: 0;
 	padding: 0;
 }
@@ -149,33 +149,34 @@
 	display: none;
 }
 
-/* --- Einzelnes Rennen (Zeile: Datum · Info · Aktion) -------------------- */
+/* --- Einzelnes Rennen (Zeile: Datum · Info · Aktion) --------------------
+   Klare Ebenen: Titel (groß) › Klassen (leise Textzeile) › Links (Akzent,
+   klickbar). Rechts genau ein Button. */
 
 .rc-rcc .rc-rcc__item {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 0.55rem;
-	padding: 1.25rem 0;
+	gap: 0.4rem;
+	padding: 1.4rem 0;
 	border-top: 1px solid var(--rc-rcc-border);
 }
 
 .rc-rcc .rc-rcc__list > .rc-rcc__item:first-child {
 	border-top: 0;
-	padding-top: 0.25rem;
 }
 
-/* Datum: kräftig, tabellarisch. Kommend in voller Theme-Textfarbe,
-   vergangene gedämpft. Sekundär zur Überschrift (etwas kleiner). */
+/* Datum: kräftig, sekundär zur Überschrift. Kommend volle Textfarbe,
+   vergangen gedämpft. */
 .rc-rcc .rc-rcc__date {
-	font-size: 1.1em;
+	font-size: 1.05em;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	line-height: 1.3;
-	color: inherit;
+	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc__item--past .rc-rcc__date {
-	color: var(--rc-rcc-muted);
+.rc-rcc__item--upcoming .rc-rcc__date {
+	color: inherit;
 }
 
 .rc-rcc__date time {
@@ -183,17 +184,16 @@
 	text-decoration: none;
 }
 
-/* Info-Spalte: Titel, Meta, Klassen. */
 .rc-rcc .rc-rcc__info {
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 0.45rem;
 	min-width: 0;
 }
 
-/* Titel: die klar dominante Überschrift – groß und fett. */
+/* Ebene 1 – Titel: die dominante Überschrift. */
 .rc-rcc .rc-rcc__title {
-	font-size: 1.4em;
+	font-size: 1.35em;
 	font-weight: 700;
 	line-height: 1.25;
 	color: inherit;
@@ -204,94 +204,75 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* Meta-Zeile: Teilnehmer + Dokumente. Klickbares klar sichtbar (Akzentfarbe
-   + Unterstreichung). ·-getrennt. */
-.rc-rcc .rc-rcc__meta {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.3rem 0.85rem;
-	font-size: 0.95em;
+/* Ebene 2 – Klassen: leise Textzeile, nur zum Lesen (·-getrennt). */
+.rc-rcc .rc-rcc__classes {
+	font-size: 0.9em;
+	line-height: 1.5;
 	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc .rc-rcc__meta > * + *::before {
-	content: "·";
-	margin-right: 0.85rem;
-	opacity: 0.45;
+.rc-rcc .rc-rcc__class {
+	white-space: nowrap;
 }
 
-.rc-rcc .rc-rcc__ppl {
+.rc-rcc .rc-rcc__class + .rc-rcc__class::before {
+	content: "·";
+	margin: 0 0.45em;
+	opacity: 0.5;
+}
+
+.rc-rcc__class-entries {
+	font-variant-numeric: tabular-nums;
+	margin-left: 0.3em;
+	opacity: 0.6;
+}
+
+/* Ebene 3 – Links: klar klickbar (Akzentfarbe + Unterstrich). */
+.rc-rcc .rc-rcc__links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.3rem 1.15rem;
+	font-size: 0.95em;
+}
+
+.rc-rcc .rc-rcc__link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.35em;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
-	color: inherit;
+	color: var(--rc-rcc-accent);
 	text-decoration: none;
 }
 
-/* Verlinkte Teilnehmerzahl + Dokumente = interaktiv → Akzentfarbe + Unterstrich
-   (Spezifität 0,2,x, damit Theme-`a`-Farben nicht durchschlagen). */
-.rc-rcc a.rc-rcc__ppl {
-	color: var(--rc-rcc-accent);
+.rc-rcc a.rc-rcc__link .rc-rcc__link-label {
+	text-decoration: underline;
+	text-underline-offset: 3px;
 }
 
-.rc-rcc a.rc-rcc__ppl .rc-rcc__ppl-count {
-	text-decoration: underline;
-	text-underline-offset: 2px;
+.rc-rcc a.rc-rcc__link:hover .rc-rcc__link-label,
+.rc-rcc a.rc-rcc__link:focus-visible .rc-rcc__link-label {
 	text-decoration-thickness: 2px;
 }
 
-.rc-rcc .rc-rcc__doc {
+/* Nicht verlinkte Teilnehmerzahl (keine Teilnehmerliste) = nicht klickbar. */
+.rc-rcc .rc-rcc__ppl--static {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.3em;
-	font-weight: 600;
-	color: var(--rc-rcc-accent);
-	text-decoration: none;
-}
-
-.rc-rcc .rc-rcc__doc-label {
-	text-decoration: underline;
-	text-underline-offset: 2px;
-	text-decoration-thickness: 2px;
-}
-
-/* Klassen als leichte Outline-Chips (kein schwerer Farbwall). */
-.rc-rcc .rc-rcc__classes {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.35rem;
-}
-
-.rc-rcc .rc-rcc__class {
-	display: inline-flex;
-	align-items: baseline;
 	gap: 0.35em;
-	font-size: 0.78em;
-	line-height: 1;
-	padding: 0.35em 0.65em;
-	border: 1px solid var(--rc-rcc-border);
-	border-radius: 5px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 	color: var(--rc-rcc-muted);
 }
 
-.rc-rcc__class-entries {
-	font-variant-numeric: tabular-nums;
-	font-weight: 600;
-	opacity: 0.75;
-}
-
-/* Aktion: nur der primäre Button. Kommend = gefüllter Akzent (die einzige
-   farbige Fläche), vergangen = leiser Ghost-Button. */
+/* Aktion: ein Button. Kommend gefüllter Akzent, vergangen Akzent-Rahmen. */
 .rc-rcc .rc-rcc__cta {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.45em;
-	padding: 0.6em 1.35em;
-	font-size: 0.98em;
+	display: inline-block;
+	padding: 0.6em 1.4em;
+	font-size: 0.95em;
 	font-weight: 700;
 	line-height: 1.2;
 	border: 2px solid transparent;
@@ -300,8 +281,8 @@
 	text-decoration: none;
 }
 
-/* Farbregeln mit .rc-rcc-Präfix (0,2,x), damit Theme-`a`-Farben den Button-
-   Text nicht überschreiben (sonst z. B. Akzent-Text auf Akzent-Fläche). */
+/* Farbregeln mit .rc-rcc-Präfix (0,2,x), sonst überschreibt die Theme-`a`-
+   Farbe den Button-Text (Akzent auf Akzent = unsichtbar). */
 .rc-rcc a.rc-rcc__cta--upcoming {
 	background: var(--rc-rcc-accent);
 	color: var(--rc-rcc-on-accent, #fff);
@@ -324,18 +305,20 @@
 }
 
 /* Desktop: drei Spalten. Datum fix (fluchtet zeilenübergreifend), Info
-   flexibel, Button rechtsbündig. */
+   flexibel, Button rechtsbündig und vertikal zentriert. */
 @media ( min-width: 600px ) {
 	.rc-rcc .rc-rcc__item {
 		grid-template-columns: 8.5rem minmax( 0, 1fr ) auto;
 		grid-template-areas: "date info action";
-		align-items: start;
-		column-gap: 1.5rem;
-		row-gap: 0.5rem;
+		align-items: center;
+		column-gap: 1.75rem;
+		row-gap: 0.4rem;
 	}
 
 	.rc-rcc__date {
 		grid-area: date;
+		align-self: start;
+		padding-top: 0.1em;
 	}
 
 	.rc-rcc__info {
