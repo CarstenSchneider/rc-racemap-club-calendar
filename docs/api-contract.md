@@ -39,7 +39,7 @@ GET {base}/api/clubs/{myrcmOrgId}
 
 | Feld | Typ | Hinweis |
 |---|---|---|
-| `id` | string | stabil, eindeutig (Sichtbarkeits-Schlüssel im Plugin) |
+| `id` | string | stabil, eindeutig (Sichtbarkeits-Schlüssel im Plugin). Bei MyRCM-Herkunft enthält sie `myrcm-event-<N>`; das Plugin leitet daraus die Ergebnis-URL ab. |
 | `name` | string | Renntitel |
 | `hostName` | string | Veranstalter – **kanonischer** Vereinsname (= `hosts.json`), siehe Fix unten |
 | `venueName` | string | Streckenname (= `venues.json`) |
@@ -49,9 +49,9 @@ GET {base}/api/clubs/{myrcmOrgId}
 | `registrationStatus` | `open`\|`closed`\|`upcoming`\|`login_required` | `login_required` wird tatsächlich geliefert (MyRCM zeigt die Nennung nur eingeloggt), war bisher nicht dokumentiert |
 | `registrationCount` | int | Teilnehmerzahl |
 | `note` | string | Statustext (z. B. „Nennung geschlossen.") |
-| `classes` | array | Strings **oder** `{name, entries}` |
+| `classes` | array | Strings **oder** `{name, entries}`; `entries` kann fehlen oder `null` sein (dann zeigt das Plugin die Klasse ohne Zahl). Mischformen in einem Array sind erlaubt. |
 | `documents` | object[] | `{type, label, url}`; `type` u. a. `announcement`, `rules`, sonst generisch |
-| `url` / `detailUrl` | string | Event-Seite (bei MyRCM zugleich **Ergebnis**-Seite für vergangene Rennen). Bei `myrcm+rck` zeigt sie auf **RCK**; die Ergebnisse liegen dann weiterhin auf MyRCM und werden aus `registrationListUrl` abgeleitet. |
+| `url` / `detailUrl` | string | Event-Seite (bei MyRCM zugleich **Ergebnis**-Seite für vergangene Rennen). Bei `myrcm+rck` zeigt sie auf **RCK**; die Ergebnisse liegen dann weiterhin auf MyRCM. Das Plugin leitet sie aus der `id` ab (`…-myrcm-event-<N>`), nicht aus einer URL – die Ableitung bleibt damit gültig, falls sich die URL-Belegung des Events ändert. |
 | `registrationListUrl` | string | Teilnehmerliste |
 | `source` | string | Eine **oder mehrere** Quellen, `+`-getrennt. Geliefert werden u. a. `myrcm`, `rck-kleinserie`, `rck-challenge` und – für zusammengeführte Cross-Listings – **`myrcm+rck`**. Kein Enum mit genau einem Wert: das Plugin prüft per Teilstring (`stripos` auf `rck`), nicht per `===`. |
 
@@ -68,7 +68,12 @@ Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätz
    Event zusammengefuehrt:
    - von **MyRCM**: `title`, `classes`, `documents`, `from`/`to`, `venueId`/`venueName`
    - von **RCK**: `registrationStatus`, `registrationCount`, `registrationOpens`,
-     `registrationDeadline`, `registrationRequiresLogin`, `url`
+     `registrationDeadline`, `registrationRequiresLogin`, `url`, `note`
+   - `classes`: **Union** beider Quellen; wo ein Klassenname in beiden vorkommt,
+     gewinnen die **RCK-`entries`**. Hat RCK für die Veranstaltung noch keine
+     Nennungen, fehlt `entries` – die Klasse bleibt in der Liste, nur ohne Zahl.
+   - `registrationListUrl` bleibt **MyRCM** (dort liegen Teilnehmerliste und
+     Ergebnisse, auch wenn über RCK genannt wird)
    - `source` = `myrcm+rck`
 
    Grund: bei RCK-Serienrennen ist RCK die Nennplattform und traegt den korrekten
