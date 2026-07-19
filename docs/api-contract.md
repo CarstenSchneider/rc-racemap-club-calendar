@@ -67,9 +67,10 @@ Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätz
    ein RCK-Rennen zusaetzlich auf MyRCM aus) werden ueber **gleichen `hostId` +
    RCK-Renntag innerhalb der MyRCM-Spanne `from`…`to`** erkannt und zu **einem**
    Event zusammengefuehrt:
-   - von **MyRCM**: `title`, `classes`, `documents`, `from`/`to`, `venueId`/`venueName`
-   - von **RCK**: `registrationStatus`, `registrationCount`, `registrationOpens`,
-     `registrationDeadline`, `registrationRequiresLogin`, `url`, `note`
+   - von **MyRCM**: `documents`, `from`/`to`, `venueId`/`venueName`
+   - von **RCK**: `title`, `registrationStatus`, `registrationCount`,
+     `registrationOpens`, `registrationDeadline`, `registrationRequiresLogin`,
+     `url`, `note`
    - `classes`: **Union** beider Quellen; wo ein Klassenname in beiden vorkommt,
      gewinnen die **RCK-`entries`**. Hat RCK für die Veranstaltung noch keine
      Nennungen, fehlt `entries` – die Klasse bleibt in der Liste, nur ohne Zahl.
@@ -77,8 +78,13 @@ Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätz
      Ergebnisse, auch wenn über RCK genannt wird)
    - `source` = `myrcm+rck`
 
-   Grund: bei RCK-Serienrennen ist RCK die Nennplattform und traegt den korrekten
-   Nennstatus; MyRCM hat die vollstaendigeren Klassen und Dokumente.
+   Gruende: Bei RCK-Serienrennen ist RCK die Nennplattform und traegt den
+   korrekten Nennstatus. Der **Titel** kommt von RCK, weil er dort kanonisch ist
+   (`RCK Challenge Ost - Zwickau`), waehrend der MyRCM-Titel vom Verein frei
+   eingetragen und teils nicht identifizierend ist (`RCK-Challenge` steht bei
+   mehreren Vereinen). Der **Zeitraum** kommt von MyRCM, weil er den Trainingstag
+   mit umfasst; RCK kennt nur den Wertungstag. Dokumente sind bei MyRCM
+   vollstaendiger.
 
    **DMC** (`source: dmc`) wird zuletzt angehaengt, sofern kein MyRCM-/RCK-Rennen
    auf derselben Venue im ueberlappenden Zeitraum liegt. DMC-Rennen liefern
