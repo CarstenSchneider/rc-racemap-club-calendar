@@ -11,9 +11,8 @@
  * @var string                     $uid            Eindeutige DOM-ID dieser Instanz.
  * @var array<int, RC_RCC_Race[]>  $current_groups Aktuelle/künftige Jahre → Rennen.
  * @var array<int, RC_RCC_Race[]>  $archive_groups Frühere Jahre → Rennen.
- * @var bool                       $show_logo       RC-RaceMap-Logo anzeigen.
  * @var string                     $logo_url        URL des Logos.
- * @var string                     $map_url         Link zur RC-RaceMap-Karte.
+ * @var string                     $plugin_url      Link zur Plugin-Seite.
  * @var string                     $accent_class    Optionale Akzent-Klasse.
  * @var string                     $accent_style    Optionaler Inline-Style (Akzentfarbe).
  *
@@ -80,20 +79,18 @@ defined( 'ABSPATH' ) || exit;
 		?>
 	</div>
 
-	<?php if ( $show_logo ) : ?>
-		<div class="rc-rcc__footer">
-			<span class="rc-rcc__credit">
-				<?php
-				printf(
-					/* translators: %s: „RC RaceMap" als Link zur Karte. */
-					esc_html__( 'MyRCM und RCK Daten via %s WordPress PlugIn', 'rc-racemap-club-calendar' ),
-					'<a class="rc-rcc__credit-link" href="' . esc_url( $map_url ) . '" rel="noopener noreferrer" target="_blank">RC RaceMap</a>'
-				); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Vorlage escaped, Link separat escaped.
-				?>
-			</span>
-			<a href="<?php echo esc_url( $map_url ); ?>" class="rc-rcc__brand" rel="noopener noreferrer" target="_blank" aria-label="<?php echo esc_attr__( 'RC RaceMap', 'rc-racemap-club-calendar' ); ?>">
-				<?php echo RC_RCC_Shortcode::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
-			</a>
-		</div>
-	<?php endif; ?>
+	<div class="rc-rcc__footer">
+		<span class="rc-rcc__credit">
+			<?php
+			printf(
+				/* translators: %s: „RC RaceMap" als Link zur Karte. */
+				esc_html__( 'MyRCM und RCK Daten via %s WordPress PlugIn', 'rc-racemap-club-calendar' ),
+				'<a class="rc-rcc__credit-link" href="' . esc_url( $plugin_url ) . '" rel="noopener noreferrer" target="_blank">RC RaceMap</a>'
+			); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Vorlage escaped, Link separat escaped.
+			?>
+		</span>
+		<a href="<?php echo esc_url( $plugin_url ); ?>" class="rc-rcc__brand" rel="noopener noreferrer" target="_blank" aria-label="<?php echo esc_attr__( 'RC RaceMap', 'rc-racemap-club-calendar' ); ?>">
+			<?php echo RC_RCC_Shortcode::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
+		</a>
+	</div>
 </div>

@@ -7,7 +7,8 @@
  * erscheint dann die vertraute WordPress-Aktualisierungsmeldung, sobald ein
  * neuer Release veröffentlicht wurde.
  *
- * Da das Repo privat ist, wird ein Zugriffstoken benötigt. Reihenfolge:
+ * Das Repository ist öffentlich – ein Token wird nicht benötigt. Für den Fall,
+ * dass sich das ändert, bleiben zwei Wege offen (keine Oberfläche):
  *   1. Konstante RC_RCC_UPDATE_TOKEN in wp-config.php (empfohlen, am sichersten)
  *   2. Filter 'rc_rcc_update_token'
  *   3. Einstellungsfeld im Adminbereich (Fallback)
@@ -114,8 +115,6 @@ class RC_RCC_Updater {
 		}
 
 		// 3. Einstellungsfeld (Fallback).
-		$token = RC_RCC_Plugin::get_setting( 'update_token', '' );
-
-		return is_string( $token ) ? trim( $token ) : '';
+		return '';
 	}
 }

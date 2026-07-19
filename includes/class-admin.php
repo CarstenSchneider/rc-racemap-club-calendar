@@ -135,9 +135,8 @@ class RC_RCC_Admin {
 
 		$fields = array(
 			'club_id'      => __( 'MyRCM Organisator-ID', 'rc-racemap-club-calendar' ),
-			'cache_ttl'    => __( 'Cache-Dauer', 'rc-racemap-club-calendar' ),
+			'cache_ttl'    => __( 'Termine aktualisieren', 'rc-racemap-club-calendar' ),
 			'accent_color' => __( 'Akzentfarbe', 'rc-racemap-club-calendar' ),
-			'show_logo'    => __( 'RC RaceMap Logo anzeigen', 'rc-racemap-club-calendar' ),
 		);
 
 		foreach ( $fields as $key => $label ) {
@@ -176,17 +175,6 @@ class RC_RCC_Admin {
 			)
 		);
 
-		add_settings_field(
-			'rc_rcc_field_update_token',
-			__( 'GitHub-Token für Updates', 'rc-racemap-club-calendar' ),
-			array( $this, 'render_field' ),
-			self::PAGE_SETTINGS,
-			'rc_rcc_updates_section',
-			array(
-				'key'       => 'update_token',
-				'label_for' => 'rc_rcc_field_update_token',
-			)
-		);
 	}
 
 	/**
@@ -203,7 +191,6 @@ class RC_RCC_Admin {
 
 		$clean['club_id']   = isset( $input['club_id'] ) ? sanitize_text_field( $input['club_id'] ) : '';
 		$clean['cache_ttl'] = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
-		$clean['show_logo'] = ! empty( $input['show_logo'] );
 
 		// Akzentfarbe: gültiger Hex oder leer (= Linkfarbe des Themes).
 		$clean['accent_color'] = isset( $input['accent_color'] )
@@ -211,13 +198,6 @@ class RC_RCC_Admin {
 			: '';
 
 		$clean['auto_update'] = ! empty( $input['auto_update'] );
-
-		// Update-Token: nur unbedenkliche Token-Zeichen zulassen.
-		$token                  = isset( $input['update_token'] ) ? (string) $input['update_token'] : '';
-		$clean['update_token']  = trim( (string) preg_replace( '/[^A-Za-z0-9_]/', '', $token ) );
-
-		// Eine per Konstante gesetzte Kennung hat Vorrang; das Feld dient nur
-		// als Fallback und wird nicht benötigt, wenn RC_RCC_UPDATE_TOKEN gilt.
 
 		// Ein Cache von 0 würde die API überlasten; sinnvolles Minimum erzwingen.
 		if ( $clean['cache_ttl'] < MINUTE_IN_SECONDS ) {
@@ -265,16 +245,6 @@ class RC_RCC_Admin {
 				echo '<p class="description">' . esc_html__( 'Farbe für Links und den Button. Leer lassen = Linkfarbe deines Themes.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
-			case 'show_logo':
-				printf(
-					'<label><input type="checkbox" id="%1$s" name="%2$s" value="1" %3$s /> %4$s</label>',
-					esc_attr( $id ),
-					esc_attr( $name ),
-					checked( (bool) $value, true, false ),
-					esc_html__( 'Das RC RaceMap Logo im Kalender-Fußbereich anzeigen.', 'rc-racemap-club-calendar' )
-				);
-				break;
-
 			case 'auto_update':
 				printf(
 					'<label><input type="checkbox" id="%1$s" name="%2$s" value="1" %3$s /> %4$s</label>',
@@ -283,26 +253,9 @@ class RC_RCC_Admin {
 					checked( (bool) $value, true, false ),
 					esc_html__( 'Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar sind.', 'rc-racemap-club-calendar' )
 				);
-				echo '<p class="description">' . esc_html__( 'Betrifft ausschließlich dieses Plugin. Andere Plugins, Themes und der WordPress-Core bleiben unberührt.', 'rc-racemap-club-calendar' ) . '</p>';
+				echo '<p class="description">' . esc_html__( 'Betrifft ausschließlich diesen Kalender. Andere Plugins, dein Theme und WordPress selbst bleiben unberührt.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
-			case 'update_token':
-				$const_set = defined( 'RC_RCC_UPDATE_TOKEN' ) && '' !== trim( (string) RC_RCC_UPDATE_TOKEN );
-
-				printf(
-					'<input type="password" autocomplete="off" id="%1$s" name="%2$s" value="%3$s" class="regular-text" %4$s />',
-					esc_attr( $id ),
-					esc_attr( $name ),
-					esc_attr( (string) $value ),
-					$const_set ? 'disabled' : ''
-				);
-
-				if ( $const_set ) {
-					echo '<p class="description">' . esc_html__( 'Ein Token ist bereits über die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php gesetzt. Dieses Feld wird daher ignoriert.', 'rc-racemap-club-calendar' ) . '</p>';
-				} else {
-					echo '<p class="description">' . esc_html__( 'Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-config.php.', 'rc-racemap-club-calendar' ) . '</p>';
-				}
-				break;
 		}
 	}
 
@@ -316,12 +269,10 @@ class RC_RCC_Admin {
 	 */
 	private function render_cache_field( string $id, string $name, int $value ): void {
 		$options = array(
-			5 * MINUTE_IN_SECONDS  => __( '5 Minuten', 'rc-racemap-club-calendar' ),
-			15 * MINUTE_IN_SECONDS => __( '15 Minuten', 'rc-racemap-club-calendar' ),
-			30 * MINUTE_IN_SECONDS => __( '30 Minuten', 'rc-racemap-club-calendar' ),
-			HOUR_IN_SECONDS        => __( '1 Stunde', 'rc-racemap-club-calendar' ),
-			6 * HOUR_IN_SECONDS    => __( '6 Stunden', 'rc-racemap-club-calendar' ),
-			DAY_IN_SECONDS         => __( '24 Stunden', 'rc-racemap-club-calendar' ),
+			15 * MINUTE_IN_SECONDS => __( 'alle 15 Minuten', 'rc-racemap-club-calendar' ),
+			HOUR_IN_SECONDS        => __( 'stündlich (empfohlen)', 'rc-racemap-club-calendar' ),
+			6 * HOUR_IN_SECONDS    => __( 'alle 6 Stunden', 'rc-racemap-club-calendar' ),
+			DAY_IN_SECONDS         => __( 'einmal täglich', 'rc-racemap-club-calendar' ),
 		);
 
 		printf( '<select id="%1$s" name="%2$s">', esc_attr( $id ), esc_attr( $name ) );
@@ -334,7 +285,7 @@ class RC_RCC_Admin {
 			);
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Wie lange abgerufene Renndaten zwischengespeichert werden, bevor sie aktualisiert werden.', 'rc-racemap-club-calendar' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Die Renntermine werden auf deiner Seite zwischengespeichert, damit sie sofort laden. Hier legst du fest, wie oft dabei nach Änderungen gesucht wird – etwa nach neuen Terminen oder aktuellen Nennzahlen. Häufiger ist selten nötig: die Renndaten selbst ändern sich meist nur einmal am Tag.', 'rc-racemap-club-calendar' ) . '</p>';
 	}
 
 	/**

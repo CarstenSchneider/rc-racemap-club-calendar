@@ -145,11 +145,14 @@ class RC_RCC_Shortcode {
 
 		// Variables consumed by the templates.
 		$uid             = 'rc-rcc-' . $this->instance;
-		$show_logo       = (bool) RC_RCC_Plugin::get_setting( 'show_logo', true );
 		$logo_url        = RC_RCC_URL . 'assets/images/rc-racemap-logo.svg';
-		// Karten-URL für den Footer-Hinweis; Basis per Filter überschreibbar.
-		$map_base        = (string) apply_filters( 'rc_rcc_map_base_url', 'https://rcracemap.com/' );
-		$map_url         = ( '' !== $effective_club ) ? add_query_arg( 'club', $effective_club, $map_base ) : $map_base;
+		/**
+		 * Ziel der beiden Footer-Links: die Seite, auf der andere Vereine das
+		 * Plugin bekommen. Per Filter überschreibbar.
+		 *
+		 * @param string $url Standard-Adresse der Plugin-Seite.
+		 */
+		$plugin_url      = (string) apply_filters( 'rc_rcc_plugin_page_url', 'https://rcracemap.com/wordpress-plugin' );
 		$accent          = (string) sanitize_hex_color( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
 		$accent_class    = ( '' !== $accent ) ? ' rc-rcc--accent' : '';
 		$accent_style    = ( '' !== $accent ) ? '--rc-rcc-accent:' . $accent . ';' : '';
