@@ -66,7 +66,8 @@ class RC_RCC_Calendar {
 			return $this->memo[ $club_id ];
 		}
 
-		$races                  = $this->api->get_events( $club_id, $ttl, $force_refresh );
+		$races = $this->api->get_events( $club_id, $ttl, $force_refresh );
+		$this->attach_custom_documents( $races );
 		$this->memo[ $club_id ] = $races;
 
 		return $races;
@@ -150,6 +151,51 @@ class RC_RCC_Calendar {
 	 *
 	 * @return array<string, bool>
 	 */
+	/**
+	 * Documents the club uploaded itself, keyed by event ID.
+	 *
+	 * @return array<string, array<int, array{label: string, url: string}>>
+	 */
+	public function documents_map(): array {
+		$map = get_option( RC_RCC_Plugin::OPTION_DOCUMENTS, array() );
+
+		return is_array( $map ) ? $map : array();
+	}
+
+	/**
+	 * Append the club's own documents to each race.
+	 *
+	 * They land in `extra_links` and therefore render in the documents column
+	 * alongside the ones the API delivers – behind them, so an official
+	 * announcement stays first.
+	 *
+	 * @param RC_RCC_Race[] $races Races to enrich (by reference).
+	 * @return void
+	 */
+	private function attach_custom_documents( array $races ): void {
+		$map = $this->documents_map();
+
+		if ( empty( $map ) ) {
+			return;
+		}
+
+		foreach ( $races as $race ) {
+			foreach ( $map[ $race->id ] ?? array() as $doc ) {
+				$label = isset( $doc['label'] ) ? (string) $doc['label'] : '';
+				$url   = isset( $doc['url'] ) ? (string) $doc['url'] : '';
+
+				if ( '' === $label || '' === $url ) {
+					continue;
+				}
+
+				$race->extra_links[] = array(
+					'label' => $label,
+					'url'   => $url,
+				);
+			}
+		}
+	}
+
 	public function visibility_map(): array {
 		$map = get_option( RC_RCC_Plugin::OPTION_VISIBILITY, array() );
 

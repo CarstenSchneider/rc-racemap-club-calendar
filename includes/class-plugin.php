@@ -55,6 +55,13 @@ final class RC_RCC_Plugin {
 	public const OPTION_VISIBILITY = 'rc_rcc_visibility';
 
 	/**
+	 * Option holding per-event documents the club uploaded itself.
+	 *
+	 * Shape: array<string event_id, array<int, array{label: string, url: string}>>
+	 */
+	public const OPTION_DOCUMENTS = 'rc_rcc_documents';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin

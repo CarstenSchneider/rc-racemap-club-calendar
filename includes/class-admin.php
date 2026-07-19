@@ -30,6 +30,11 @@ class RC_RCC_Admin {
 	private const PAGE_RACES = 'rc-racemap-races';
 
 	/**
+	 * Höchstzahl eigener Dokumente pro Rennen.
+	 */
+	public const MAX_DOCUMENTS = 5;
+
+	/**
 	 * Name der Settings-Gruppe (Settings API).
 	 */
 	private const SETTINGS_GROUP = 'rc_rcc_settings_group';
@@ -333,6 +338,7 @@ class RC_RCC_Admin {
 
 		$races      = $this->calendar->all_races( $force_refresh );
 		$visibility = $this->calendar->visibility_map();
+		$documents  = $this->calendar->documents_map();
 		$error      = $this->calendar->api()->last_error();
 
 		$refresh_url = wp_nonce_url(
@@ -383,6 +389,8 @@ class RC_RCC_Admin {
 
 		update_option( RC_RCC_Plugin::OPTION_VISIBILITY, $map, false );
 
+		$this->save_documents( $known_ids );
+
 		wp_safe_redirect(
 			add_query_arg(
 				array(
@@ -415,6 +423,69 @@ class RC_RCC_Admin {
 	 * @param string $hook Aktueller Admin-Seiten-Hook.
 	 * @return void
 	 */
+	/**
+	 * Die vom Verein selbst hinterlegten Dokumente speichern.
+	 *
+	 * Erwartet zwei parallele Arrays je Event-ID. Zeilen ohne Adresse werden
+	 * verworfen; fehlt die Bezeichnung, springt „Dokument" ein, damit der Link
+	 * im Kalender nicht namenlos erscheint.
+	 *
+	 * @param string[] $known_ids Event-IDs, die das Formular angezeigt hat.
+	 * @return void
+	 */
+	private function save_documents( array $known_ids ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce wurde im Aufrufer geprüft.
+		$labels = isset( $_POST['rc_rcc_doc_label'] ) && is_array( $_POST['rc_rcc_doc_label'] )
+			? wp_unslash( $_POST['rc_rcc_doc_label'] )
+			: array();
+
+		$urls = isset( $_POST['rc_rcc_doc_url'] ) && is_array( $_POST['rc_rcc_doc_url'] )
+			? wp_unslash( $_POST['rc_rcc_doc_url'] )
+			: array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$map = $this->calendar->documents_map();
+
+		foreach ( $known_ids as $id ) {
+			if ( '' === $id ) {
+				continue;
+			}
+
+			$row_labels = isset( $labels[ $id ] ) && is_array( $labels[ $id ] ) ? $labels[ $id ] : array();
+			$row_urls   = isset( $urls[ $id ] ) && is_array( $urls[ $id ] ) ? $urls[ $id ] : array();
+
+			$docs = array();
+
+			foreach ( $row_urls as $i => $raw_url ) {
+				$url = esc_url_raw( trim( (string) $raw_url ) );
+
+				if ( '' === $url ) {
+					continue;
+				}
+
+				$label = isset( $row_labels[ $i ] ) ? sanitize_text_field( (string) $row_labels[ $i ] ) : '';
+
+				$docs[] = array(
+					'label' => ( '' !== $label ) ? $label : __( 'Dokument', 'rc-racemap-club-calendar' ),
+					'url'   => $url,
+				);
+
+				// Obergrenze, damit ein manipuliertes Formular die Option nicht aufblaeht.
+				if ( count( $docs ) >= self::MAX_DOCUMENTS ) {
+					break;
+				}
+			}
+
+			if ( empty( $docs ) ) {
+				unset( $map[ $id ] );
+			} else {
+				$map[ $id ] = $docs;
+			}
+		}
+
+		update_option( RC_RCC_Plugin::OPTION_DOCUMENTS, $map, false );
+	}
+
 	public function enqueue_assets( string $hook ): void {
 		if ( false === strpos( $hook, self::PAGE_SETTINGS ) && false === strpos( $hook, self::PAGE_RACES ) ) {
 			return;
@@ -436,6 +507,26 @@ class RC_RCC_Admin {
 				array( 'wp-color-picker', 'jquery' ),
 				RC_RCC_VERSION,
 				true
+			);
+		}
+
+		// Medienauswahl für eigene Dokumente nur auf der Rennen-Seite.
+		if ( false !== strpos( $hook, self::PAGE_RACES ) ) {
+			wp_enqueue_media();
+			wp_enqueue_script(
+				'rc-rcc-admin',
+				RC_RCC_URL . 'assets/js/admin.js',
+				array( 'jquery' ),
+				RC_RCC_VERSION,
+				true
+			);
+			wp_localize_script(
+				'rc-rcc-admin',
+				'rcRccAdmin',
+				array(
+					'mediaTitle'  => __( 'Dokument auswählen', 'rc-racemap-club-calendar' ),
+					'mediaButton' => __( 'Dokument übernehmen', 'rc-racemap-club-calendar' ),
+				)
 			);
 		}
 	}
