@@ -231,7 +231,22 @@ class RC_RCC_Race {
 		foreach ( $race->extra_links as $i => $doc ) {
 			$race->extra_links[ $i ]['url'] = self::localize_myrcm_url( $doc['url'], $lang );
 		}
+		// Bei zusammengeführten Events (`source: myrcm+rck`) zeigt der Event-Link
+		// auf RCK, die Ergebnisse liegen aber weiter auf MyRCM. Drei Stufen,
+		// absteigend nach Verlässlichkeit:
+		//   1. der Event-Link selbst (reine MyRCM-Rennen),
+		//   2. die `id` – sie trägt die MyRCM-Event-Nummer auch dann noch, wenn
+		//      alle URLs des Events auf RCK zeigen,
+		//   3. die Teilnehmerliste, falls die `id` das Muster nicht erfüllt.
 		$race->results_url = self::derive_results_url( $race->links['registration'] ?? '', $race->organizer, $lang );
+
+		if ( '' === $race->results_url && preg_match( '/myrcm-event-(\d+)/i', $race->id, $m ) ) {
+			$race->results_url = self::myrcm_results_url( $m[1], $race->organizer, $lang );
+		}
+
+		if ( '' === $race->results_url ) {
+			$race->results_url = self::derive_results_url( $race->links['participants'] ?? '', $race->organizer, $lang );
+		}
 
 		return $race;
 	}
@@ -256,6 +271,18 @@ class RC_RCC_Race {
 	 */
 	public function is_rck(): bool {
 		return '' !== $this->source && false !== stripos( $this->source, 'rck' );
+	}
+
+	/**
+	 * Whether this event is a merged cross-listing (`source: myrcm+rck`).
+	 *
+	 * Der Verein hat ein RCK-Serienrennen zusätzlich auf MyRCM ausgeschrieben.
+	 * Genannt wird über RCK, Ergebnisse und Klassen liegen auf MyRCM.
+	 *
+	 * @return bool
+	 */
+	public function is_merged(): bool {
+		return $this->is_rck() && false !== stripos( $this->source, 'myrcm' );
 	}
 
 	/**
@@ -479,9 +506,16 @@ class RC_RCC_Race {
 	 * @return string
 	 */
 	private static function derive_status( array $data ): string {
+		$source = self::first_string( $data, array( 'source' ) );
+		$merged = false !== stripos( $source, 'rck' ) && false !== stripos( $source, 'myrcm' );
+
 		$note = self::first_string( $data, array( 'note', 'status' ) );
 
-		if ( '' !== $note ) {
+		// Bei zusammengeführten Events stammt `note` aus MyRCM, der maßgebliche
+		// `registrationStatus` aber aus RCK. Beide können sich widersprechen
+		// (MyRCM „Nennung geschlossen." bei offener RCK-Nennung), deshalb hat
+		// hier der Status-Enum Vorrang vor dem Freitext.
+		if ( '' !== $note && ! $merged ) {
 			return $note;
 		}
 
@@ -685,7 +719,19 @@ class RC_RCC_Race {
 			return '';
 		}
 
-		$url = 'https://www.myrcm.ch/myrcm/main?hId%5B1%5D=search&dId%5BE%5D=' . $m[1];
+		return self::myrcm_results_url( $m[1], $host, $lang );
+	}
+
+	/**
+	 * Build the MyRCM results URL for a known event number.
+	 *
+	 * @param string $event_id MyRCM-Event-Nummer.
+	 * @param string $host     Veranstaltername (Filter auf der Ergebnisseite).
+	 * @param string $lang     MyRCM-Sprachcode.
+	 * @return string
+	 */
+	private static function myrcm_results_url( string $event_id, string $host, string $lang ): string {
+		$url = 'https://www.myrcm.ch/myrcm/main?hId%5B1%5D=search&dId%5BE%5D=' . $event_id;
 		if ( '' !== $host ) {
 			$url .= '&dFi=' . rawurlencode( $host );
 		}

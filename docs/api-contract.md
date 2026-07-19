@@ -46,21 +46,33 @@ GET {base}/api/clubs/{myrcmOrgId}
 | `venueLocation` | string | Ort |
 | `from` / `to` | `YYYY-MM-DD` | Datumsbereich (mehrtägig unterstützt) |
 | `series` | string[] | Rennserien |
-| `registrationStatus` | `open`\|`closed`\|`upcoming` | |
+| `registrationStatus` | `open`\|`closed`\|`upcoming`\|`login_required` | `login_required` wird tatsächlich geliefert (MyRCM zeigt die Nennung nur eingeloggt), war bisher nicht dokumentiert |
 | `registrationCount` | int | Teilnehmerzahl |
 | `note` | string | Statustext (z. B. „Nennung geschlossen.") |
 | `classes` | array | Strings **oder** `{name, entries}` |
 | `documents` | object[] | `{type, label, url}`; `type` u. a. `announcement`, `rules`, sonst generisch |
-| `url` / `detailUrl` | string | Event-Seite (bei MyRCM zugleich **Ergebnis**-Seite für vergangene Rennen) |
+| `url` / `detailUrl` | string | Event-Seite (bei MyRCM zugleich **Ergebnis**-Seite für vergangene Rennen). Bei `myrcm+rck` zeigt sie auf **RCK**; die Ergebnisse liegen dann weiterhin auf MyRCM und werden aus `registrationListUrl` abgeleitet. |
 | `registrationListUrl` | string | Teilnehmerliste |
-| `source` | string | **`myrcm`** oder **`rck`** – das Plugin unterscheidet darüber (RCK zeigt „Zum Rennen" statt „Ergebnisse") |
+| `source` | string | Eine **oder mehrere** Quellen, `+`-getrennt. Geliefert werden u. a. `myrcm`, `rck-kleinserie`, `rck-challenge` und – für zusammengeführte Cross-Listings – **`myrcm+rck`**. Kein Enum mit genau einem Wert: das Plugin prüft per Teilstring (`stripos` auf `rck`), nicht per `===`. |
 
 Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätzliche Felder sind erlaubt und werden ignoriert.
 
 ## Ableitung (Anbieterseite)
 
 1. `myrcmOrgId` → `hostId` via `hosts.json` (`myrcmOrgId`-Feld, 177/177 vorhanden).
-2. `races.json` **und** `rck-races.json` nach `hostId` filtern, mergen, per `id` deduplizieren.
+2. `races.json` **und** `rck-races.json` nach `hostId` filtern und mergen.
+   Deduplizierung per `id` reicht **nicht**: die IDs werden pro Quelle gebildet und
+   kollidieren fuer dieselbe Veranstaltung nie. Cross-Listings (der Verein schreibt
+   ein RCK-Rennen zusaetzlich auf MyRCM aus) werden ueber **gleichen `hostId` +
+   RCK-Renntag innerhalb der MyRCM-Spanne `from`…`to`** erkannt und zu **einem**
+   Event zusammengefuehrt:
+   - von **MyRCM**: `title`, `classes`, `documents`, `from`/`to`, `venueId`/`venueName`
+   - von **RCK**: `registrationStatus`, `registrationCount`, `registrationOpens`,
+     `registrationDeadline`, `registrationRequiresLogin`, `url`
+   - `source` = `myrcm+rck`
+
+   Grund: bei RCK-Serienrennen ist RCK die Nennplattform und traegt den korrekten
+   Nennstatus; MyRCM hat die vollstaendigeren Klassen und Dokumente.
 3. Vereinsmeta aus `hosts.json` (name/website) + `venues.json` (lat/lng/city, Match über `hostIds`/`myrcmOrgId`).
 4. Als `{ club, events }` ausliefern.
 

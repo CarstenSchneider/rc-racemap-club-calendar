@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: includes/class-admin.php:83 includes/class-admin.php:84
-#: templates/calendar.php:97
+#: templates/calendar.php:94
 msgid "RC RaceMap"
 msgstr "RC RaceMap"
 
@@ -81,7 +81,8 @@ msgstr ""
 
 #: includes/class-admin.php:265
 msgid "Farbe für Links und den Button. Leer lassen = Linkfarbe deines Themes."
-msgstr "Color for links and the button. Leave empty to use your theme's link color."
+msgstr ""
+"Color for links and the button. Leave empty to use your theme's link color."
 
 #: includes/class-admin.php:274
 msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
@@ -265,16 +266,16 @@ msgid "Rennkalender"
 msgstr "Race calendar"
 
 #: templates/calendar.php:36
-msgid "Aktuelle Termine"
-msgstr "Upcoming events"
+msgid "Aktuelle Rennen"
+msgstr "Upcoming races"
 
 #: templates/calendar.php:48
-msgid "Archiv"
-msgstr "Archive"
+msgid "Vergangene Rennen"
+msgstr "Past races"
 
 #: templates/calendar.php:62
-msgid "Aktuell sind keine Termine vorhanden."
-msgstr "There are currently no events."
+msgid "Aktuell sind keine Rennen vorhanden."
+msgstr "There are currently no races."
 
 #: templates/calendar.php:78
 msgid "Es sind noch keine vergangenen Rennen vorhanden."
@@ -323,6 +324,15 @@ msgstr[1] "%d participants"
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr "Select year"
+
+#~ msgid "Aktuelle Termine"
+#~ msgstr "Upcoming events"
+
+#~ msgid "Archiv"
+#~ msgstr "Archive"
+
+#~ msgid "Aktuell sind keine Termine vorhanden."
+#~ msgstr "There are currently no events."
 
 #~ msgid ""
 #~ "Akzentfarbe für Links, aktive Navigation und die Teilnehmerzahl. "

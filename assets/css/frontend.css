@@ -178,6 +178,11 @@
 	border-bottom: 1px solid var(--rc-rcc-line);
 }
 
+/* Letzte Zeile ohne Linie – sonst doppelt mit dem Rahmen des Fußbereichs. */
+.rc-rcc.rc-rcc .rc-rcc__item:last-child {
+	border-bottom: 0;
+}
+
 /* 1 – Datum */
 .rc-rcc .rc-rcc__date {
 	font-size: 17px;
@@ -320,14 +325,17 @@
 
 /* --- Vergangene Rennen: alles 30 %, nur der Button bleibt voll ----------- */
 
-.rc-rcc__item--past .rc-rcc__date,
-.rc-rcc__item--past .rc-rcc__race {
+/* Nur im vorderen Tab abdunkeln: dort steht Gelaufenes neben Kommendem und
+   muss sich absetzen. Im Tab „Vergangene Rennen" ist ohnehin alles vorbei –
+   dort wäre die Abdunklung nur ein blasser Gesamteindruck. */
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__date,
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__race {
 	opacity: 0.3;
 }
 
 /* Links bleiben lesbar/klickbar, nur leicht zurückgenommen. */
-.rc-rcc__item--past .rc-rcc__ppl,
-.rc-rcc__item--past .rc-rcc__docs {
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__ppl,
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__docs {
 	opacity: 0.6;
 }
 
@@ -424,7 +432,7 @@
 	text-decoration-thickness: 2px;
 }
 
-.rc-rcc__item--past .rc-rcc__ppl:hover,
-.rc-rcc__item--past .rc-rcc__docs:hover {
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__ppl:hover,
+[data-rc-rcc-panel="current"] .rc-rcc__item--past .rc-rcc__docs:hover {
 	opacity: 1;
 }

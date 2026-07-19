@@ -29,12 +29,18 @@ $cta_label = '';
 $cta_note  = '';
 
 if ( $rc_is_past ) {
-	if ( $race->is_rck() ) {
+	if ( '' !== $race->results_url ) {
+		// Gilt auch für zusammengeführte Events: der Event-Link zeigt auf RCK,
+		// die Ergebnisse liegen auf MyRCM.
+		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+		$cta_url   = $race->results_url;
+	} elseif ( $race->is_rck() ) {
+		// Reine RCK-Rennen haben keine Ergebnisseite – dann auf das Event.
 		$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
 		$cta_url   = $event_url;
 	} else {
 		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
-		$cta_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
+		$cta_url   = $event_url;
 	}
 } elseif ( $race->is_registration_open() ) {
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );

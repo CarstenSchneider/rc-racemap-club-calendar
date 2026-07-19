@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) || exit;
 			aria-selected="true"
 			data-rc-rcc-tab="current"
 		>
-			<?php echo esc_html__( 'Aktuelle Termine', 'rc-racemap-club-calendar' ); ?>
+			<?php echo esc_html__( 'Aktuelle Rennen', 'rc-racemap-club-calendar' ); ?>
 		</button>
 		<button
 			type="button"
@@ -45,7 +45,7 @@ defined( 'ABSPATH' ) || exit;
 			tabindex="-1"
 			data-rc-rcc-tab="archive"
 		>
-			<?php echo esc_html__( 'Archiv', 'rc-racemap-club-calendar' ); ?>
+			<?php echo esc_html__( 'Vergangene Rennen', 'rc-racemap-club-calendar' ); ?>
 		</button>
 	</div>
 
@@ -59,7 +59,7 @@ defined( 'ABSPATH' ) || exit;
 		<?php
 		$groups      = $current_groups;
 		$group_scope = 'current';
-		$empty_text  = __( 'Aktuell sind keine Termine vorhanden.', 'rc-racemap-club-calendar' );
+		$empty_text  = __( 'Aktuell sind keine Rennen vorhanden.', 'rc-racemap-club-calendar' );
 		require RC_RCC_Shortcode::locate_template( 'year-groups.php' );
 		?>
 	</div>

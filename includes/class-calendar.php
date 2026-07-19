@@ -73,11 +73,11 @@ class RC_RCC_Calendar {
 	}
 
 	/**
-	 * Races of the current and future years, grouped by year.
+	 * Noch nicht gelaufene Rennen, gruppiert nach Jahr.
 	 *
-	 * Years ascending (2026, 2027, …); each year's races ascending. Undated
-	 * races are treated as current-year so they still appear. For the
-	 * "Aktuelle Termine" tab.
+	 * Jahre aufsteigend (2026, 2027, …), innerhalb eines Jahres ebenfalls
+	 * aufsteigend. Rennen ohne lesbares Datum gelten als kommend, damit sie
+	 * nicht verschwinden. Für den Tab „Aktuelle Rennen".
 	 *
 	 * @return array<int, RC_RCC_Race[]> Year => races.
 	 */
@@ -86,10 +86,11 @@ class RC_RCC_Calendar {
 	}
 
 	/**
-	 * Races of past years, grouped by year.
+	 * Bereits gelaufene Rennen, gruppiert nach Jahr.
 	 *
-	 * Years descending (2025, 2024, …); each year's races descending. For the
-	 * archive tab.
+	 * Jahre absteigend (2026, 2025, …), innerhalb eines Jahres ebenfalls
+	 * absteigend. Enthält auch die abgelaufenen Rennen des laufenden Jahres.
+	 * Für den Tab „Vergangene Rennen".
 	 *
 	 * @return array<int, RC_RCC_Race[]> Year => races.
 	 */
@@ -98,9 +99,12 @@ class RC_RCC_Calendar {
 	}
 
 	/**
-	 * Group visible races into current-and-future years, or past years.
+	 * Sichtbare Rennen nach kommend/gelaufen trennen und nach Jahr gruppieren.
 	 *
-	 * @param bool $future True = current year and later; false = earlier years.
+	 * Die Trennung läuft über das Renndatum, nicht über das Kalenderjahr: ein
+	 * bereits gelaufenes Rennen des laufenden Jahres gehört zu den vergangenen.
+	 *
+	 * @param bool $future True = noch nicht gelaufen; false = bereits gelaufen.
 	 * @return array<int, RC_RCC_Race[]>
 	 */
 	private function grouped_by_year( bool $future ): array {
@@ -108,12 +112,12 @@ class RC_RCC_Calendar {
 		$groups  = array();
 
 		foreach ( $this->visible_races() as $race ) {
-			$year     = $race->year();
-			$year_int = ( '' === $year ) ? $current : (int) $year;
-
-			if ( ( $year_int >= $current ) !== $future ) {
+			if ( $race->is_upcoming() !== $future ) {
 				continue;
 			}
+
+			$year     = $race->year();
+			$year_int = ( '' === $year ) ? $current : (int) $year;
 
 			$groups[ $year_int ][] = $race;
 		}

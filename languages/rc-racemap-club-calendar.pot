@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.27\n"
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.28\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
 "Language-Team: RC RaceMap\n"
 "MIME-Version: 1.0\n"
@@ -11,7 +11,7 @@ msgstr ""
 "X-Domain: rc-racemap-club-calendar\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 #: includes/class-admin.php:83 includes/class-admin.php:84
-#: templates/calendar.php:97
+#: templates/calendar.php:94
 msgid "RC RaceMap"
 msgstr ""
 
@@ -245,15 +245,15 @@ msgid "Rennkalender"
 msgstr ""
 
 #: templates/calendar.php:36
-msgid "Aktuelle Termine"
+msgid "Aktuelle Rennen"
 msgstr ""
 
 #: templates/calendar.php:48
-msgid "Archiv"
+msgid "Vergangene Rennen"
 msgstr ""
 
 #: templates/calendar.php:62
-msgid "Aktuell sind keine Termine vorhanden."
+msgid "Aktuell sind keine Rennen vorhanden."
 msgstr ""
 
 #: templates/calendar.php:78
