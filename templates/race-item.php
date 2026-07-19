@@ -34,8 +34,9 @@ if ( $rc_is_past ) {
 		// die Ergebnisse liegen auf MyRCM.
 		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
 		$cta_url   = $race->results_url;
-	} elseif ( $race->is_rck() ) {
-		// Reine RCK-Rennen haben keine Ergebnisseite – dann auf das Event.
+	} elseif ( $race->is_rck() || $race->is_custom() ) {
+		// Reine RCK-Rennen und eigene Termine haben keine Ergebnisseite – dann
+		// auf das Event. Ergebnisse kann der Verein als Dokument hinterlegen.
 		$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
 		$cta_url   = $event_url;
 	} else {

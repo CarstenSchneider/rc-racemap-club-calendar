@@ -69,6 +69,39 @@
 		$clone.insertAfter( $last );
 	}
 
+	/**
+	 * Eine leere Terminzeile anhaengen, sobald die letzte benannt wird.
+	 * Die Feldnamen tragen einen Index, der beim Klonen hochgezaehlt wird.
+	 *
+	 * @param {jQuery} $body Tabellenkoerper der eigenen Termine.
+	 */
+	function ensureEmptyRaceRow( $body ) {
+		var max = parseInt( $body.attr( 'data-rc-rcc-max' ), 10 ) || 50;
+		var $rows = $body.find( '.rc-rcc-own-row' );
+
+		if ( $rows.length >= max ) {
+			return;
+		}
+
+		var $last = $rows.last();
+		if ( ! $last.find( '.rc-rcc-own-title' ).val() ) {
+			return;
+		}
+
+		var index = $rows.length;
+		var $clone = $last.clone();
+
+		$clone.find( 'input' ).each( function () {
+			var $field = $( this );
+			var name = $field.attr( 'name' ) || '';
+
+			$field.val( '' );
+			$field.attr( 'name', name.replace( /\[\d+\]/, '[' + index + ']' ) );
+		} );
+
+		$body.append( $clone );
+	}
+
 	$( function () {
 		if ( $.fn.wpColorPicker ) {
 			$( '.rc-rcc-color-field' ).wpColorPicker();
@@ -81,6 +114,10 @@
 
 		$( document ).on( 'change input', '.rc-rcc-doc-url', function () {
 			ensureEmptyRow( $( this ).closest( '.rc-rcc-docs-cell' ) );
+		} );
+
+		$( document ).on( 'change input', '.rc-rcc-own-title', function () {
+			ensureEmptyRaceRow( $( this ).closest( '.rc-rcc-own-body' ) );
 		} );
 	} );
 } )( jQuery );

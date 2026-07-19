@@ -274,6 +274,18 @@ class RC_RCC_Race {
 	}
 
 	/**
+	 * Whether this event was created by the club itself.
+	 *
+	 * Solche Termine stehen in keiner Quelle – es gibt weder Nennsystem noch
+	 * Ergebnisseite, nur die Angaben des Vereins.
+	 *
+	 * @return bool
+	 */
+	public function is_custom(): bool {
+		return 'custom' === $this->source;
+	}
+
+	/**
 	 * Whether this event is a merged cross-listing (`source: myrcm+rck`).
 	 *
 	 * Der Verein hat ein RCK-Serienrennen zusätzlich auf MyRCM ausgeschrieben.

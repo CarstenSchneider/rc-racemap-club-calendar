@@ -67,6 +67,7 @@ class RC_RCC_Calendar {
 		}
 
 		$races = $this->api->get_events( $club_id, $ttl, $force_refresh );
+		$races = array_merge( $races, $this->custom_races() );
 		$this->attach_custom_documents( $races );
 		$this->memo[ $club_id ] = $races;
 
@@ -151,6 +152,64 @@ class RC_RCC_Calendar {
 	 *
 	 * @return array<string, bool>
 	 */
+	/**
+	 * The club's own races, as stored raw in the option.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function custom_races_raw(): array {
+		$rows = get_option( RC_RCC_Plugin::OPTION_CUSTOM_RACES, array() );
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		// Nach Startdatum sortieren, damit die Verwaltungsliste ruhig bleibt.
+		usort(
+			$rows,
+			static fn( $a, $b ) => strcmp( (string) ( $a['from'] ?? '' ), (string) ( $b['from'] ?? '' ) )
+		);
+
+		return array_values( $rows );
+	}
+
+	/**
+	 * The club's own races as race objects.
+	 *
+	 * Sie durchlaufen dieselbe Normalisierung wie die Daten aus der API, damit
+	 * Datum, Klassen und Links überall gleich behandelt werden.
+	 *
+	 * @return RC_RCC_Race[]
+	 */
+	public function custom_races(): array {
+		$races = array();
+
+		foreach ( $this->custom_races_raw() as $row ) {
+			$id    = isset( $row['id'] ) ? (string) $row['id'] : '';
+			$title = isset( $row['title'] ) ? (string) $row['title'] : '';
+			$from  = isset( $row['from'] ) ? (string) $row['from'] : '';
+
+			// Ohne Bezeichnung oder Startdatum ist der Termin nicht darstellbar.
+			if ( '' === $id || '' === $title || '' === $from ) {
+				continue;
+			}
+
+			$races[] = RC_RCC_Race::from_array(
+				array(
+					'id'      => $id,
+					'name'    => $title,
+					'from'    => $from,
+					'to'      => isset( $row['to'] ) ? (string) $row['to'] : '',
+					'classes' => isset( $row['classes'] ) && is_array( $row['classes'] ) ? $row['classes'] : array(),
+					'url'     => isset( $row['url'] ) ? (string) $row['url'] : '',
+					'source'  => 'custom',
+				)
+			);
+		}
+
+		return $races;
+	}
+
 	/**
 	 * Documents the club uploaded itself, keyed by event ID.
 	 *

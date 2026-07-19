@@ -62,6 +62,14 @@ final class RC_RCC_Plugin {
 	public const OPTION_DOCUMENTS = 'rc_rcc_documents';
 
 	/**
+	 * Option holding races the club created itself (not in any source).
+	 *
+	 * Shape: array<int, array{id: string, title: string, from: string,
+	 * to: string, classes: string[], url: string}>
+	 */
+	public const OPTION_CUSTOM_RACES = 'rc_rcc_custom_races';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin

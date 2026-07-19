@@ -7,6 +7,7 @@
  * @var RC_RCC_Race[]        $races       Alle Rennen (sichtbar + ausgeblendet).
  * @var array<string, bool>  $visibility  Aktuelle Sichtbarkeits-Zuordnung.
  * @var array<string, array> $documents   Eigene Dokumente je Event-ID.
+ * @var array<int, array>    $custom      Selbst angelegte Termine (Rohdaten).
  * @var WP_Error|null        $error       Letzter Abruffehler, falls vorhanden.
  * @var string               $refresh_url Nonce-URL zum erzwungenen Aktualisieren.
  *
@@ -36,15 +37,15 @@ $ctx = RC_RCC_Admin::view_context();
 		</div>
 	<?php endif; ?>
 
-	<?php if ( empty( $races ) ) : ?>
-		<div class="notice notice-info inline">
-			<p><?php echo esc_html__( 'Noch keine Rennen gefunden. Prüfe die Organisator-ID in den Einstellungen und aktualisiere dann.', 'rc-racemap-club-calendar' ); ?></p>
-		</div>
-	<?php else : ?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-			<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['action'] ); ?>" />
-			<?php wp_nonce_field( $ctx['action'] ); ?>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['action'] ); ?>" />
+		<?php wp_nonce_field( $ctx['action'] ); ?>
 
+		<?php if ( empty( $races ) ) : ?>
+			<div class="notice notice-info inline">
+				<p><?php echo esc_html__( 'Noch keine Rennen aus MyRCM, RCK oder DMC gefunden. Prüfe die Organisator-ID in den Einstellungen und aktualisiere dann. Eigene Termine kannst du trotzdem schon anlegen.', 'rc-racemap-club-calendar' ); ?></p>
+			</div>
+		<?php else : ?>
 			<table class="widefat striped rc-rcc-races-table">
 				<thead>
 					<tr>
@@ -84,7 +85,12 @@ $ctx = RC_RCC_Admin::view_context();
 								/>
 							</th>
 							<td><?php echo esc_html( $race->formatted_date() ); ?></td>
-							<td><strong><?php echo esc_html( $race->title ); ?></strong></td>
+							<td>
+								<strong><?php echo esc_html( $race->title ); ?></strong>
+								<?php if ( $race->is_custom() ) : ?>
+									<span class="rc-rcc-own-badge"><?php echo esc_html__( 'eigener Termin', 'rc-racemap-club-calendar' ); ?></span>
+								<?php endif; ?>
+							</td>
 							<td><?php echo esc_html( $race->organizer ); ?></td>
 							<td><?php echo esc_html( $race->status ); ?></td>
 							<td class="rc-rcc-docs-cell" data-rc-rcc-max="<?php echo esc_attr( (string) RC_RCC_Admin::MAX_DOCUMENTS ); ?>">
@@ -117,8 +123,76 @@ $ctx = RC_RCC_Admin::view_context();
 					<?php endforeach; ?>
 				</tbody>
 			</table>
+		<?php endif; ?>
 
-			<?php submit_button( __( 'Änderungen speichern', 'rc-racemap-club-calendar' ) ); ?>
-		</form>
-	<?php endif; ?>
+		<h2 class="rc-rcc-own-heading"><?php echo esc_html__( 'Eigene Termine', 'rc-racemap-club-calendar' ); ?></h2>
+
+		<p class="description">
+			<?php echo esc_html__( 'Für Rennen, die weder bei MyRCM noch bei RCK oder DMC stehen – Clublauf, Vereinsmeisterschaft, Trainingstag. Sie erscheinen im Kalender zwischen den übrigen Terminen, nach Datum einsortiert. Um einen Termin zu entfernen, lösche seine Bezeichnung und speichere.', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
+		<?php
+		$rc_rows = $custom;
+
+		if ( count( $rc_rows ) < RC_RCC_Admin::MAX_CUSTOM_RACES ) {
+			$rc_rows[] = array();
+		}
+		?>
+
+		<table class="widefat striped rc-rcc-own-table">
+			<thead>
+				<tr>
+					<th scope="col"><?php echo esc_html__( 'Bezeichnung', 'rc-racemap-club-calendar' ); ?></th>
+					<th scope="col"><?php echo esc_html__( 'Von', 'rc-racemap-club-calendar' ); ?></th>
+					<th scope="col"><?php echo esc_html__( 'Bis', 'rc-racemap-club-calendar' ); ?></th>
+					<th scope="col"><?php echo esc_html__( 'Klassen', 'rc-racemap-club-calendar' ); ?></th>
+					<th scope="col"><?php echo esc_html__( 'Link', 'rc-racemap-club-calendar' ); ?></th>
+				</tr>
+			</thead>
+			<tbody class="rc-rcc-own-body" data-rc-rcc-max="<?php echo esc_attr( (string) RC_RCC_Admin::MAX_CUSTOM_RACES ); ?>">
+				<?php foreach ( $rc_rows as $rc_i => $rc_row ) : ?>
+					<tr class="rc-rcc-own-row">
+						<td>
+							<input type="hidden" name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][id]" value="<?php echo esc_attr( (string) ( $rc_row['id'] ?? '' ) ); ?>" />
+							<input
+								type="text"
+								class="rc-rcc-own-title"
+								name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][title]"
+								value="<?php echo esc_attr( (string) ( $rc_row['title'] ?? '' ) ); ?>"
+								placeholder="<?php echo esc_attr__( 'z. B. Vereinsmeisterschaft', 'rc-racemap-club-calendar' ); ?>"
+							/>
+						</td>
+						<td>
+							<input type="date" name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][from]" value="<?php echo esc_attr( (string) ( $rc_row['from'] ?? '' ) ); ?>" />
+						</td>
+						<td>
+							<input type="date" name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][to]" value="<?php echo esc_attr( (string) ( $rc_row['to'] ?? '' ) ); ?>" />
+						</td>
+						<td>
+							<input
+								type="text"
+								name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][classes]"
+								value="<?php echo esc_attr( implode( ', ', (array) ( $rc_row['classes'] ?? array() ) ) ); ?>"
+								placeholder="<?php echo esc_attr__( 'Mit Komma trennen', 'rc-racemap-club-calendar' ); ?>"
+							/>
+						</td>
+						<td>
+							<input
+								type="url"
+								name="rc_rcc_custom[<?php echo esc_attr( (string) $rc_i ); ?>][url]"
+								value="<?php echo esc_attr( (string) ( $rc_row['url'] ?? '' ) ); ?>"
+								placeholder="<?php echo esc_attr__( 'Optional, z. B. Anmeldung', 'rc-racemap-club-calendar' ); ?>"
+							/>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+
+		<p class="description">
+			<?php echo esc_html__( 'Bis-Datum nur bei mehrtägigen Rennen ausfüllen. Nach dem Speichern kannst du dem Termin oben Dokumente zuordnen.', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
+		<?php submit_button( __( 'Änderungen speichern', 'rc-racemap-club-calendar' ) ); ?>
+	</form>
 </div>

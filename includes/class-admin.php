@@ -35,6 +35,11 @@ class RC_RCC_Admin {
 	public const MAX_DOCUMENTS = 5;
 
 	/**
+	 * Höchstzahl eigener Termine.
+	 */
+	public const MAX_CUSTOM_RACES = 50;
+
+	/**
 	 * Name der Settings-Gruppe (Settings API).
 	 */
 	private const SETTINGS_GROUP = 'rc_rcc_settings_group';
@@ -339,6 +344,7 @@ class RC_RCC_Admin {
 		$races      = $this->calendar->all_races( $force_refresh );
 		$visibility = $this->calendar->visibility_map();
 		$documents  = $this->calendar->documents_map();
+		$custom     = $this->calendar->custom_races_raw();
 		$error      = $this->calendar->api()->last_error();
 
 		$refresh_url = wp_nonce_url(
@@ -377,6 +383,8 @@ class RC_RCC_Admin {
 		$visible_ids = isset( $_POST['rc_rcc_visible'] ) && is_array( $_POST['rc_rcc_visible'] )
 			? array_map( 'sanitize_text_field', wp_unslash( $_POST['rc_rcc_visible'] ) )
 			: array();
+
+		$this->save_custom_races();
 
 		$map = $this->calendar->visibility_map();
 
@@ -423,6 +431,99 @@ class RC_RCC_Admin {
 	 * @param string $hook Aktueller Admin-Seiten-Hook.
 	 * @return void
 	 */
+	/**
+	 * Die vom Verein selbst angelegten Termine speichern.
+	 *
+	 * Jede Zeile bringt ihre bestehende ID mit; neue Zeilen bekommen eine
+	 * frische. Die ID bleibt über Änderungen hinweg stabil, damit hinterlegte
+	 * Dokumente und die Sichtbarkeit am Termin haften bleiben.
+	 *
+	 * Zeilen ohne Bezeichnung oder ohne Startdatum werden verworfen – das ist
+	 * zugleich der Weg, einen Termin wieder zu entfernen.
+	 *
+	 * @return void
+	 */
+	private function save_custom_races(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce wurde im Aufrufer geprüft.
+		if ( ! isset( $_POST['rc_rcc_custom'] ) || ! is_array( $_POST['rc_rcc_custom'] ) ) {
+			return;
+		}
+
+		$rows = wp_unslash( $_POST['rc_rcc_custom'] );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$saved = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$title = sanitize_text_field( (string) ( $row['title'] ?? '' ) );
+			$from  = $this->sanitize_date( (string) ( $row['from'] ?? '' ) );
+
+			if ( '' === $title || '' === $from ) {
+				continue;
+			}
+
+			$to = $this->sanitize_date( (string) ( $row['to'] ?? '' ) );
+
+			// Ein Enddatum vor dem Start ist ein Tippfehler – dann lieber eintägig.
+			if ( '' !== $to && $to < $from ) {
+				$to = '';
+			}
+
+			// Klassen kommen als eine Zeile, durch Komma getrennt.
+			$classes = array_values(
+				array_filter(
+					array_map(
+						static fn( $c ) => sanitize_text_field( trim( (string) $c ) ),
+						explode( ',', (string) ( $row['classes'] ?? '' ) )
+					),
+					static fn( $c ) => '' !== $c
+				)
+			);
+
+			$id = sanitize_text_field( (string) ( $row['id'] ?? '' ) );
+			if ( '' === $id ) {
+				$id = 'custom-' . uniqid();
+			}
+
+			$saved[] = array(
+				'id'      => $id,
+				'title'   => $title,
+				'from'    => $from,
+				'to'      => $to,
+				'classes' => $classes,
+				'url'     => esc_url_raw( trim( (string) ( $row['url'] ?? '' ) ) ),
+			);
+
+			if ( count( $saved ) >= self::MAX_CUSTOM_RACES ) {
+				break;
+			}
+		}
+
+		update_option( RC_RCC_Plugin::OPTION_CUSTOM_RACES, $saved, false );
+	}
+
+	/**
+	 * Ein Datum aus einem `<input type="date">` prüfen.
+	 *
+	 * @param string $value Rohwert.
+	 * @return string `YYYY-MM-DD` oder '' wenn unbrauchbar.
+	 */
+	private function sanitize_date( string $value ): string {
+		$value = trim( $value );
+
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value ) ) {
+			return '';
+		}
+
+		[ $y, $m, $d ] = array_map( 'intval', explode( '-', $value ) );
+
+		return checkdate( $m, $d, $y ) ? $value : '';
+	}
+
 	/**
 	 * Die vom Verein selbst hinterlegten Dokumente speichern.
 	 *
