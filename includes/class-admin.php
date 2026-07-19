@@ -205,7 +205,7 @@ class RC_RCC_Admin {
 		$clean['cache_ttl'] = isset( $input['cache_ttl'] ) ? absint( $input['cache_ttl'] ) : $defaults['cache_ttl'];
 		$clean['show_logo'] = ! empty( $input['show_logo'] );
 
-		// Akzentfarbe: gültiger Hex oder leer (= automatisch aus dem Theme).
+		// Akzentfarbe: gültiger Hex oder leer (= Linkfarbe des Themes).
 		$clean['accent_color'] = isset( $input['accent_color'] )
 			? (string) sanitize_hex_color( trim( (string) $input['accent_color'] ) )
 			: '';
@@ -254,6 +254,7 @@ class RC_RCC_Admin {
 				$this->render_cache_field( $id, $name, (int) $value );
 				break;
 
+
 			case 'accent_color':
 				printf(
 					'<input type="text" id="%1$s" name="%2$s" value="%3$s" class="rc-rcc-color-field" data-default-color="" />',
@@ -261,7 +262,7 @@ class RC_RCC_Admin {
 					esc_attr( $name ),
 					esc_attr( (string) $value )
 				);
-				echo '<p class="description">' . esc_html__( 'Akzentfarbe für Links, aktive Navigation und die Teilnehmerzahl. Standard: neutrales Grau.', 'rc-racemap-club-calendar' ) . '</p>';
+				echo '<p class="description">' . esc_html__( 'Farbe für Links und den Button. Leer lassen = Linkfarbe deines Themes.', 'rc-racemap-club-calendar' ) . '</p>';
 				break;
 
 			case 'show_logo':

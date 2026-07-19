@@ -113,6 +113,14 @@ class RC_RCC_Race {
 	public string $registration_status = '';
 
 	/**
+	 * Beginn der Nennung als Unix-Timestamp (aus `registrationOpens`), sonst
+	 * null. Für den Hinweis „Nennung ab …", wenn die Nennung noch nicht offen ist.
+	 *
+	 * @var int|null
+	 */
+	public ?int $registration_opens = null;
+
+	/**
 	 * Participant count (optional). Null when unknown.
 	 *
 	 * @var int|null
@@ -200,6 +208,14 @@ class RC_RCC_Race {
 		$race->classes              = self::normalise_classes( $data['classes'] ?? null );
 		$race->status               = self::derive_status( $data );
 		$race->registration_status  = strtolower( self::first_string( $data, array( 'registrationStatus' ) ) );
+
+		$opens = self::first_string( $data, array( 'registrationOpens' ) );
+		if ( '' !== $opens ) {
+			$opens_ts = strtotime( $opens );
+			if ( false !== $opens_ts ) {
+				$race->registration_opens = $opens_ts;
+			}
+		}
 		$race->participant_count = self::derive_participant_count( $data );
 		$race->links             = self::derive_links( $data );
 		$race->extra_links       = self::derive_extra_documents( $data );

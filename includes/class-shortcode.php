@@ -95,16 +95,6 @@ class RC_RCC_Shortcode {
 			RC_RCC_VERSION,
 			true
 		);
-
-		wp_localize_script(
-			'rc-rcc-frontend',
-			'rcRccData',
-			array(
-				/* translators: %d: Anzahl weiterer Rennklassen. */
-				'more' => __( '+%d weitere', 'rc-racemap-club-calendar' ),
-				'less' => __( 'weniger', 'rc-racemap-club-calendar' ),
-			)
-		);
 	}
 
 	/**
@@ -157,7 +147,12 @@ class RC_RCC_Shortcode {
 		$uid             = 'rc-rcc-' . $this->instance;
 		$show_logo       = (bool) RC_RCC_Plugin::get_setting( 'show_logo', true );
 		$logo_url        = RC_RCC_URL . 'assets/images/rc-racemap-logo.svg';
-		$container_style = self::accent_inline_style( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
+		// Karten-URL für den Footer-Hinweis; Basis per Filter überschreibbar.
+		$map_base        = (string) apply_filters( 'rc_rcc_map_base_url', 'https://rcracemap.com/' );
+		$map_url         = ( '' !== $effective_club ) ? add_query_arg( 'club', $effective_club, $map_base ) : $map_base;
+		$accent          = (string) sanitize_hex_color( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
+		$accent_class    = ( '' !== $accent ) ? ' rc-rcc--accent' : '';
+		$accent_style    = ( '' !== $accent ) ? '--rc-rcc-accent:' . $accent . ';' : '';
 
 		ob_start();
 		require RC_RCC_PATH . 'templates/calendar.php';
@@ -165,44 +160,6 @@ class RC_RCC_Shortcode {
 		return (string) ob_get_clean();
 	}
 
-	/**
-	 * Build the inline style that pins the accent colour on the calendar root.
-	 *
-	 * Given a configured hex colour, returns
-	 * "--rc-rcc-accent:#hex;--rc-rcc-on-accent:#contrast;" where the on-accent
-	 * text colour (used on filled pills/buttons) is black or white depending on
-	 * the accent's luminance. Returns '' when no (valid) colour is set, so the
-	 * CSS default / theme-derived accent stays in effect.
-	 *
-	 * @param string $hex Configured accent colour (e.g. "#a3a52c") or ''.
-	 * @return string
-	 */
-	public static function accent_inline_style( string $hex ): string {
-		$hex = sanitize_hex_color( trim( $hex ) );
-
-		if ( null === $hex || '' === $hex ) {
-			return '';
-		}
-
-		// Expand shorthand (#abc → #aabbcc) for the luminance calculation.
-		$raw = ltrim( $hex, '#' );
-		if ( 3 === strlen( $raw ) ) {
-			$raw = $raw[0] . $raw[0] . $raw[1] . $raw[1] . $raw[2] . $raw[2];
-		}
-
-		$r = hexdec( substr( $raw, 0, 2 ) );
-		$g = hexdec( substr( $raw, 2, 2 ) );
-		$b = hexdec( substr( $raw, 4, 2 ) );
-
-		// Text/Icon auf dem gefüllten Button: helle Schrift (Weiß) auf dem Akzent,
-		// nur bei sehr hellen Akzenten dunkle Schrift. Bewusst ein fester
-		// Farbwert (kein `Canvas`), damit die Schrift nicht auf die Theme-
-		// Linkfarbe zurückfällt (die oft dem Akzent gleicht → unsichtbar).
-		$brightness = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
-		$on_accent  = ( $brightness > 200 ) ? '#111111' : '#ffffff';
-
-		return '--rc-rcc-accent:' . $hex . ';--rc-rcc-on-accent:' . $on_accent . ';';
-	}
 
 	/**
 	 * Return an inline SVG icon by name.
@@ -215,6 +172,20 @@ class RC_RCC_Shortcode {
 	 * @param string $name Icon name.
 	 * @return string SVG markup, or '' for an unknown name.
 	 */
+	/**
+	 * Die RC-RaceMap-Bildmarke: Karten-Pin mit Zielflagge – identisch zum
+	 * Marker auf rcracemap.com. Inline statt <img>, damit `currentColor` greift
+	 * und der Pin sich an helle wie dunkle Themes anpasst.
+	 *
+	 * @return string Inline-SVG.
+	 */
+	public static function brand_mark(): string {
+		return '<svg class="rc-rcc__mark" viewBox="0 0 477 528.98" width="20" height="22" fill="currentColor" aria-hidden="true" focusable="false">'
+			. '<path d="M249.52,205.37v66.26c22.09-2.98,44.17-5.96,66.26-6.71v-66.26c-22.09.75-44.17,3.73-66.26,6.71Z"/>'
+			. '<path d="M477,238.5C477,106.78,370.22,0,238.5,0S0,106.78,0,238.5c0,111.19,76.09,204.61,179.04,231.03l59.46,59.46,59.46-59.46c102.95-26.42,179.04-119.84,179.04-231.03ZM382.05,271.63c-22.09-5.96-44.17-7.45-66.26-6.71v66.26c-22.09.75-44.17,3.73-66.26,6.71v-66.26c-22.09,2.98-44.17,5.96-66.26,6.71v66.26c-22.09.75-44.17-.75-66.26-6.71v-66.26c22.09,5.96,44.17,7.45,66.26,6.71v-66.26c-22.09.75-44.17-.75-66.26-6.71v-66.26c22.09,5.96,44.17,7.45,66.26,6.71v66.26c22.09-.75,44.17-3.73,66.26-6.71v-66.26c22.09-2.98,44.17-5.96,66.26-6.71v66.26c22.09-.75,44.17.75,66.26,6.71v66.26Z"/>'
+			. '</svg>';
+	}
+
 	public static function icon( string $name ): string {
 		$open  = '<svg class="rc-rcc__icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
 		$close = '</svg>';

@@ -1,18 +1,17 @@
 /**
  * RC RaceMap Club Calendar – Frontend.
  *
- * Eigenständiges, THEME-UNABHÄNGIGES Design: eigene Schrift (Inter/System),
- * neutrale helle Karten. Farbe kommt nur als Akzent (eine Option, Standard =
- * neutrales Dunkelgrau) – für Links, aktive Navigation und die Teilnehmerzahl.
- * Karten selbst bleiben neutral (keine farbigen Kacheln).
+ * Bewusst einfach: 5-Spalten-Tabelle (Datum · Rennen+Klassen · Teilnehmer ·
+ * Dokumente · Aktion), Trennlinie zwischen den Zeilen.
  *
- * Erhöhte Spezifität (.rc-rcc.rc-rcc / .rc-rcc a…), damit das Theme nichts
- * überschreibt.
+ * Farbkonzept: Links (Teilnehmer, Dokumente, Button) bekommen KEINE eigene
+ * Farbe – sie erben die Linkfarbe des Themes. Alles andere ist schwarz/weiß bzw.
+ * Graustufen. Vergangene Rennen: alles auf 30 %, nur der Button bleibt voll.
+ *
+ * Schrift: Inter, self-hosted (assets/fonts), damit die Darstellung auf jeder
+ * Seite gleich ist.
  */
 
-/* Inter als self-hosted Variable-Font (DSGVO-konform, kein Google Fonts).
-   Dateien liegen im Plugin unter assets/fonts/. Latin + Latin-Extended (für
-   č/ř/ž/ä/ö/ü …). Deckt alle genutzten Schnitte (400–700) über eine Datei ab. */
 @font-face {
 	font-family: "Inter";
 	font-style: normal;
@@ -32,19 +31,11 @@
 }
 
 .rc-rcc {
-	/* Einzige Farb-Option (Admin-Farbwähler). Standard = neutrales Slate. */
-	--rc-rcc-accent: #2c333f;
-	--rc-rcc-on-accent: #ffffff;
-
-	/* Feste, theme-unabhängige Tokens. */
-	--rc-rcc-text: #1f1d1a;
-	--rc-rcc-muted: #726f6a;
-	--rc-rcc-card: #ffffff;
-	--rc-rcc-card-past: #f6f5f2;
-	--rc-rcc-border: #e6e3de;
-	--rc-rcc-tag-bg: #f1efe9;
-	--rc-rcc-tag-text: #5f5d58;
-	--rc-rcc-open: #2f9e44;
+	--rc-rcc-text: #111111;
+	--rc-rcc-muted: #6b6b6b;
+	--rc-rcc-line: #d9d9d9;
+	--rc-rcc-tag-bg: #e7e7e7;
+	--rc-rcc-tag-text: #555555;
 
 	font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 16px;
@@ -61,8 +52,7 @@
 	box-sizing: inherit;
 }
 
-/* Reset mit hoher Spezifität – ABER die Karte (li.rc-rcc__item) ausgenommen,
-   damit ihr Innenabstand nicht auf 0 gesetzt wird. */
+/* Reset mit hoher Spezifität, Zeilen (li.rc-rcc__item) ausgenommen. */
 .rc-rcc.rc-rcc h1,
 .rc-rcc.rc-rcc h2,
 .rc-rcc.rc-rcc h3,
@@ -70,7 +60,7 @@
 .rc-rcc.rc-rcc p,
 .rc-rcc.rc-rcc ul,
 .rc-rcc.rc-rcc ol,
-.rc-rcc.rc-rcc li:not(.rc-rcc__item) {
+.rc-rcc.rc-rcc li {
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -90,9 +80,9 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 2px;
-	margin: 0 0 18px;
+	margin: 0 0 16px;
 	padding: 0;
-	border-bottom: 1px solid var(--rc-rcc-border);
+	border-bottom: 1px solid var(--rc-rcc-line);
 }
 
 .rc-rcc .rc-rcc__tab {
@@ -103,12 +93,11 @@
 	margin: 0;
 	padding: 8px 14px;
 	font-family: inherit;
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
 	line-height: 1.3;
 	color: var(--rc-rcc-muted);
 	cursor: pointer;
-	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .rc-rcc .rc-rcc__tab:hover,
@@ -118,7 +107,7 @@
 
 .rc-rcc .rc-rcc__tab.is-active {
 	color: var(--rc-rcc-text);
-	border-bottom-color: var(--rc-rcc-accent);
+	border-bottom-color: var(--rc-rcc-text);
 }
 
 .rc-rcc .rc-rcc__panel[hidden] {
@@ -130,8 +119,9 @@
 .rc-rcc .rc-rcc__years {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 2px 18px;
-	margin: 0 0 16px;
+	gap: 2px 22px;
+	/* Gleicher Abstand nach oben und unten. */
+	margin: 18px 0;
 	padding: 0;
 }
 
@@ -141,14 +131,14 @@
 	border: 0;
 	border-bottom: 2px solid transparent;
 	margin: 0;
-	padding: 2px 0;
+	padding: 4px 0;
 	font-family: inherit;
-	font-size: 14px;
-	font-weight: 600;
+	/* Gleiche Größe wie das Datum. */
+	font-size: 17px;
+	font-weight: 700;
 	line-height: 1.3;
 	color: var(--rc-rcc-muted);
 	cursor: pointer;
-	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .rc-rcc .rc-rcc__year-btn:hover,
@@ -158,7 +148,7 @@
 
 .rc-rcc .rc-rcc__year-btn.is-active {
 	color: var(--rc-rcc-text);
-	border-bottom-color: var(--rc-rcc-accent);
+	border-bottom-color: var(--rc-rcc-text);
 }
 
 .rc-rcc .rc-rcc__year-panel[hidden] {
@@ -170,7 +160,6 @@
 .rc-rcc .rc-rcc__list {
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
 }
 
 .rc-rcc .rc-rcc__empty {
@@ -178,32 +167,25 @@
 	color: var(--rc-rcc-muted);
 }
 
-/* --- Renn-Karte (neutral, viel Padding) ---------------------------------- */
+/* --- Zeile (5 Spalten) --------------------------------------------------- */
 
-.rc-rcc .rc-rcc__item {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+.rc-rcc.rc-rcc .rc-rcc__item {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 10px;
 	margin: 0;
-	padding: 24px 28px;
-	border: 1px solid var(--rc-rcc-border);
-	border-radius: 16px;
-	background: var(--rc-rcc-card);
-	box-shadow: 0 4px 14px rgba( 20, 20, 20, 0.05 );
+	padding: 22px 0;
+	border-bottom: 1px solid var(--rc-rcc-line);
 }
 
-.rc-rcc .rc-rcc__item--past {
-	background: var(--rc-rcc-card-past);
-	box-shadow: none;
-}
-
-/* Datum (klein, gedämpft). */
+/* 1 – Datum */
 .rc-rcc .rc-rcc__date {
-	font-size: 14px;
-	font-weight: 600;
+	font-size: 17px;
+	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	line-height: 1.3;
-	color: var(--rc-rcc-muted);
+	color: var(--rc-rcc-text);
+	white-space: nowrap;
 }
 
 .rc-rcc .rc-rcc__date time {
@@ -211,173 +193,238 @@
 	text-decoration: none;
 }
 
-/* Titelzeile: Titel links, Teilnehmerzahl rechts (gleiche Typo). */
-.rc-rcc .rc-rcc__head {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 12px 20px;
+/* 2 – Rennen + Klassen */
+.rc-rcc .rc-rcc__race {
+	min-width: 0;
 }
 
 .rc-rcc .rc-rcc__title {
-	font-size: 21px;
+	font-size: 17px;
 	font-weight: 700;
-	line-height: 1.25;
+	line-height: 1.3;
 	color: var(--rc-rcc-text);
 	overflow-wrap: anywhere;
 }
 
-.rc-rcc__item--past .rc-rcc__title {
-	color: var(--rc-rcc-muted);
-}
-
-.rc-rcc .rc-rcc__ppl {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	flex: 0 0 auto;
-	font-size: 21px;
-	font-weight: 700;
-	font-variant-numeric: tabular-nums;
-	line-height: 1.25;
-	white-space: nowrap;
-	color: var(--rc-rcc-accent);
-	text-decoration: none;
-}
-
-.rc-rcc .rc-rcc__ppl .rc-rcc__icon {
-	width: 0.85em;
-	height: 0.85em;
-}
-
-.rc-rcc .rc-rcc__ppl--static {
-	color: var(--rc-rcc-muted);
-}
-
-.rc-rcc a.rc-rcc__ppl:hover,
-.rc-rcc a.rc-rcc__ppl:focus-visible {
-	filter: brightness( 1.15 );
-}
-
-/* Aktions-/Dokumentzeile. */
-.rc-rcc .rc-rcc__meta {
+.rc-rcc.rc-rcc .rc-rcc__classes {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px 20px;
-	font-size: 14.5px;
+	gap: 10px;
+	/* Höhere Spezifität als der Listen-Reset, sonst fällt der Abstand weg. */
+	margin-top: 14px;
 }
 
-.rc-rcc .rc-rcc__action {
+/* Pillen im rcracemap-Stil: Outline, kompakte Höhe, Zahl in Klammern.
+   Spezifität (0,3,0), damit der Listen-Reset das Padding nicht überschreibt. */
+.rc-rcc.rc-rcc .rc-rcc__class {
 	display: inline-flex;
 	align-items: center;
-	gap: 5px;
-	font-weight: 700;
-	color: var(--rc-rcc-accent);
-	text-decoration: none;
-}
-
-.rc-rcc .rc-rcc__action--open {
-	color: var(--rc-rcc-open);
-}
-
-.rc-rcc .rc-rcc__action--open::before {
-	content: "";
-	width: 9px;
-	height: 9px;
-	border-radius: 50%;
-	background: var(--rc-rcc-open);
-	margin-right: 2px;
-}
-
-.rc-rcc a.rc-rcc__action:hover .rc-rcc__action-label,
-.rc-rcc a.rc-rcc__action:focus-visible .rc-rcc__action-label {
-	text-decoration: underline;
-	text-underline-offset: 3px;
-}
-
-.rc-rcc .rc-rcc__doc {
-	font-weight: 600;
-	color: var(--rc-rcc-accent);
-	text-decoration: underline;
-	text-underline-offset: 3px;
-}
-
-.rc-rcc a.rc-rcc__doc:hover,
-.rc-rcc a.rc-rcc__doc:focus-visible {
-	filter: brightness( 1.15 );
-}
-
-/* Rennklassen als dezente Tags; Zahl in Akzentfarbe. */
-.rc-rcc .rc-rcc__classes {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 6px;
-}
-
-.rc-rcc .rc-rcc__class {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-	font-size: 12.5px;
-	font-weight: 500;
-	line-height: 1.4;
-	padding: 4px 11px;
+	gap: 4px;
+	height: 22px;
+	padding: 0 10px;
+	font-size: 11px;
+	font-weight: 400;
+	line-height: 1;
+	border: 1px solid var(--rc-rcc-line);
 	border-radius: 999px;
 	background: var(--rc-rcc-tag-bg);
 	color: var(--rc-rcc-tag-text);
+	max-width: 100%;
 }
 
 .rc-rcc .rc-rcc__class-entries {
-	font-weight: 700;
+	font-weight: inherit;
 	font-variant-numeric: tabular-nums;
-	color: var(--rc-rcc-accent);
+	color: inherit;
 }
 
-.rc-rcc__item--past .rc-rcc__class-entries {
-	color: var(--rc-rcc-tag-text);
-}
-
-.rc-rcc .rc-rcc__class[hidden] {
-	display: none;
-}
-
-/* „+N weitere"-Umschalter (von frontend.js eingefügt). */
-.rc-rcc .rc-rcc__class-more {
-	appearance: none;
-	cursor: pointer;
-	font-family: inherit;
-	font-size: 12.5px;
+/* 3 – Teilnehmer (Link → Theme-Linkfarbe, keine eigene Farbe) */
+.rc-rcc .rc-rcc__ppl-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 17px;
 	font-weight: 600;
-	line-height: 1.4;
-	padding: 4px 11px;
-	border-radius: 999px;
-	border: 1px solid var(--rc-rcc-border);
-	background: transparent;
-	color: var(--rc-rcc-accent);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 }
 
-.rc-rcc .rc-rcc__class-more:hover,
-.rc-rcc .rc-rcc__class-more:focus-visible {
-	border-color: var(--rc-rcc-accent);
+.rc-rcc .rc-rcc__ppl-link--static {
+	color: var(--rc-rcc-muted);
+	text-decoration: none;
+}
+
+.rc-rcc .rc-rcc__ppl-count {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.rc-rcc .rc-rcc__ppl-link--static .rc-rcc__ppl-count {
+	text-decoration: none;
+}
+
+/* 4 – Dokumente (Links → Theme-Linkfarbe) */
+.rc-rcc .rc-rcc__docs {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+	font-size: 14px;
+}
+
+.rc-rcc .rc-rcc__doc {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.rc-rcc .rc-rcc__doc-label {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* 5 – Aktion: gefüllter Button in der Theme-Linkfarbe (currentColor) bzw.
+   Hinweistext „Nennung ab …". */
+.rc-rcc .rc-rcc__cta {
+	display: inline-block;
+	padding: 10px 20px;
+	border-radius: 3px;
+	background: currentColor;
+	text-decoration: none;
+	line-height: 1.2;
+}
+
+.rc-rcc .rc-rcc__cta-label {
+	display: inline-block;
+	color: #ffffff;
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.rc-rcc .rc-rcc__cta:hover,
+.rc-rcc .rc-rcc__cta:focus-visible {
+	filter: brightness( 1.1 );
+}
+
+.rc-rcc .rc-rcc__cta-note {
+	display: inline-block;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--rc-rcc-muted);
+}
+
+/* --- Vergangene Rennen: alles 30 %, nur der Button bleibt voll ----------- */
+
+.rc-rcc__item--past .rc-rcc__date,
+.rc-rcc__item--past .rc-rcc__race {
+	opacity: 0.3;
+}
+
+/* Links bleiben lesbar/klickbar, nur leicht zurückgenommen. */
+.rc-rcc__item--past .rc-rcc__ppl,
+.rc-rcc__item--past .rc-rcc__docs {
+	opacity: 0.6;
+}
+
+/* --- Desktop: fünf Spalten ---------------------------------------------- */
+
+@media ( min-width: 900px ) {
+	.rc-rcc.rc-rcc .rc-rcc__item {
+		/* Feste Breiten, damit alle Spalten zeilenübergreifend fluchten. */
+		grid-template-columns: 9em minmax( 0, 1fr ) 6.5em 12em 12.5em;
+		grid-template-areas: "date race ppl docs action";
+		align-items: start;
+		column-gap: 28px;
+		row-gap: 0;
+	}
+
+	.rc-rcc__date {
+		grid-area: date;
+	}
+
+	.rc-rcc__race {
+		grid-area: race;
+	}
+
+	.rc-rcc__ppl {
+		grid-area: ppl;
+		justify-self: start;
+	}
+
+	.rc-rcc__docs {
+		grid-area: docs;
+	}
+
+	.rc-rcc__action {
+		grid-area: action;
+		justify-self: end;
+	}
 }
 
 /* --- Footer / Logo ------------------------------------------------------- */
 
 .rc-rcc .rc-rcc__footer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px 14px;
 	margin: 18px 0 0;
-	padding-top: 12px;
-	border-top: 1px solid var(--rc-rcc-border);
-	text-align: right;
+	padding-top: 14px;
+	border-top: 1px solid var(--rc-rcc-line);
+}
+
+.rc-rcc .rc-rcc__credit {
+	font-size: 14px;
+	color: var(--rc-rcc-muted);
+}
+
+.rc-rcc .rc-rcc__credit-link {
+	font-weight: 700;
 }
 
 .rc-rcc .rc-rcc__brand {
-	display: inline-block;
-	opacity: 0.7;
+	display: inline-flex;
+	align-items: center;
+	color: var(--rc-rcc-text);
 }
 
-.rc-rcc .rc-rcc__logo {
+.rc-rcc .rc-rcc__mark {
 	display: block;
-	height: auto;
-	max-width: 100%;
+	width: auto;
+	height: 22px;
+}
+
+/* --- Optionale Akzentfarbe (Admin) überschreibt die Theme-Linkfarbe ------ */
+
+.rc-rcc--accent .rc-rcc__ppl-link:not(.rc-rcc__ppl-link--static),
+.rc-rcc--accent .rc-rcc__doc,
+.rc-rcc--accent .rc-rcc__cta {
+	color: var(--rc-rcc-accent);
+}
+
+/* --- Hover ---------------------------------------------------------------- */
+
+.rc-rcc a.rc-rcc__doc:hover,
+.rc-rcc a.rc-rcc__doc:focus-visible,
+.rc-rcc a.rc-rcc__ppl-link:hover,
+.rc-rcc a.rc-rcc__ppl-link:focus-visible {
+	filter: brightness( 0.8 );
+}
+
+.rc-rcc a.rc-rcc__doc:hover .rc-rcc__doc-label,
+.rc-rcc a.rc-rcc__doc:focus-visible .rc-rcc__doc-label,
+.rc-rcc a.rc-rcc__ppl-link:hover .rc-rcc__ppl-count,
+.rc-rcc a.rc-rcc__ppl-link:focus-visible .rc-rcc__ppl-count {
+	text-decoration-thickness: 2px;
+}
+
+.rc-rcc__item--past .rc-rcc__ppl:hover,
+.rc-rcc__item--past .rc-rcc__docs:hover {
+	opacity: 1;
 }
