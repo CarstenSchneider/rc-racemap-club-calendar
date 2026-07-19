@@ -53,14 +53,15 @@ GET {base}/api/clubs/{myrcmOrgId}
 | `documents` | object[] | `{type, label, url}`; `type` u. a. `announcement`, `rules`, sonst generisch |
 | `url` / `detailUrl` | string | Event-Seite (bei MyRCM zugleich **Ergebnis**-Seite für vergangene Rennen). Bei `myrcm+rck` zeigt sie auf **RCK**; die Ergebnisse liegen dann weiterhin auf MyRCM. Das Plugin leitet sie aus der `id` ab (`…-myrcm-event-<N>`), nicht aus einer URL – die Ableitung bleibt damit gültig, falls sich die URL-Belegung des Events ändert. |
 | `registrationListUrl` | string | Teilnehmerliste |
-| `source` | string | Eine **oder mehrere** Quellen, `+`-getrennt. Geliefert werden u. a. `myrcm`, `rck-kleinserie`, `rck-challenge` und – für zusammengeführte Cross-Listings – **`myrcm+rck`**. Kein Enum mit genau einem Wert: das Plugin prüft per Teilstring (`stripos` auf `rck`), nicht per `===`. |
+| `source` | string | Eine **oder mehrere** Quellen, `+`-getrennt. Geliefert werden u. a. `myrcm`, `rck-kleinserie`, `rck-challenge`, **`dmc`** und – für zusammengeführte Cross-Listings – **`myrcm+rck`**. Kein Enum mit genau einem Wert: das Plugin prüft per Teilstring (`stripos` auf `rck`), nicht per `===`. |
 
 Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätzliche Felder sind erlaubt und werden ignoriert.
 
 ## Ableitung (Anbieterseite)
 
 1. `myrcmOrgId` → `hostId` via `hosts.json` (`myrcmOrgId`-Feld, 177/177 vorhanden).
-2. `races.json` **und** `rck-races.json` nach `hostId` filtern und mergen.
+2. `races.json`, `rck-races.json` **und** `dmc-races.json` nach `hostId` filtern
+   und mergen.
    Deduplizierung per `id` reicht **nicht**: die IDs werden pro Quelle gebildet und
    kollidieren fuer dieselbe Veranstaltung nie. Cross-Listings (der Verein schreibt
    ein RCK-Rennen zusaetzlich auf MyRCM aus) werden ueber **gleichen `hostId` +
@@ -78,6 +79,12 @@ Das Plugin normalisiert diese Felder in `class-race.php` (`from_array`). Zusätz
 
    Grund: bei RCK-Serienrennen ist RCK die Nennplattform und traegt den korrekten
    Nennstatus; MyRCM hat die vollstaendigeren Klassen und Dokumente.
+
+   **DMC** (`source: dmc`) wird zuletzt angehaengt, sofern kein MyRCM-/RCK-Rennen
+   auf derselben Venue im ueberlappenden Zeitraum liegt. DMC-Rennen liefern
+   typischerweise Titel, Datum, Klassen und ein Ausschreibungs-PDF, aber **kein**
+   `url`, keinen `registrationStatus` und keine Teilnehmerzahl. Das Plugin stellt
+   sie deshalb ohne Aktion in Spalte 5 dar – es gibt nichts zu verlinken.
 3. Vereinsmeta aus `hosts.json` (name/website) + `venues.json` (lat/lng/city, Match über `hostIds`/`myrcmOrgId`).
 4. Als `{ club, events }` ausliefern.
 
