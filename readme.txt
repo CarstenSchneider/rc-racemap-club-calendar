@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.26
+Stable tag: 1.0.39
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,10 +18,11 @@ Das Plugin bringt bewusst **kein eigenes Design** mit, sondern übernimmt Schrif
 
 = Funktionen =
 
-* Zwei Tabs: **Kommende Rennen** und **Archiv** – Wechsel ohne Seitenreload
-* Pro Rennen: Datum, Titel, Veranstalter, Ort, Rennklassen, Status, Teilnehmerzahl
-* Aktionslinks: Nennung, Teilnehmerliste, Ausschreibung, Reglement
-* Rennen im Backend gezielt ein-/ausblenden (gespeichert pro Event-ID)
+* Zwei Tabs: **Aktuelle Rennen** und **Vergangene Rennen** – Wechsel ohne Seitenreload, je Tab eine Jahres-Navigation
+* Pro Rennen: Datum, Titel, Rennklassen mit Nennzahl, Teilnehmerzahl, Dokumente, Aktion (Nennung / Ergebnisse / Zum Rennen)
+* Rennen im Backend ein-/ausblenden, umbenennen und mit eigenen PDFs versehen (gespeichert pro Event-ID)
+* Eigene Termine für Rennen, die in keiner Quelle stehen
+* Dauerhaftes Archiv: einmal angezeigte Rennen bleiben erhalten, auch wenn die Quelle sie nicht mehr führt
 * Neue Rennen sind automatisch sichtbar
 * Zwischenspeicherung über WordPress-Transients für hohe Performance
 * Vollständig übersetzbar (Textdomain: rc-racemap-club-calendar)
@@ -29,18 +30,21 @@ Das Plugin bringt bewusst **kein eigenes Design** mit, sondern übernimmt Schrif
 
 = Datenquelle =
 
-Die Renndaten werden nicht direkt von MyRCM gescraped, sondern später über eine
-RC-RaceMap-API bezogen (`GET /api/clubs/{club-id}`). Solange die API noch nicht
-verfügbar ist, arbeitet das Plugin mit mitgelieferten Beispieldaten. Die echte
-API lässt sich per Konstante `RC_RCC_API_BASE_URL` oder über den Filter
-`rc_rcc_api_base_url` aktivieren.
+Die Renndaten kommen über die RC-RaceMap-API (`GET /api/clubs/{club-id}`), die
+MyRCM, RCK und DMC zusammenführt. Die Basis-URL lässt sich per Konstante
+`RC_RCC_API_BASE_URL` oder über den Filter `rc_rcc_api_base_url` umstellen.
 
 == Installation ==
 
-1. Den Ordner `rc-racemap-club-calendar` nach `/wp-content/plugins/` hochladen.
-2. Das Plugin im Menü „Plugins" aktivieren.
-3. Unter **RC RaceMap → Einstellungen** die MyRCM Organisator-ID eintragen.
-4. Den Shortcode `[rc_racemap_club_calendar]` auf einer beliebigen Seite einfügen.
+Ausführliche Schritt-für-Schritt-Anleitung: `docs/anleitung.md`.
+
+1. Die ZIP von der Release-Seite laden und unter **Plugins → Installieren →
+   Plugin hochladen** einspielen, dann aktivieren.
+2. Unter **RC RaceMap → Einstellungen** die MyRCM Organisator-ID eintragen –
+   die Zahl hinter `dId[O]=` in der Adresse eurer MyRCM-Vereinsseite.
+3. Den Shortcode `[rc_racemap_club_calendar]` auf einer beliebigen Seite einfügen.
+4. Prüfen, dass unter **Einstellungen → Allgemein** Sprache und Datumsformat
+   stimmen – der Kalender übernimmt beides von WordPress.
 
 == Frequently Asked Questions ==
 
@@ -49,6 +53,14 @@ API lässt sich per Konstante `RC_RCC_API_BASE_URL` oder über den Filter
 Unter **RC RaceMap → Rennen verwalten** lässt sich für jedes Rennen der Haken
 entfernen. Die Auswahl wird dauerhaft pro Event-ID gespeichert.
 
+= Warum stehen die Monatsnamen auf Englisch? =
+
+Der Kalender übernimmt Sprache und Datumsformat von WordPress. Fehlen die
+deutschen Sprachdateien des Kerns, bleiben die Monatsnamen englisch, obwohl die
+Sprache auf Deutsch steht. Erkennbar an der Begrüßung oben rechts: steht dort
+„Howdy" statt „Hallo", fehlen sie. Abhilfe: **Dashboard → Aktualisierungen →
+Übersetzungen aktualisieren**.
+
 = Kann ich das Aussehen anpassen? =
 
 Ja. Alle Templates unter `templates/` lassen sich vom Theme überschreiben,
@@ -56,6 +68,27 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.39 =
+* Schmalere Spalten und engere Klassen-Pillen – mehr Platz für die Rennklassen.
+
+= 1.0.37 – 1.0.38 =
+* Der Kalender übernimmt Schrift und Schriftgrößen des Themes; die mitgelieferte Schrift entfällt (133 KB weniger).
+* Leere Spalten werden nicht mehr ausgegeben – keine großen Lücken mehr auf dem Handy.
+
+= 1.0.34 – 1.0.36 =
+* Dauerhaftes Archiv: einmal angezeigte Rennen bleiben erhalten, auch wenn die Quelle sie nach einigen Wochen nicht mehr führt.
+* Jahres-Navigation auch im Backend.
+* Historie einspielen (JSON), inkl. Titel, Dokumenten und Teilnehmerzahlen.
+
+= 1.0.30 – 1.0.33 =
+* Eigene PDFs je Rennen und eigene Termine für Rennen, die in keiner Quelle stehen.
+* Titel je Rennen überschreibbar.
+* Jedes Release enthält ein installierbares Plugin-ZIP.
+
+= 1.0.28 – 1.0.29 =
+* Zusammengeführte RCK+MyRCM-Rennen; Aufteilung nach Renndatum statt Kalenderjahr.
+* Einstellungsseite auf vier Felder reduziert.
 
 = 1.0.22 =
 * Teilnehmerzahl wird nur noch unterstrichen, wenn sie tatsächlich zur Teilnehmerliste verlinkt ist (z. B. bei RCK-Rennen ohne Liste ist sie nun nicht mehr fälschlich als Link markiert).
