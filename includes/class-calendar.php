@@ -404,6 +404,18 @@ class RC_RCC_Calendar {
 	}
 
 	/**
+	 * Compare document labels forgivingly (case and spacing).
+	 *
+	 * @param string $label Beschriftung.
+	 * @return string
+	 */
+	private static function normalise_label( string $label ): string {
+		return function_exists( 'mb_strtolower' )
+			? mb_strtolower( trim( $label ) )
+			: strtolower( trim( $label ) );
+	}
+
+	/**
 	 * Documents the club uploaded itself, keyed by event ID.
 	 *
 	 * @return array<string, array<int, array{label: string, url: string}>>
@@ -431,6 +443,12 @@ class RC_RCC_Calendar {
 			return;
 		}
 
+		// Beschriftungen der Dokumente, die schon aus der Quelle kommen.
+		$source_labels = array(
+			'announcement' => __( 'Ausschreibung', 'rc-racemap-club-calendar' ),
+			'regulations'  => __( 'Reglement', 'rc-racemap-club-calendar' ),
+		);
+
 		foreach ( $races as $race ) {
 			foreach ( $map[ $race->id ] ?? array() as $doc ) {
 				$label = isset( $doc['label'] ) ? (string) $doc['label'] : '';
@@ -439,6 +457,25 @@ class RC_RCC_Calendar {
 				if ( '' === $label || '' === $url ) {
 					continue;
 				}
+
+				// Gleiche Beschriftung wie ein Dokument der Quelle? Dann ersetzt
+				// das eigene es, statt daneben zu stehen. Wer selbst etwas
+				// hinterlegt, meint es so – womöglich ist es die korrigierte
+				// Fassung.
+				$normalised = self::normalise_label( $label );
+
+				foreach ( $source_labels as $key => $source_label ) {
+					if ( self::normalise_label( $source_label ) === $normalised ) {
+						unset( $race->links[ $key ] );
+					}
+				}
+
+				$race->extra_links = array_values(
+					array_filter(
+						$race->extra_links,
+						static fn( $existing ) => self::normalise_label( (string) ( $existing['label'] ?? '' ) ) !== $normalised
+					)
+				);
 
 				$race->extra_links[] = array(
 					'label' => $label,

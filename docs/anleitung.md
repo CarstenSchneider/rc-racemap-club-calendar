@@ -103,6 +103,10 @@ Quelle; der steht als blasser Platzhalter darin.
 du das PDF hoch oder wählst ein vorhandenes. Bis zu fünf Dokumente pro Rennen.
 Sie erscheinen im Kalender hinter denen, die MyRCM oder RCK schon mitliefern.
 
+Gibt es dort bereits ein Dokument mit derselben Bezeichnung — etwa eine
+Ausschreibung —, ersetzt deins es. So kannst du eine korrigierte Fassung
+nachreichen, ohne dass beide nebeneinander stehen.
+
 **Eigene Termine** — für Rennen, die weder bei MyRCM noch bei RCK oder DMC
 stehen: Clublauf, Vereinsmeisterschaft, Trainingstag. Im Abschnitt „Eigene
 Termine" Bezeichnung und Datum eintragen. Sie erscheinen im Kalender zwischen den
