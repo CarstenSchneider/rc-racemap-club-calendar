@@ -4,7 +4,9 @@
  *
  * Erwartete Variablen (von RC_RCC_Admin::render_races_page bereitgestellt):
  *
- * @var RC_RCC_Race[]        $races       Alle Rennen (sichtbar + ausgeblendet).
+ * @var RC_RCC_Race[]        $races         Rennen des gewählten Jahres.
+ * @var array<string, array> $years         Jahr => Rennen (absteigend).
+ * @var string               $selected_year Aktuell gewähltes Jahr.
  * @var array<string, bool>  $visibility  Aktuelle Sichtbarkeits-Zuordnung.
  * @var array<string, array> $documents   Eigene Dokumente je Event-ID.
  * @var array<int, array>    $custom      Selbst angelegte Termine (Rohdaten).
@@ -45,6 +47,26 @@ $ctx = RC_RCC_Admin::view_context();
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 		<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['action'] ); ?>" />
 		<?php wp_nonce_field( $ctx['action'] ); ?>
+
+		<?php if ( count( $years ) > 1 ) : ?>
+			<div class="rc-rcc-admin-years">
+				<?php foreach ( $years as $rc_year => $rc_year_races ) : ?>
+					<?php
+					$rc_year_url = add_query_arg(
+						array(
+							'page'        => 'rc-racemap-races',
+							'rc_rcc_year' => $rc_year,
+						),
+						admin_url( 'admin.php' )
+					);
+					?>
+					<a
+						class="rc-rcc-admin-year<?php echo ( (string) $rc_year === $selected_year ) ? ' is-active' : ''; ?>"
+						href="<?php echo esc_url( $rc_year_url ); ?>"
+					><?php echo esc_html( (string) $rc_year ); ?> <span class="count">(<?php echo esc_html( (string) count( $rc_year_races ) ); ?>)</span></a>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
 
 		<?php if ( empty( $races ) ) : ?>
 			<div class="notice notice-info inline">
@@ -213,4 +235,25 @@ $ctx = RC_RCC_Admin::view_context();
 
 		<?php submit_button( __( 'Änderungen speichern', 'rc-racemap-club-calendar' ) ); ?>
 	</form>
+
+	<details class="rc-rcc-import">
+		<summary><?php echo esc_html__( 'Historie einspielen', 'rc-racemap-club-calendar' ); ?></summary>
+
+		<p class="description">
+			<?php echo esc_html__( 'Die Datenquelle reicht nur rund ein halbes Jahr zurück. Wenn du deine älteren Rennen bereits als Liste hast, kannst du sie hier einmalig ins Archiv übernehmen – danach bleiben sie dauerhaft im Tab „Vergangene Rennen".', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
+		<p class="description">
+			<?php echo esc_html__( 'Erwartet wird JSON: eine Liste von Rennen mit mindestens „from" (JJJJ-MM-TT) und „name". Optional „to", „url", „classes" und „documents". Ein erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert also statt zu verdoppeln.', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['import_action'] ); ?>" />
+			<?php wp_nonce_field( $ctx['import_action'] ); ?>
+
+			<textarea name="rc_rcc_import" class="rc-rcc-import-field" rows="10" placeholder='[{"from":"2025-09-06","to":"2025-09-07","name":"BTM – Berlin Touring Masters"}]'></textarea>
+
+			<?php submit_button( __( 'Ins Archiv übernehmen', 'rc-racemap-club-calendar' ), 'secondary' ); ?>
+		</form>
+	</details>
 </div>

@@ -44,6 +44,13 @@ class RC_RCC_Api {
 	private ?WP_Error $last_error = null;
 
 	/**
+	 * Raw event rows from the most recent hydrate() call.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private array $last_rows = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @param RC_RCC_Cache $cache Cache component.
@@ -102,6 +109,15 @@ class RC_RCC_Api {
 	 */
 	public function last_error(): ?WP_Error {
 		return $this->last_error;
+	}
+
+	/**
+	 * The raw event rows behind the most recent result.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function last_rows(): array {
+		return $this->last_rows;
 	}
 
 	/**
@@ -203,6 +219,10 @@ class RC_RCC_Api {
 	 * @return RC_RCC_Race[]
 	 */
 	private function hydrate( array $rows ): array {
+		// Rohdaten des zuletzt gelieferten Abrufs merken – der Kalender legt
+		// sie ins Archiv, damit vergangene Rennen erhalten bleiben.
+		$this->last_rows = $rows;
+
 		$races = array();
 
 		foreach ( $rows as $row ) {

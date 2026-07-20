@@ -77,6 +77,18 @@ final class RC_RCC_Plugin {
 	public const OPTION_TITLES = 'rc_rcc_titles';
 
 	/**
+	 * Option holding every event ever delivered by the API.
+	 *
+	 * Die Quelle liefert nur rund ein halbes Jahr rückwärts. Ohne diese Ablage
+	 * würde der Tab „Vergangene Rennen" sich selbst leeren, während die vom
+	 * Verein angelegten Termine dauerhaft stehen bleiben – zwei verschiedene
+	 * Verhalten in derselben Liste.
+	 *
+	 * Shape: array<string event_id, array<string, mixed>> (Rohdaten der API)
+	 */
+	public const OPTION_ARCHIVE = 'rc_rcc_archive';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin

@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.32\n"
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.34\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
 "Language-Team: RC RaceMap\n"
 "MIME-Version: 1.0\n"
@@ -10,91 +10,91 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: rc-racemap-club-calendar\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: includes/class-admin.php:93 includes/class-admin.php:94
+#: includes/class-admin.php:99 includes/class-admin.php:100
 #: templates/calendar.php:92
 msgid "RC RaceMap"
 msgstr ""
 
-#: includes/class-admin.php:104 includes/class-admin.php:105
-#: includes/class-admin.php:689
+#: includes/class-admin.php:110 includes/class-admin.php:111
+#: includes/class-admin.php:866
 msgid "Einstellungen"
 msgstr ""
 
-#: includes/class-admin.php:113 includes/class-admin.php:114
-#: includes/views/manage-races.php:23
+#: includes/class-admin.php:119 includes/class-admin.php:120
+#: includes/views/manage-races.php:25
 msgid "Rennen verwalten"
 msgstr ""
 
-#: includes/class-admin.php:139
+#: includes/class-admin.php:145
 msgid "Kalender-Einstellungen"
 msgstr ""
 
-#: includes/class-admin.php:141
+#: includes/class-admin.php:147
 msgid "Lege fest, wie dein Vereinskalender abgerufen und angezeigt wird."
 msgstr ""
 
-#: includes/class-admin.php:147
+#: includes/class-admin.php:153
 msgid "MyRCM Organisator-ID"
 msgstr ""
 
-#: includes/class-admin.php:148
+#: includes/class-admin.php:154
 msgid "Termine aktualisieren"
 msgstr ""
 
-#: includes/class-admin.php:149
+#: includes/class-admin.php:155
 msgid "Akzentfarbe"
 msgstr ""
 
-#: includes/class-admin.php:169 includes/class-admin.php:178
+#: includes/class-admin.php:175 includes/class-admin.php:184
 msgid "Automatische Updates"
 msgstr ""
 
-#: includes/class-admin.php:171
+#: includes/class-admin.php:177
 msgid ""
 "Dieses Plugin bezieht Updates aus seinem privaten GitHub-Repository. Dafür "
 "wird ein Zugriffstoken benötigt."
 msgstr ""
 
-#: includes/class-admin.php:240
+#: includes/class-admin.php:246
 msgid ""
 "Die Organisator-ID deines Vereins bei MyRCM – die Nummer, die MyRCM deinem "
 "Verein zuweist (z. B. „16961\"). Sie steht u. a. in der MyRCM-Adresse deiner "
 "Vereinsseite."
 msgstr ""
 
-#: includes/class-admin.php:255
+#: includes/class-admin.php:261
 msgid "Farbe für Links und den Button. Leer lassen = Linkfarbe deines Themes."
 msgstr ""
 
-#: includes/class-admin.php:264
+#: includes/class-admin.php:270
 msgid ""
 "Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar "
 "sind."
 msgstr ""
 
-#: includes/class-admin.php:266
+#: includes/class-admin.php:272
 msgid ""
 "Betrifft ausschließlich diesen Kalender. Andere Plugins, dein Theme und "
 "WordPress selbst bleiben unberührt."
 msgstr ""
 
-#: includes/class-admin.php:282
+#: includes/class-admin.php:288
 msgid "alle 15 Minuten"
 msgstr ""
 
-#: includes/class-admin.php:283
+#: includes/class-admin.php:289
 msgid "stündlich (empfohlen)"
 msgstr ""
 
-#: includes/class-admin.php:284
+#: includes/class-admin.php:290
 msgid "alle 6 Stunden"
 msgstr ""
 
-#: includes/class-admin.php:285
+#: includes/class-admin.php:291
 msgid "einmal täglich"
 msgstr ""
 
-#: includes/class-admin.php:298
+#: includes/class-admin.php:304
 msgid ""
 "Die Renntermine werden auf deiner Seite zwischengespeichert, damit sie "
 "sofort laden. Hier legst du fest, wie oft dabei nach Änderungen gesucht wird "
@@ -102,59 +102,76 @@ msgid ""
 "nötig: die Renndaten selbst ändern sich meist nur einmal am Tag."
 msgstr ""
 
-#: includes/class-admin.php:312
+#: includes/class-admin.php:318
 msgid "RC RaceMap Club Calendar"
 msgstr ""
 
-#: includes/class-admin.php:323
+#: includes/class-admin.php:329
 msgid "Shortcode"
 msgstr ""
 
-#: includes/class-admin.php:324
+#: includes/class-admin.php:330
 msgid ""
 "Füge diesen Shortcode auf einer beliebigen Seite ein, um den Kalender "
 "anzuzeigen:"
 msgstr ""
 
-#: includes/class-admin.php:374
+#: includes/class-admin.php:408 includes/class-admin.php:515
 msgid "Dazu bist du nicht berechtigt."
 msgstr ""
 
-#: includes/class-admin.php:425
+#. translators: %d: Anzahl der eingespielten Rennen.
+#: includes/class-admin.php:467
+#, php-format
+msgid "%d Rennen ins Archiv übernommen."
+msgid_plural "%d Rennen ins Archiv übernommen."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-admin.php:475
+msgid ""
+"Das war kein gültiges JSON. Bitte den kompletten Inhalt der Datei einfügen."
+msgstr ""
+
+#: includes/class-admin.php:480
+msgid "Es wurde nichts übernommen – kein Eintrag hatte Datum und Bezeichnung."
+msgstr ""
+
+#: includes/class-admin.php:489
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr ""
 
-#: includes/class-admin.php:614 includes/class-race.php:681
+#: includes/class-admin.php:791 includes/class-race.php:681
 msgid "Dokument"
 msgstr ""
 
-#: includes/class-admin.php:672
+#: includes/class-admin.php:849
 msgid "Dokument auswählen"
 msgstr ""
 
-#: includes/class-admin.php:673
+#: includes/class-admin.php:850
 msgid "Dokument übernehmen"
 msgstr ""
 
-#: includes/class-api.php:131
+#: includes/class-api.php:147
 msgid "Keine Club-ID konfiguriert."
 msgstr ""
 
 #. translators: %d: HTTP-Statuscode.
-#: includes/class-api.php:156
+#: includes/class-api.php:172
 #, php-format
 msgid "Die RC-RaceMap-API hat mit HTTP-Status %d geantwortet."
 msgstr ""
 
-#: includes/class-api.php:166
+#: includes/class-api.php:182
 msgid "Die RC-RaceMap-API hat ungültiges JSON zurückgegeben."
 msgstr ""
 
-#: includes/class-api.php:266
+#: includes/class-api.php:286
 msgid "Die Datei mit Beispieldaten fehlt."
 msgstr ""
 
-#: includes/class-api.php:273
+#: includes/class-api.php:293
 msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
 msgstr ""
 
@@ -176,89 +193,89 @@ msgstr ""
 msgid "Nennung folgt"
 msgstr ""
 
-#: includes/views/manage-races.php:24
+#: includes/views/manage-races.php:26
 msgid "Daten aktualisieren"
 msgstr ""
 
-#: includes/views/manage-races.php:28
+#: includes/views/manage-races.php:30
 msgid ""
 "Entferne den Haken, um ein Rennen im Kalender auszublenden. Neue Rennen "
 "werden automatisch angezeigt. Die Sichtbarkeit wird pro Event-ID gespeichert "
 "– ein umbenanntes Rennen behält also seinen Zustand."
 msgstr ""
 
-#: includes/views/manage-races.php:32
+#: includes/views/manage-races.php:34
 msgid ""
 "Den Titel kannst du überschreiben – hilfreich, wenn MyRCM einen unklaren "
 "Namen liefert. Leer lassen übernimmt den Titel der Quelle, der im Feld als "
 "Platzhalter steht."
 msgstr ""
 
-#: includes/views/manage-races.php:36
+#: includes/views/manage-races.php:38
 msgid ""
 "In der Spalte „Eigene Dokumente\" kannst du je Rennen PDFs hinterlegen – "
 "etwa Reglement, Ausschreibung oder Ergebnisse. Sie erscheinen im Kalender "
 "hinter den Dokumenten, die MyRCM oder RCK bereits mitliefern."
 msgstr ""
 
-#: includes/views/manage-races.php:51
+#: includes/views/manage-races.php:73
 msgid ""
 "Noch keine Rennen aus MyRCM, RCK oder DMC gefunden. Prüfe die Organisator-ID "
 "in den Einstellungen und aktualisiere dann. Eigene Termine kannst du "
 "trotzdem schon anlegen."
 msgstr ""
 
-#: includes/views/manage-races.php:57
+#: includes/views/manage-races.php:79
 msgid "Anzeigen"
 msgstr ""
 
-#: includes/views/manage-races.php:58
+#: includes/views/manage-races.php:80
 msgid "Datum"
 msgstr ""
 
-#: includes/views/manage-races.php:59
+#: includes/views/manage-races.php:81
 msgid "Titel"
 msgstr ""
 
-#: includes/views/manage-races.php:60
+#: includes/views/manage-races.php:82
 msgid "Veranstalter"
 msgstr ""
 
-#: includes/views/manage-races.php:61
+#: includes/views/manage-races.php:83
 msgid "Status"
 msgstr ""
 
-#: includes/views/manage-races.php:62
+#: includes/views/manage-races.php:84
 msgid "Eigene Dokumente"
 msgstr ""
 
-#: includes/views/manage-races.php:96
+#: includes/views/manage-races.php:118
 msgid "eigener Termin"
 msgstr ""
 
-#: includes/views/manage-races.php:122
+#: includes/views/manage-races.php:144
 msgid "Bezeichnung, z. B. Reglement"
 msgstr ""
 
-#: includes/views/manage-races.php:129
+#: includes/views/manage-races.php:151
 msgid "Adresse der Datei"
 msgstr ""
 
-#: includes/views/manage-races.php:132
+#: includes/views/manage-races.php:154
 msgid "Datei wählen"
 msgstr ""
 
-#: includes/views/manage-races.php:137
+#: includes/views/manage-races.php:159
 msgid ""
 "Leer lassen, wenn nichts hinterlegt werden soll. Eine Zeile leeren entfernt "
 "das Dokument."
 msgstr ""
 
-#: includes/views/manage-races.php:146
+#: includes/views/manage-races.php:168
 msgid "Eigene Termine"
 msgstr ""
 
-#: includes/views/manage-races.php:149
+#: includes/views/manage-races.php:171
 msgid ""
 "Für Rennen, die weder bei MyRCM noch bei RCK oder DMC stehen – Clublauf, "
 "Vereinsmeisterschaft, Trainingstag. Sie erscheinen im Kalender zwischen den "
@@ -266,46 +283,69 @@ msgid ""
 "lösche seine Bezeichnung und speichere."
 msgstr ""
 
-#: includes/views/manage-races.php:163
+#: includes/views/manage-races.php:185
 msgid "Bezeichnung"
 msgstr ""
 
-#: includes/views/manage-races.php:164
+#: includes/views/manage-races.php:186
 msgid "Von"
 msgstr ""
 
-#: includes/views/manage-races.php:165
+#: includes/views/manage-races.php:187
 msgid "Bis"
 msgstr ""
 
-#: includes/views/manage-races.php:166
+#: includes/views/manage-races.php:188
 msgid "Klassen"
 msgstr ""
 
-#: includes/views/manage-races.php:167
+#: includes/views/manage-races.php:189
 msgid "Link"
 msgstr ""
 
-#: includes/views/manage-races.php:180
+#: includes/views/manage-races.php:202
 msgid "z. B. Vereinsmeisterschaft"
 msgstr ""
 
-#: includes/views/manage-races.php:194
+#: includes/views/manage-races.php:216
 msgid "Mit Komma trennen"
 msgstr ""
 
-#: includes/views/manage-races.php:202
+#: includes/views/manage-races.php:224
 msgid "Optional, z. B. Anmeldung"
 msgstr ""
 
-#: includes/views/manage-races.php:211
+#: includes/views/manage-races.php:233
 msgid ""
 "Bis-Datum nur bei mehrtägigen Rennen ausfüllen. Nach dem Speichern kannst du "
 "dem Termin oben Dokumente zuordnen."
 msgstr ""
 
-#: includes/views/manage-races.php:214
+#: includes/views/manage-races.php:236
 msgid "Änderungen speichern"
+msgstr ""
+
+#: includes/views/manage-races.php:240
+msgid "Historie einspielen"
+msgstr ""
+
+#: includes/views/manage-races.php:243
+msgid ""
+"Die Datenquelle reicht nur rund ein halbes Jahr zurück. Wenn du deine "
+"älteren Rennen bereits als Liste hast, kannst du sie hier einmalig ins "
+"Archiv übernehmen – danach bleiben sie dauerhaft im Tab „Vergangene Rennen\"."
+msgstr ""
+
+#: includes/views/manage-races.php:247
+msgid ""
+"Erwartet wird JSON: eine Liste von Rennen mit mindestens „from\" (JJJJ-MM-"
+"TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
+"erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
+"also statt zu verdoppeln."
+msgstr ""
+
+#: includes/views/manage-races.php:256
+msgid "Ins Archiv übernehmen"
 msgstr ""
 
 #: templates/calendar.php:25

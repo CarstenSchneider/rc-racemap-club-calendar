@@ -50,6 +50,11 @@ class RC_RCC_Admin {
 	private const ACTION_SAVE_VISIBILITY = 'rc_rcc_save_visibility';
 
 	/**
+	 * Action zum Einspielen einer Renn-Historie.
+	 */
+	private const ACTION_IMPORT_ARCHIVE = 'rc_rcc_import_archive';
+
+	/**
 	 * Erforderliche Berechtigung für alle Seiten.
 	 */
 	private const CAPABILITY = 'manage_options';
@@ -80,6 +85,7 @@ class RC_RCC_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_post_' . self::ACTION_SAVE_VISIBILITY, array( $this, 'handle_save_visibility' ) );
+		add_action( 'admin_post_' . self::ACTION_IMPORT_ARCHIVE, array( $this, 'handle_import_archive' ) );
 		add_filter( 'plugin_action_links_' . RC_RCC_BASENAME, array( $this, 'add_settings_link' ) );
 	}
 
@@ -341,12 +347,40 @@ class RC_RCC_Admin {
 		$force_refresh = isset( $_GET['rc_rcc_refresh'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur Cache-Umgehung, kein Zustandswechsel.
 			&& check_admin_referer( 'rc_rcc_refresh' );
 
-		$races      = $this->calendar->all_races( $force_refresh );
+		$all_races  = $this->calendar->all_races( $force_refresh );
 		$visibility = $this->calendar->visibility_map();
 		$documents  = $this->calendar->documents_map();
 		$custom     = $this->calendar->custom_races_raw();
 		$titles     = $this->calendar->titles_map();
 		$error      = $this->calendar->api()->last_error();
+
+		// Nach Jahr aufteilen; das Archiv reicht mit der Zeit über mehrere
+		// Jahre, eine flache Liste wäre dann nicht mehr zu überblicken.
+		$years = array();
+		foreach ( $all_races as $race ) {
+			$year = $race->year();
+			$year = ( '' === $year ) ? (string) wp_date( 'Y' ) : $year;
+
+			$years[ $year ][] = $race;
+		}
+
+		krsort( $years );
+
+		// Vorauswahl: das laufende Jahr, sonst das jüngste vorhandene.
+		$current_year = (string) wp_date( 'Y' );
+		$year_keys    = array_keys( $years );
+		$default_year = in_array( $current_year, $year_keys, true )
+			? $current_year
+			: (string) ( $year_keys[0] ?? $current_year );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nur eine Ansichtsauswahl.
+		$selected_year = isset( $_GET['rc_rcc_year'] ) ? sanitize_text_field( wp_unslash( $_GET['rc_rcc_year'] ) ) : '';
+
+		if ( ! in_array( $selected_year, $year_keys, true ) ) {
+			$selected_year = $default_year;
+		}
+
+		$races = $years[ $selected_year ] ?? array();
 
 		$refresh_url = wp_nonce_url(
 			add_query_arg(
@@ -419,6 +453,36 @@ class RC_RCC_Admin {
 	 * @return void
 	 */
 	private function render_admin_notice(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- nur Anzeige.
+		if ( isset( $_GET['rc_rcc_imported'] ) ) {
+			$state = sanitize_text_field( wp_unslash( $_GET['rc_rcc_imported'] ) );
+			$count = isset( $_GET['rc_rcc_count'] ) ? absint( $_GET['rc_rcc_count'] ) : 0;
+
+			if ( 'ok' === $state ) {
+				printf(
+					'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+					esc_html(
+						sprintf(
+							/* translators: %d: Anzahl der eingespielten Rennen. */
+							_n( '%d Rennen ins Archiv übernommen.', '%d Rennen ins Archiv übernommen.', $count, 'rc-racemap-club-calendar' ),
+							$count
+						)
+					)
+				);
+			} elseif ( 'invalid' === $state ) {
+				printf(
+					'<div class="notice notice-error is-dismissible"><p>%s</p></div>',
+					esc_html__( 'Das war kein gültiges JSON. Bitte den kompletten Inhalt der Datei einfügen.', 'rc-racemap-club-calendar' )
+				);
+			} else {
+				printf(
+					'<div class="notice notice-warning is-dismissible"><p>%s</p></div>',
+					esc_html__( 'Es wurde nichts übernommen – kein Eintrag hatte Datum und Bezeichnung.', 'rc-racemap-club-calendar' )
+				);
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 		if ( isset( $_GET['rc_rcc_updated'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reines Anzeige-Flag nach sicherem Redirect.
 			printf(
 				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
@@ -433,6 +497,119 @@ class RC_RCC_Admin {
 	 * @param string $hook Aktueller Admin-Seiten-Hook.
 	 * @return void
 	 */
+	/**
+	 * Eine Renn-Historie ins Archiv einspielen.
+	 *
+	 * Gedacht für den Umzug: viele Vereine haben ihre vergangenen Rennen auf
+	 * der alten Seite stehen, die API reicht aber nur rund ein halbes Jahr
+	 * zurück. Erwartet wird JSON in der Form, die auch die API liefert –
+	 * mindestens `from` und `name`/`title` je Eintrag.
+	 *
+	 * Bestehende Einträge mit derselben ID werden ersetzt, damit sich ein
+	 * Import korrigieren lässt.
+	 *
+	 * @return void
+	 */
+	public function handle_import_archive(): void {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( esc_html__( 'Dazu bist du nicht berechtigt.', 'rc-racemap-club-calendar' ) );
+		}
+
+		check_admin_referer( self::ACTION_IMPORT_ARCHIVE );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- direkt darüber geprüft.
+		$raw = isset( $_POST['rc_rcc_import'] ) ? (string) wp_unslash( $_POST['rc_rcc_import'] ) : '';
+
+		$rows   = json_decode( trim( $raw ), true );
+		$result = 'empty';
+		$count  = 0;
+
+		if ( ! is_array( $rows ) ) {
+			$result = 'invalid';
+		} else {
+			$archive = $this->calendar->archive_map();
+
+			foreach ( $rows as $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+
+				$from  = $this->sanitize_date( (string) ( $row['from'] ?? '' ) );
+				$title = sanitize_text_field( (string) ( $row['name'] ?? $row['title'] ?? '' ) );
+
+				if ( '' === $from || '' === $title ) {
+					continue;
+				}
+
+				$to = $this->sanitize_date( (string) ( $row['to'] ?? '' ) );
+
+				$id = sanitize_text_field( (string) ( $row['id'] ?? '' ) );
+				if ( '' === $id ) {
+					$id = 'archive-' . md5( $from . '|' . $title );
+				}
+
+				$documents = array();
+				foreach ( (array) ( $row['documents'] ?? array() ) as $doc ) {
+					if ( ! is_array( $doc ) ) {
+						continue;
+					}
+
+					$url = esc_url_raw( trim( (string) ( $doc['url'] ?? '' ) ) );
+
+					if ( '' === $url ) {
+						continue;
+					}
+
+					$documents[] = array(
+						'url'   => $url,
+						'type'  => sanitize_text_field( (string) ( $doc['type'] ?? '' ) ),
+						'label' => sanitize_text_field( (string) ( $doc['label'] ?? '' ) ),
+					);
+				}
+
+				$classes = array();
+				foreach ( (array) ( $row['classes'] ?? array() ) as $class ) {
+					$name = is_array( $class ) ? (string) ( $class['name'] ?? '' ) : (string) $class;
+					$name = sanitize_text_field( $name );
+
+					if ( '' !== $name ) {
+						$classes[] = $name;
+					}
+				}
+
+				$archive[ $id ] = array(
+					'id'        => $id,
+					'name'      => $title,
+					'from'      => $from,
+					'to'        => ( '' !== $to ) ? $to : $from,
+					'url'       => esc_url_raw( trim( (string) ( $row['url'] ?? '' ) ) ),
+					'classes'   => $classes,
+					'documents' => $documents,
+					'source'    => sanitize_text_field( (string) ( $row['source'] ?? 'import' ) ),
+				);
+
+				++$count;
+			}
+
+			if ( $count > 0 ) {
+				update_option( RC_RCC_Plugin::OPTION_ARCHIVE, $archive, false );
+				$result = 'ok';
+			}
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'            => self::PAGE_RACES,
+					'rc_rcc_imported' => $result,
+					'rc_rcc_count'    => $count,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
 	/**
 	 * Die vom Verein selbst angelegten Termine speichern.
 	 *
@@ -701,8 +878,9 @@ class RC_RCC_Admin {
 	 */
 	public static function view_context(): array {
 		return array(
-			'action'     => self::ACTION_SAVE_VISIBILITY,
-			'page_races' => self::PAGE_RACES,
+			'action'         => self::ACTION_SAVE_VISIBILITY,
+			'import_action'  => self::ACTION_IMPORT_ARCHIVE,
+			'page_races'     => self::PAGE_RACES,
 		);
 	}
 }

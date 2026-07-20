@@ -67,6 +67,14 @@ class RC_RCC_Calendar {
 		}
 
 		$races = $this->api->get_events( $club_id, $ttl, $force_refresh );
+
+		// Nur bei fehlerfreiem Abruf archivieren – sonst würde eine kaputte
+		// oder leere Antwort den Bestand einfrieren bzw. verfälschen.
+		if ( null === $this->api->last_error() ) {
+			$this->archive_rows( $this->api->last_rows() );
+		}
+
+		$races = array_merge( $races, $this->archived_races( $races ) );
 		$races = array_merge( $races, $this->custom_races() );
 		$this->apply_custom_titles( $races );
 		$this->attach_custom_documents( $races );
@@ -153,6 +161,92 @@ class RC_RCC_Calendar {
 	 *
 	 * @return array<string, bool>
 	 */
+	/**
+	 * Add the delivered rows to the local archive.
+	 *
+	 * Bereits archivierte Events werden überschrieben, damit spätere
+	 * Korrekturen der Quelle – etwa ein nachgetragenes Ergebnis oder ein
+	 * korrigierter Titel – ankommen.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Rohdaten der API.
+	 * @return void
+	 */
+	private function archive_rows( array $rows ): void {
+		if ( empty( $rows ) ) {
+			return;
+		}
+
+		$archive = $this->archive_map();
+		$before  = $archive;
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$id = isset( $row['id'] ) ? (string) $row['id'] : '';
+
+			if ( '' === $id ) {
+				continue;
+			}
+
+			$archive[ $id ] = $row;
+		}
+
+		// Nur schreiben, wenn sich etwas geändert hat – sonst bei jedem
+		// Seitenaufruf ein Schreibzugriff auf die Datenbank.
+		if ( $archive !== $before ) {
+			update_option( RC_RCC_Plugin::OPTION_ARCHIVE, $archive, false );
+		}
+	}
+
+	/**
+	 * The local archive of everything the API has ever delivered.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public function archive_map(): array {
+		$map = get_option( RC_RCC_Plugin::OPTION_ARCHIVE, array() );
+
+		return is_array( $map ) ? $map : array();
+	}
+
+	/**
+	 * Archived races that the current API response no longer contains.
+	 *
+	 * @param RC_RCC_Race[] $current Races from the current response.
+	 * @return RC_RCC_Race[]
+	 */
+	private function archived_races( array $current ): array {
+		$archive = $this->archive_map();
+
+		if ( empty( $archive ) ) {
+			return array();
+		}
+
+		// Was die Quelle aktuell liefert, hat Vorrang – es ist frischer.
+		$known = array();
+		foreach ( $current as $race ) {
+			$known[ $race->id ] = true;
+		}
+
+		$races = array();
+
+		foreach ( $archive as $id => $row ) {
+			if ( isset( $known[ $id ] ) || ! is_array( $row ) ) {
+				continue;
+			}
+
+			$race = RC_RCC_Race::from_array( $row );
+
+			if ( '' !== $race->id ) {
+				$races[] = $race;
+			}
+		}
+
+		return $races;
+	}
+
 	/**
 	 * The club's own races, as stored raw in the option.
 	 *

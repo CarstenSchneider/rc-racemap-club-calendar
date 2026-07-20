@@ -75,3 +75,59 @@
 	width: 100%;
 	min-width: 12em;
 }
+
+/* --- Jahres-Navigation im Backend --------------------------------------- */
+
+.rc-rcc-admin-years {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin: 12px 0;
+}
+
+.rc-rcc-admin-year {
+	padding: 4px 12px;
+	border: 1px solid #c3c4c7;
+	border-radius: 999px;
+	background: #fff;
+	color: #2c3338;
+	text-decoration: none;
+	font-size: 13px;
+}
+
+.rc-rcc-admin-year:hover {
+	border-color: #8c8f94;
+	color: #135e96;
+}
+
+.rc-rcc-admin-year.is-active {
+	border-color: #2271b1;
+	background: #2271b1;
+	color: #fff;
+}
+
+.rc-rcc-admin-year .count {
+	opacity: 0.7;
+}
+
+/* --- Historie einspielen ------------------------------------------------- */
+
+.rc-rcc-import {
+	margin-top: 2.5em;
+	padding: 12px 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.rc-rcc-import > summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.rc-rcc-import-field {
+	width: 100%;
+	max-width: 900px;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+}
