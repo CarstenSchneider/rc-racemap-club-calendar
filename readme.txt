@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.42
+Stable tag: 1.0.43
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Das Plugin bringt bewusst **kein eigenes Design** mit, sondern übernimmt Schrif
 * Dauerhaftes Archiv: einmal angezeigte Rennen bleiben erhalten, auch wenn die Quelle sie nicht mehr führt
 * Neue Rennen sind automatisch sichtbar
 * Zwischenspeicherung über WordPress-Transients für hohe Performance
-* Vollständig übersetzbar (Textdomain: rc-racemap-club-calendar)
+* In acht Sprachen: Deutsch, Englisch, Französisch, Niederländisch, Italienisch, Spanisch, Tschechisch, Polnisch – folgt der WordPress-Sprache
 * Mobile First, keine externen Bibliotheken
 
 = Datenquelle =
@@ -68,6 +68,10 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.43 =
+* Acht Sprachen (de, en, fr, nl, it, es, cs, pl); Sprache folgt der WordPress-Einstellung.
+* Der CSV-Import versteht die Spaltennamen in allen acht Sprachen.
 
 = 1.0.39 =
 * Schmalere Spalten und engere Klassen-Pillen – mehr Platz für die Rennklassen.

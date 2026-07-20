@@ -1,13 +1,11 @@
-# RC RaceMap Club Calendar — English (US) translation.
-# Copyright (C) 2026 RC RaceMap
-# This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.13\n"
+"Project-Id-Version: RC RaceMap Club Calendar\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
-"POT-Creation-Date: 2026-07-09 21:36+0200\n"
 "Language-Team: RC RaceMap\n"
-"Language: en_US\n"
+"Last-Translator: RC RaceMap\n"
+"PO-Revision-Date: 2026-07-20 00:00+0000\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,91 +20,81 @@ msgstr "RC RaceMap"
 #: includes/class-admin.php:110 includes/class-admin.php:111
 #: includes/class-admin.php:1153
 msgid "Einstellungen"
-msgstr "Settings"
+msgstr "Ajustes"
 
 #: includes/class-admin.php:119 includes/class-admin.php:120
 #: includes/views/manage-races.php:25
 msgid "Rennen verwalten"
-msgstr "Manage races"
+msgstr "Gestionar carreras"
 
 #: includes/class-admin.php:145
 msgid "Kalender-Einstellungen"
-msgstr "Calendar settings"
+msgstr "Ajustes del calendario"
 
 #: includes/class-admin.php:147
 msgid "Lege fest, wie dein Vereinskalender abgerufen und angezeigt wird."
-msgstr "Define how your club calendar is fetched and displayed."
+msgstr "Define cómo se obtiene y se muestra el calendario de tu club."
 
 #: includes/class-admin.php:153
 msgid "MyRCM Organisator-ID"
-msgstr "MyRCM organizer ID"
+msgstr "ID de organizador de MyRCM"
 
 #: includes/class-admin.php:154
 msgid "Termine aktualisieren"
-msgstr "Check for new races"
+msgstr "Frecuencia de actualización"
 
 #: includes/class-admin.php:155
 msgid "Akzentfarbe"
-msgstr "Accent color"
+msgstr "Color de acento"
 
 #: includes/class-admin.php:175 includes/class-admin.php:184
 msgid "Automatische Updates"
-msgstr "Automatic updates"
+msgstr "Actualizaciones automáticas"
 
 #: includes/class-admin.php:177
 msgid ""
 "Dieses Plugin bezieht Updates aus seinem privaten GitHub-Repository. Dafür "
 "wird ein Zugriffstoken benötigt."
-msgstr ""
-"This plugin gets its updates from its private GitHub repository. This "
-"requires an access token."
+msgstr "Este plugin obtiene las actualizaciones de su repositorio privado de GitHub. Para ello se necesita un token de acceso."
 
 #: includes/class-admin.php:246
 msgid ""
 "Die Organisator-ID deines Vereins bei MyRCM – die Nummer, die MyRCM deinem "
 "Verein zuweist (z. B. „16961\"). Sie steht u. a. in der MyRCM-Adresse deiner "
 "Vereinsseite."
-msgstr ""
-"Your club's organizer ID at MyRCM – the number MyRCM assigns to your club "
-"(e.g. \"16961\"). You can find it, among other places, in the MyRCM address "
-"of your club page."
+msgstr "El ID de organizador de tu club en MyRCM – el número que MyRCM asigna a tu club (p. ej. «16961»). Aparece, entre otros sitios, en la dirección de MyRCM de la página de tu club."
 
 #: includes/class-admin.php:261
 msgid "Farbe für Links und den Button. Leer lassen = Linkfarbe deines Themes."
-msgstr ""
-"Color for links and the button. Leave empty to use your theme's link color."
+msgstr "Color para los enlaces y el botón. Dejar vacío = color de enlace de tu tema."
 
 #: includes/class-admin.php:270
 msgid ""
 "Neue Versionen dieses Plugins automatisch installieren, sobald sie verfügbar "
 "sind."
-msgstr ""
-"Automatically install new versions of this plugin as soon as they are "
-"available."
+msgstr "Instalar automáticamente las nuevas versiones de este plugin en cuanto estén disponibles."
 
 #: includes/class-admin.php:272
 msgid ""
 "Betrifft ausschließlich diesen Kalender. Andere Plugins, dein Theme und "
 "WordPress selbst bleiben unberührt."
-msgstr ""
-"Affects only this calendar. Other plugins, your theme and WordPress itself "
-"remain untouched."
+msgstr "Afecta únicamente a este calendario. Otros plugins, tu tema y el propio WordPress no se ven afectados."
 
 #: includes/class-admin.php:288
 msgid "alle 15 Minuten"
-msgstr "every 15 minutes"
+msgstr "cada 15 minutos"
 
 #: includes/class-admin.php:289
 msgid "stündlich (empfohlen)"
-msgstr "hourly (recommended)"
+msgstr "cada hora (recomendado)"
 
 #: includes/class-admin.php:290
 msgid "alle 6 Stunden"
-msgstr "every 6 hours"
+msgstr "cada 6 horas"
 
 #: includes/class-admin.php:291
 msgid "einmal täglich"
-msgstr "once a day"
+msgstr "una vez al día"
 
 #: includes/class-admin.php:304
 msgid ""
@@ -114,11 +102,7 @@ msgid ""
 "sofort laden. Hier legst du fest, wie oft dabei nach Änderungen gesucht wird "
 "– etwa nach neuen Terminen oder aktuellen Nennzahlen. Häufiger ist selten "
 "nötig: die Renndaten selbst ändern sich meist nur einmal am Tag."
-msgstr ""
-"Race dates are stored on your site so they load instantly. This setting "
-"controls how often they are checked for changes – new races, for example, or "
-"updated entry numbers. Checking more often is rarely necessary: the race "
-"data itself usually changes only once a day."
+msgstr "Las fechas de las carreras se almacenan en caché en tu sitio para que carguen al instante. Aquí defines con qué frecuencia se buscan cambios, por ejemplo nuevas fechas o cifras de inscritos actualizadas. Más a menudo rara vez hace falta: los datos suelen cambiar solo una vez al día."
 
 #: includes/class-admin.php:318
 msgid "RC RaceMap Club Calendar"
@@ -132,68 +116,67 @@ msgstr "Shortcode"
 msgid ""
 "Füge diesen Shortcode auf einer beliebigen Seite ein, um den Kalender "
 "anzuzeigen:"
-msgstr "Insert this shortcode on any page to display the calendar:"
+msgstr "Inserta este shortcode en cualquier página para mostrar el calendario:"
 
 #: includes/class-admin.php:408 includes/class-admin.php:515
 msgid "Dazu bist du nicht berechtigt."
-msgstr "You are not allowed to do this."
+msgstr "No tienes permiso para hacer esto."
 
 #. translators: %d: Anzahl der eingespielten Rennen.
 #: includes/class-admin.php:467
 #, php-format
 msgid "%d Rennen ins Archiv übernommen."
 msgid_plural "%d Rennen ins Archiv übernommen."
-msgstr[0] "%d race imported into the archive."
-msgstr[1] "%d races imported into the archive."
+msgstr[0] "%d carrera importada al archivo."
+msgstr[1] "%d carreras importadas al archivo."
 
 #: includes/class-admin.php:475
 msgid ""
 "Das war kein gültiges JSON. Bitte den kompletten Inhalt der Datei einfügen."
-msgstr ""
-"That was not valid JSON. Please paste the complete contents of the file."
+msgstr "Eso no era JSON válido. Pega el contenido completo del archivo."
 
 #: includes/class-admin.php:480
 msgid "Es wurde nichts übernommen – kein Eintrag hatte Datum und Bezeichnung."
-msgstr "Nothing was imported – no entry had both a date and a label."
+msgstr "No se importó nada – ninguna entrada tenía fecha y denominación."
 
 #: includes/class-admin.php:489
 msgid "Sichtbarkeit der Rennen gespeichert."
-msgstr "Race visibility saved."
+msgstr "Visibilidad de las carreras guardada."
 
 #: includes/class-admin.php:970 includes/class-admin.php:1078
 #: includes/class-race.php:681
 msgid "Dokument"
-msgstr "Document"
+msgstr "Documento"
 
 #: includes/class-admin.php:1136
 msgid "Dokument auswählen"
-msgstr "Select document"
+msgstr "Elegir documento"
 
 #: includes/class-admin.php:1137
 msgid "Dokument übernehmen"
-msgstr "Use this document"
+msgstr "Usar documento"
 
 #: includes/class-api.php:147
 msgid "Keine Club-ID konfiguriert."
-msgstr "No club ID configured."
+msgstr "No hay ningún ID de club configurado."
 
 #. translators: %d: HTTP-Statuscode.
 #: includes/class-api.php:172
 #, php-format
 msgid "Die RC-RaceMap-API hat mit HTTP-Status %d geantwortet."
-msgstr "The RC RaceMap API responded with HTTP status %d."
+msgstr "La API de RC-RaceMap respondió con el estado HTTP %d."
 
 #: includes/class-api.php:182
 msgid "Die RC-RaceMap-API hat ungültiges JSON zurückgegeben."
-msgstr "The RC RaceMap API returned invalid JSON."
+msgstr "La API de RC-RaceMap devolvió JSON no válido."
 
 #: includes/class-api.php:286
 msgid "Die Datei mit Beispieldaten fehlt."
-msgstr "The sample data file is missing."
+msgstr "Falta el archivo con los datos de ejemplo."
 
 #: includes/class-api.php:293
 msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
-msgstr "The sample data file does not contain valid JSON."
+msgstr "El archivo de datos de ejemplo no contiene JSON válido."
 
 #. translators: 1: start date, 2: end date of a multi-day event.
 #: includes/class-race.php:353
@@ -203,109 +186,97 @@ msgstr "%1$s – %2$s"
 
 #: includes/class-race.php:550
 msgid "Nennung geöffnet"
-msgstr "Registration open"
+msgstr "Inscripción abierta"
 
 #: includes/class-race.php:552
 msgid "Nennung geschlossen"
-msgstr "Registration closed"
+msgstr "Inscripción cerrada"
 
 #: includes/class-race.php:554
 msgid "Nennung folgt"
-msgstr "Registration to follow"
+msgstr "Inscripción próximamente"
 
 #: includes/views/manage-races.php:26
 msgid "Daten aktualisieren"
-msgstr "Refresh data"
+msgstr "Actualizar datos"
 
 #: includes/views/manage-races.php:30
 msgid ""
 "Entferne den Haken, um ein Rennen im Kalender auszublenden. Neue Rennen "
 "werden automatisch angezeigt. Die Sichtbarkeit wird pro Event-ID gespeichert "
 "– ein umbenanntes Rennen behält also seinen Zustand."
-msgstr ""
-"Uncheck to hide a race from the calendar. New races are shown automatically. "
-"Visibility is stored per event ID, so a renamed race keeps its state."
+msgstr "Quita la marca para ocultar una carrera en el calendario. Las carreras nuevas se muestran automáticamente. La visibilidad se guarda por ID de evento, así que una carrera renombrada conserva su estado."
 
 #: includes/views/manage-races.php:34
 msgid ""
 "Den Titel kannst du überschreiben – hilfreich, wenn MyRCM einen unklaren "
 "Namen liefert. Leer lassen übernimmt den Titel der Quelle, der im Feld als "
 "Platzhalter steht."
-msgstr ""
-"You can override the title – useful when MyRCM delivers an unclear name. "
-"Leave it empty to keep the source's title, which is shown in the field as a "
-"placeholder."
+msgstr "Puedes sobrescribir el título – útil cuando MyRCM ofrece un nombre poco claro. Dejarlo vacío usa el título de la fuente, mostrado en el campo como marcador."
 
 #: includes/views/manage-races.php:38
 msgid ""
 "In der Spalte „Eigene Dokumente\" kannst du je Rennen PDFs hinterlegen – "
 "etwa Reglement, Ausschreibung oder Ergebnisse. Sie erscheinen im Kalender "
 "hinter den Dokumenten, die MyRCM oder RCK bereits mitliefern."
-msgstr ""
-"In the \"Your own documents\" column you can add PDFs to each race – "
-"regulations, an announcement or results, for example. They appear in the "
-"calendar after the documents MyRCM or RCK already provide."
+msgstr "En la columna «Documentos propios» puedes adjuntar PDF a cada carrera – por ejemplo reglamento, convocatoria o resultados. Aparecen en el calendario tras los documentos que ya aportan MyRCM o RCK."
 
 #: includes/views/manage-races.php:73
 msgid ""
 "Noch keine Rennen aus MyRCM, RCK oder DMC gefunden. Prüfe die Organisator-ID "
 "in den Einstellungen und aktualisiere dann. Eigene Termine kannst du "
 "trotzdem schon anlegen."
-msgstr ""
-"No races found from MyRCM, RCK or DMC yet. Check the organizer ID in the "
-"settings and then refresh. You can still add your own races."
+msgstr "Aún no se han encontrado carreras de MyRCM, RCK o DMC. Comprueba el ID de organizador en los ajustes y actualiza después. De todos modos ya puedes crear fechas propias."
 
 #: includes/views/manage-races.php:79
 msgid "Anzeigen"
-msgstr "Show"
+msgstr "Mostrar"
 
 #: includes/views/manage-races.php:80
 msgid "Datum"
-msgstr "Date"
+msgstr "Fecha"
 
 #: includes/views/manage-races.php:81
 msgid "Titel"
-msgstr "Title"
+msgstr "Título"
 
 #: includes/views/manage-races.php:82
 msgid "Veranstalter"
-msgstr "Organizer"
+msgstr "Organizador"
 
 #: includes/views/manage-races.php:83
 msgid "Status"
-msgstr "Status"
+msgstr "Estado"
 
 #: includes/views/manage-races.php:84
 msgid "Eigene Dokumente"
-msgstr "Your own documents"
+msgstr "Documentos propios"
 
 #: includes/views/manage-races.php:118
 msgid "eigener Termin"
-msgstr "own race"
+msgstr "fecha propia"
 
 #: includes/views/manage-races.php:144
 msgid "Bezeichnung, z. B. Reglement"
-msgstr "Label, e.g. Regulations"
+msgstr "Denominación, p. ej. Reglamento"
 
 #: includes/views/manage-races.php:151
 msgid "Adresse der Datei"
-msgstr "File address"
+msgstr "Dirección del archivo"
 
 #: includes/views/manage-races.php:154
 msgid "Datei wählen"
-msgstr "Choose file"
+msgstr "Elegir archivo"
 
 #: includes/views/manage-races.php:159
 msgid ""
 "Leer lassen, wenn nichts hinterlegt werden soll. Eine Zeile leeren entfernt "
 "das Dokument."
-msgstr ""
-"Leave empty if you don't want to add anything. Clearing a row removes that "
-"document."
+msgstr "Dejar vacío si no se quiere adjuntar nada. Vaciar una fila elimina el documento."
 
 #: includes/views/manage-races.php:168
 msgid "Eigene Termine"
-msgstr "Your own races"
+msgstr "Fechas propias"
 
 #: includes/views/manage-races.php:171
 msgid ""
@@ -313,68 +284,60 @@ msgid ""
 "Vereinsmeisterschaft, Trainingstag. Sie erscheinen im Kalender zwischen den "
 "übrigen Terminen, nach Datum einsortiert. Um einen Termin zu entfernen, "
 "lösche seine Bezeichnung und speichere."
-msgstr ""
-"For races that appear neither on MyRCM nor on RCK or DMC – a club run, a "
-"club championship, a practice day. They appear in the calendar among the "
-"other races, sorted by date. To remove one, clear its label and save."
+msgstr "Para carreras que no están ni en MyRCM ni en RCK o DMC – carrera de club, campeonato de club, día de entrenamiento. Aparecen en el calendario entre las demás fechas, ordenadas por fecha. Para quitar una fecha, borra su denominación y guarda."
 
 #: includes/views/manage-races.php:185
 msgid "Bezeichnung"
-msgstr "Label"
+msgstr "Denominación"
 
 #: includes/views/manage-races.php:186
 msgid "Von"
-msgstr "From"
+msgstr "Desde"
 
 #: includes/views/manage-races.php:187
 msgid "Bis"
-msgstr "To"
+msgstr "Hasta"
 
 #: includes/views/manage-races.php:188
 msgid "Klassen"
-msgstr "Classes"
+msgstr "Categorías"
 
 #: includes/views/manage-races.php:189
 msgid "Link"
-msgstr "Link"
+msgstr "Enlace"
 
 #: includes/views/manage-races.php:202
 msgid "z. B. Vereinsmeisterschaft"
-msgstr "e.g. Club championship"
+msgstr "p. ej. Campeonato de club"
 
 #: includes/views/manage-races.php:216
 msgid "Mit Komma trennen"
-msgstr "Separate with commas"
+msgstr "Separar con comas"
 
 #: includes/views/manage-races.php:224
 msgid "Optional, z. B. Anmeldung"
-msgstr "Optional, e.g. sign-up"
+msgstr "Opcional, p. ej. Inscripción"
 
 #: includes/views/manage-races.php:233
 msgid ""
 "Bis-Datum nur bei mehrtägigen Rennen ausfüllen. Nach dem Speichern kannst du "
 "dem Termin oben Dokumente zuordnen."
-msgstr ""
-"Only fill in the end date for multi-day races. After saving you can attach "
-"documents to the race above."
+msgstr "Rellena la fecha de fin solo en carreras de varios días. Tras guardar, puedes asociar documentos a la fecha de arriba."
 
 #: includes/views/manage-races.php:236
 msgid "Änderungen speichern"
-msgstr "Save changes"
+msgstr "Guardar cambios"
 
 #: includes/views/manage-races.php:240
 msgid "Historie einspielen"
-msgstr "Import history"
+msgstr "Importar histórico"
 
 #: includes/views/manage-races.php:243
 msgid ""
 "Die Datenquelle reicht nur rund ein halbes Jahr zurück. Wenn du deine "
 "älteren Rennen bereits als Liste hast, kannst du sie hier einmalig ins "
 "Archiv übernehmen – danach bleiben sie dauerhaft im Tab „Vergangene Rennen\"."
-msgstr ""
-"The data source only goes back about six months. If you already have your "
-"older races as a list, you can import them here once – after that they stay "
-"in the \"Past races\" tab for good."
+msgstr "La fuente de datos solo llega a unos seis meses atrás. Si ya tienes tus carreras antiguas como lista, puedes importarlas aquí una vez al archivo – luego permanecen de forma permanente en la pestaña «Carreras pasadas»."
 
 #: includes/views/manage-races.php:247
 msgid ""
@@ -383,215 +346,86 @@ msgid ""
 "Ergebnisse, Teilnehmer und Klassen – nur Von und Titel sind Pflicht. Datum "
 "als 26.07.2025 oder 2025-07-26, mehrere Klassen mit Komma trennen. So lässt "
 "sich die Liste in Excel oder Numbers zusammenstellen und hier einfügen."
-msgstr "A table is easiest: one header row, then one row per race. The columns From, To, Title, Announcement, Rules, Results, Participants and Classes are recognised – only From and Title are required. Dates as 26/07/2025 or 2025-07-26, separate multiple classes with commas. So you can put the list together in Excel or Numbers and paste it here."
+msgstr "Lo más fácil como tabla: una fila de encabezado, debajo una fila por carrera. Las columnas reconocidas son Desde, Hasta, Título, Convocatoria, Reglamento, Resultados, Participantes y Categorías – solo Desde y Título son obligatorias. Fecha como 26.07.2025 o 2025-07-26, varias categorías separadas por comas. Así puedes componer la lista en Excel o Numbers y pegarla aquí."
 
 #: includes/views/manage-races.php:254
 msgid ""
 "Alternativ versteht das Feld JSON – eine Liste von Rennen mit mindestens "
 "„from\" und „name\". Ein erneuter Import überschreibt bestehende Einträge, "
 "korrigiert also statt zu verdoppeln."
-msgstr "The field also accepts JSON – a list of races with at least \"from\" and \"name\". Importing again overwrites existing entries, so it corrects rather than duplicates."
+msgstr "El campo también admite JSON – una lista de carreras con al menos «from» y «name». Un nuevo import sobrescribe las entradas existentes, así que corrige en vez de duplicar."
 
 #: includes/views/manage-races.php:258
 msgid ""
 "Statt einer Liste kann auch ein Objekt mit den Schlüsseln „archive\", "
 "„titles\" und „documents\" eingefügt werden. Damit lassen sich Titel und "
 "Dokumente vorhandener Rennen in einem Zug setzen – jeweils nach Event-ID."
-msgstr ""
-"Instead of a list you can paste an object with the keys \"archive\", "
-"\"titles\" and \"documents\". That lets you set titles and documents for "
-"existing races in one go – each keyed by event ID."
+msgstr "En lugar de una lista también se puede insertar un objeto con las claves «archive», «titles» y «documents». Así puedes definir de una vez los títulos y documentos de carreras existentes – cada uno por ID de evento."
 
 #: includes/views/manage-races.php:267
 msgid "Ins Archiv übernehmen"
-msgstr "Add to archive"
+msgstr "Importar al archivo"
 
 #: templates/calendar.php:25
 msgid "Rennkalender"
-msgstr "Race calendar"
+msgstr "Calendario de carreras"
 
 #: templates/calendar.php:35
 msgid "Aktuelle Rennen"
-msgstr "Upcoming races"
+msgstr "Próximas carreras"
 
 #: templates/calendar.php:47
 msgid "Vergangene Rennen"
-msgstr "Past races"
+msgstr "Carreras pasadas"
 
 #: templates/calendar.php:61
 msgid "Aktuell sind keine Rennen vorhanden."
-msgstr "There are currently no races."
+msgstr "Actualmente no hay carreras."
 
 #: templates/calendar.php:77
 msgid "Es sind noch keine vergangenen Rennen vorhanden."
-msgstr "There are no past races yet."
+msgstr "Todavía no hay carreras pasadas."
 
 #. translators: %s: „RC RaceMap" als Link zur Karte.
 #: templates/calendar.php:87
 #, php-format
 msgid "MyRCM und RCK Daten via %s WordPress PlugIn"
-msgstr "MyRCM and RCK data via the %s WordPress plugin"
+msgstr "Datos de MyRCM y RCK mediante el plugin de WordPress %s"
 
 #: templates/race-item.php:38 templates/race-item.php:46
 msgid "Ergebnisse"
-msgstr "Results"
+msgstr "Resultados"
 
 #: templates/race-item.php:43 templates/race-item.php:60
 msgid "Zum Rennen"
-msgstr "View race"
+msgstr "Ver la carrera"
 
 #: templates/race-item.php:50
 msgid "Nennung"
-msgstr "Register"
+msgstr "Inscripción"
 
 #. translators: %s: Datum, ab dem die Nennung möglich ist.
 #: templates/race-item.php:56
 #, php-format
 msgid "Nennung ab %s"
-msgstr "Registration from %s"
+msgstr "Inscripción desde el %s"
 
 #: templates/race-item.php:67
 msgid "Ausschreibung"
-msgstr "Race announcement"
+msgstr "Convocatoria"
 
 #: templates/race-item.php:70
 msgid "Reglement"
-msgstr "Rules"
+msgstr "Reglamento"
 
 #. translators: %d: Anzahl der Teilnehmer.
 #: templates/race-item.php:106
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
-msgstr[0] "%d participant"
-msgstr[1] "%d participants"
+msgstr[0] "%d participante"
+msgstr[1] "%d participantes"
 
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
-msgstr "Select year"
-
-#~ msgid ""
-#~ "Erwartet wird JSON: eine Liste von Rennen mit mindestens „from\" (JJJJ-MM-"
-#~ "TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
-#~ "erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
-#~ "also statt zu verdoppeln."
-#~ msgstr ""
-#~ "JSON is expected: a list of races with at least \"from\" (YYYY-MM-DD) and "
-#~ "\"name\". Optionally \"to\", \"url\", \"classes\" and \"documents\". "
-#~ "Importing the same file again overwrites the entries, so it corrects "
-#~ "rather than duplicates."
-
-#~ msgid ""
-#~ "Noch keine Rennen gefunden. Prüfe die Organisator-ID in den Einstellungen "
-#~ "und aktualisiere dann."
-#~ msgstr ""
-#~ "No races found yet. Check the organizer ID in the settings and then "
-#~ "refresh."
-
-#~ msgid "Sichtbarkeit speichern"
-#~ msgstr "Save visibility"
-
-#~ msgid "Cache-Dauer"
-#~ msgstr "Cache duration"
-
-#~ msgid "RC RaceMap Logo anzeigen"
-#~ msgstr "Show RC RaceMap logo"
-
-#~ msgid "GitHub-Token für Updates"
-#~ msgstr "GitHub token for updates"
-
-#~ msgid "Das RC RaceMap Logo im Kalender-Fußbereich anzeigen."
-#~ msgstr "Show the RC RaceMap logo in the calendar footer."
-
-#~ msgid ""
-#~ "Betrifft ausschließlich dieses Plugin. Andere Plugins, Themes und der "
-#~ "WordPress-Core bleiben unberührt."
-#~ msgstr ""
-#~ "Affects only this plugin. Other plugins, themes and the WordPress core "
-#~ "remain untouched."
-
-#~ msgid ""
-#~ "Ein Token ist bereits über die Konstante RC_RCC_UPDATE_TOKEN in der wp-"
-#~ "config.php gesetzt. Dieses Feld wird daher ignoriert."
-#~ msgstr ""
-#~ "A token is already set via the RC_RCC_UPDATE_TOKEN constant in wp-"
-#~ "config.php. This field is therefore ignored."
-
-#~ msgid ""
-#~ "Fein granuliertes GitHub-Token mit Leserecht (Contents) auf das Plugin-"
-#~ "Repository. Sicherer ist die Konstante RC_RCC_UPDATE_TOKEN in der wp-"
-#~ "config.php."
-#~ msgstr ""
-#~ "Fine-grained GitHub token with read access (Contents) to the plugin "
-#~ "repository. The RC_RCC_UPDATE_TOKEN constant in wp-config.php is more "
-#~ "secure."
-
-#~ msgid "5 Minuten"
-#~ msgstr "5 minutes"
-
-#~ msgid "15 Minuten"
-#~ msgstr "15 minutes"
-
-#~ msgid "30 Minuten"
-#~ msgstr "30 minutes"
-
-#~ msgid "1 Stunde"
-#~ msgstr "1 hour"
-
-#~ msgid "6 Stunden"
-#~ msgstr "6 hours"
-
-#~ msgid "24 Stunden"
-#~ msgstr "24 hours"
-
-#~ msgid ""
-#~ "Wie lange abgerufene Renndaten zwischengespeichert werden, bevor sie "
-#~ "aktualisiert werden."
-#~ msgstr "How long fetched race data is cached before it is refreshed."
-
-#~ msgid "Aktuelle Termine"
-#~ msgstr "Upcoming events"
-
-#~ msgid "Archiv"
-#~ msgstr "Archive"
-
-#~ msgid "Aktuell sind keine Termine vorhanden."
-#~ msgstr "There are currently no events."
-
-#~ msgid ""
-#~ "Akzentfarbe für Links, aktive Navigation und die Teilnehmerzahl. "
-#~ "Standard: neutrales Grau."
-#~ msgstr ""
-#~ "Accent color for links, the active navigation and the participant count. "
-#~ "Default: neutral gray."
-
-#, php-format
-#~ msgid "+%d weitere"
-#~ msgstr "+%d more"
-
-#~ msgid "weniger"
-#~ msgstr "less"
-
-#~ msgid ""
-#~ "Farbe des Nennung-Buttons. Leer lassen = dezenter Standard (Theme-"
-#~ "Textfarbe)."
-#~ msgstr ""
-#~ "Color of the registration button. Leave empty for a subtle default (theme "
-#~ "text color)."
-
-#~ msgid ""
-#~ "Farbe für Datum, Titel, Klassen-Pillen und den Nennung-Button. Leer "
-#~ "lassen = automatisch die Linkfarbe deines Themes."
-#~ msgstr ""
-#~ "Color for the date, title, class pills and the registration button. Leave "
-#~ "empty to use your theme's link color automatically."
-
-#~ msgid "Teilnehmerliste"
-#~ msgstr "Entry list"
-
-#~ msgid "Beendet"
-#~ msgstr "Finished"
-
-#, php-format
-#~ msgid "%1$s, %2$s"
-#~ msgstr "%1$s, %2$s"
+msgstr "Elegir año"

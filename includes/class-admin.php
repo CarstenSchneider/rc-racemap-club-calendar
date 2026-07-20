@@ -764,41 +764,42 @@ class RC_RCC_Admin {
 		$sep = ( substr_count( $lines[0], ';' ) >= substr_count( $lines[0], ',' ) ) ? ';' : ',';
 
 		$head = array_map(
-			static function ( $cell ) {
-				$cell = strtolower( trim( (string) $cell ) );
-
-				// Umlaute und Sonderzeichen aus der Kopfzeile werfen.
-				return preg_replace( '/[^a-z]/', '', strtr( $cell, array( 'ä' => 'a', 'ö' => 'o', 'ü' => 'u', 'ß' => 's' ) ) );
-			},
+			array( $this, 'normalize_header' ),
 			str_getcsv( array_shift( $lines ), $sep, '"', '\\' )
 		);
 
+		// Spaltennamen in allen acht Sprachen des Kalenders – die Anleitung zeigt
+		// das Import-Beispiel lokalisiert, also muss der Parser sie erkennen.
+		// Schlüssel sind bereits transliteriert (normalize_header), damit sie
+		// zum verarbeiteten Header passen (é→e, ł→l, á→a …).
 		$alias = array(
-			// deutsch
-			'von'           => 'from',
-			'datum'         => 'from',
-			'bis'           => 'to',
-			'titel'         => 'name',
-			'rennen'        => 'name',
-			'ausschreibung' => 'announcement',
-			'reglement'     => 'rules',
-			'ergebnisse'    => 'results',
-			'teilnehmer'    => 'count',
-			'klassen'       => 'classes',
-			// englisch – Tabellen aus fremden Quellen kommen oft so
-			'from'          => 'from',
-			'start'         => 'from',
-			'to'            => 'to',
-			'end'           => 'to',
-			'name'          => 'name',
-			'title'         => 'name',
-			'race'          => 'name',
-			'announcement'  => 'announcement',
-			'rules'         => 'rules',
-			'results'       => 'results',
-			'participants'  => 'count',
-			'entries'       => 'count',
-			'classes'       => 'classes',
+			// from
+			'von' => 'from', 'datum' => 'from', 'from' => 'from', 'start' => 'from',
+			'du' => 'from', 'van' => 'from', 'da' => 'from', 'desde' => 'from', 'od' => 'from',
+			// to
+			'bis' => 'to', 'to' => 'to', 'end' => 'to',
+			'au' => 'to', 'tot' => 'to', 'a' => 'to', 'hasta' => 'to', 'do' => 'to',
+			// title
+			'titel' => 'name', 'rennen' => 'name', 'name' => 'name', 'title' => 'name', 'race' => 'name',
+			'titre' => 'name', 'titolo' => 'name', 'titulo' => 'name', 'nazev' => 'name', 'tytul' => 'name',
+			// announcement
+			'ausschreibung' => 'announcement', 'announcement' => 'announcement',
+			'annonce' => 'announcement', 'uitnodiging' => 'announcement', 'bando' => 'announcement',
+			'convocatoria' => 'announcement', 'propozice' => 'announcement', 'zaproszenie' => 'announcement',
+			// rules
+			'reglement' => 'rules', 'rules' => 'rules', 'regolamento' => 'rules',
+			'reglamento' => 'rules', 'pravidla' => 'rules', 'regulamin' => 'rules',
+			// results
+			'ergebnisse' => 'results', 'results' => 'results', 'resultats' => 'results',
+			'uitslagen' => 'results', 'risultati' => 'results', 'resultados' => 'results',
+			'vysledky' => 'results', 'wyniki' => 'results',
+			// entries / participant count
+			'teilnehmer' => 'count', 'participants' => 'count', 'entries' => 'count',
+			'deelnemers' => 'count', 'partecipanti' => 'count', 'participantes' => 'count',
+			'ucastnici' => 'count', 'uczestnicy' => 'count',
+			// classes
+			'klassen' => 'classes', 'classes' => 'classes', 'categories' => 'classes',
+			'categorie' => 'classes', 'categorias' => 'classes', 'kategorie' => 'classes',
 		);
 
 		$rows = array();
@@ -853,6 +854,41 @@ class RC_RCC_Admin {
 		}
 
 		return $rows ? $rows : null;
+	}
+
+	/**
+	 * Eine Spaltenüberschrift auf einen ASCII-Schlüssel bringen.
+	 *
+	 * Diakritische Zeichen werden **transliteriert**, nicht entfernt, sonst
+	 * würde „Résultats" zu „rsultats" statt „resultats" und der Alias griffe
+	 * nicht. Deckt die Zeichen der acht Kalender-Sprachen ab.
+	 *
+	 * @param string $cell Rohe Kopfzelle.
+	 * @return string Kleingeschrieben, nur a–z0–9.
+	 */
+	public function normalize_header( $cell ) {
+		$cell = function_exists( 'mb_strtolower' )
+			? mb_strtolower( trim( (string) $cell ), 'UTF-8' )
+			: strtolower( trim( (string) $cell ) );
+
+		$map = array(
+			'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ą' => 'a', 'ā' => 'a',
+			'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'ě' => 'e', 'ę' => 'e', 'ē' => 'e',
+			'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i',
+			'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ő' => 'o', 'ø' => 'o',
+			'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ů' => 'u', 'ű' => 'u', 'ū' => 'u',
+			'ý' => 'y', 'ÿ' => 'y',
+			'ç' => 'c', 'č' => 'c', 'ć' => 'c',
+			'ď' => 'd', 'đ' => 'd',
+			'ł' => 'l', 'ľ' => 'l',
+			'ñ' => 'n', 'ń' => 'n', 'ň' => 'n',
+			'ř' => 'r', 'ŕ' => 'r',
+			'š' => 's', 'ś' => 's', 'ş' => 's', 'ß' => 's',
+			'ť' => 't',
+			'ž' => 'z', 'ź' => 'z', 'ż' => 'z',
+		);
+
+		return preg_replace( '/[^a-z0-9]/', '', strtr( $cell, $map ) );
 	}
 
 	/**

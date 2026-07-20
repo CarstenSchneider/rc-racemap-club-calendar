@@ -442,7 +442,7 @@ msgstr "View race"
 
 #: templates/race-item.php:50
 msgid "Nennung"
-msgstr "Registration"
+msgstr "Register"
 
 #. translators: %s: Datum, ab dem die Nennung möglich ist.
 #: templates/race-item.php:56
@@ -452,11 +452,11 @@ msgstr "Registration from %s"
 
 #: templates/race-item.php:67
 msgid "Ausschreibung"
-msgstr "Announcement"
+msgstr "Race announcement"
 
 #: templates/race-item.php:70
 msgid "Reglement"
-msgstr "Regulations"
+msgstr "Rules"
 
 #. translators: %d: Anzahl der Teilnehmer.
 #: templates/race-item.php:106
