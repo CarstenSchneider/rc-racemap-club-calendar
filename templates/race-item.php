@@ -9,6 +9,9 @@
  *   5. Aktion: Ergebnisse (vorbei) / Nennung (offen) / Zum Rennen (MyRCM),
  *      alternativ der Hinweistext „Nennung ab …".
  *
+ * Leere Zellen werden nicht ausgegeben: auf Mobil stehen die Zellen
+ * untereinander, eine leere belegte sonst eine eigene Zeile samt Abstand.
+ *
  * @var RC_RCC_Race $race Das anzuzeigende Rennen.
  *
  * @package RC_RaceMap_Club_Calendar
@@ -96,35 +99,39 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 		<?php endif; ?>
 	</div>
 
-	<div class="rc-rcc__cell rc-rcc__ppl">
-		<?php if ( $has_participants ) : ?>
-			<?php
-			$ppl_label = sprintf(
-				/* translators: %d: Anzahl der Teilnehmer. */
-				_n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ),
-				(int) $race->participant_count
-			);
-			$ppl_inner = RC_RCC_Shortcode::icon( 'users' ) . '<span class="rc-rcc__ppl-count">' . esc_html( (string) (int) $race->participant_count ) . '</span>';
-			?>
+	<?php if ( $has_participants ) : ?>
+		<?php
+		$ppl_label = sprintf(
+			/* translators: %d: Anzahl der Teilnehmer. */
+			_n( '%d Teilnehmer', '%d Teilnehmer', $race->participant_count, 'rc-racemap-club-calendar' ),
+			(int) $race->participant_count
+		);
+		$ppl_inner = RC_RCC_Shortcode::icon( 'users' ) . '<span class="rc-rcc__ppl-count">' . esc_html( (string) (int) $race->participant_count ) . '</span>';
+		?>
+		<div class="rc-rcc__cell rc-rcc__ppl">
 			<?php if ( '' !== $participants_url ) : ?>
 				<a class="rc-rcc__ppl-link" href="<?php echo esc_url( $participants_url ); ?>" title="<?php echo esc_attr( $ppl_label ); ?>" rel="noopener noreferrer" target="_blank"><?php echo $ppl_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstante Inline-SVGs + escapte Zahl. ?></a>
 			<?php else : ?>
 				<span class="rc-rcc__ppl-link rc-rcc__ppl-link--static" title="<?php echo esc_attr( $ppl_label ); ?>"><?php echo $ppl_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstante Inline-SVGs + escapte Zahl. ?></span>
 			<?php endif; ?>
-		<?php endif; ?>
-	</div>
+		</div>
+	<?php endif; ?>
 
-	<div class="rc-rcc__cell rc-rcc__docs">
-		<?php foreach ( $documents as $doc ) : ?>
-			<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__doc-label"><?php echo esc_html( $doc[0] ); ?></span><?php echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?></a>
-		<?php endforeach; ?>
-	</div>
+	<?php if ( ! empty( $documents ) ) : ?>
+		<div class="rc-rcc__cell rc-rcc__docs">
+			<?php foreach ( $documents as $doc ) : ?>
+				<a class="rc-rcc__doc" href="<?php echo esc_url( $doc[1] ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__doc-label"><?php echo esc_html( $doc[0] ); ?></span><?php echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?></a>
+			<?php endforeach; ?>
+		</div>
+	<?php endif; ?>
 
-	<div class="rc-rcc__cell rc-rcc__action">
-		<?php if ( '' !== $cta_note ) : ?>
-			<span class="rc-rcc__cta-note"><?php echo esc_html( $cta_note ); ?></span>
-		<?php elseif ( '' !== $cta_url ) : ?>
-			<a class="rc-rcc__cta" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__cta-label"><?php echo esc_html( $cta_label ); ?></span></a>
-		<?php endif; ?>
-	</div>
+	<?php if ( '' !== $cta_note || '' !== $cta_url ) : ?>
+		<div class="rc-rcc__cell rc-rcc__action">
+			<?php if ( '' !== $cta_note ) : ?>
+				<span class="rc-rcc__cta-note"><?php echo esc_html( $cta_note ); ?></span>
+			<?php else : ?>
+				<a class="rc-rcc__cta" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__cta-label"><?php echo esc_html( $cta_label ); ?></span></a>
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
 </li>
