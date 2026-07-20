@@ -199,9 +199,9 @@
 .rc-rcc.rc-rcc .rc-rcc__classes {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 10px;
+	gap: 6px;
 	/* Höhere Spezifität als der Listen-Reset, sonst fällt der Abstand weg. */
-	margin-top: 14px;
+	margin-top: 12px;
 }
 
 /* Pillen im rcracemap-Stil: Outline, kompakte Höhe, Zahl in Klammern.
@@ -213,7 +213,7 @@
 	/* Höhe und Innenabstand mitskalieren, sonst platzt die Pille bei einer
 	   größeren Theme-Schrift aus ihrem Rahmen. */
 	height: 2em;
-	padding: 0 0.9em;
+	padding: 0 0.75em;
 	font-size: 0.6875em;
 	font-weight: 400;
 	line-height: 1;
@@ -330,11 +330,16 @@
 
 @media ( min-width: 900px ) {
 	.rc-rcc.rc-rcc .rc-rcc__item {
-		/* Feste Breiten, damit alle Spalten zeilenübergreifend fluchten. */
-		grid-template-columns: 9em minmax( 0, 1fr ) 6.5em 12em 12.5em;
+		/* Feste Breiten, damit alle Spalten zeilenübergreifend fluchten.
+		   Bemessen am längsten real vorkommenden Inhalt plus Reserve:
+		   Datum „30–31. May", Teilnehmer dreistellig, Dokument
+		   „Ausschreibung TEC", Hinweis „Nennung ab 30. September 2026".
+		   Die Aktionsspalte ist die engste – der Hinweistext füllt sie aus.
+		   Was hier gespart wird, kommt den Klassen-Pillen zugute. */
+		grid-template-columns: 8em minmax( 0, 1fr ) 4.5em 10em 12.5em;
 		grid-template-areas: "date race ppl docs action";
 		align-items: start;
-		column-gap: 28px;
+		column-gap: 20px;
 		row-gap: 0;
 	}
 
