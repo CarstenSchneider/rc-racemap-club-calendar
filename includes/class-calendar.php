@@ -68,6 +68,7 @@ class RC_RCC_Calendar {
 
 		$races = $this->api->get_events( $club_id, $ttl, $force_refresh );
 		$races = array_merge( $races, $this->custom_races() );
+		$this->apply_custom_titles( $races );
 		$this->attach_custom_documents( $races );
 		$this->memo[ $club_id ] = $races;
 
@@ -208,6 +209,42 @@ class RC_RCC_Calendar {
 		}
 
 		return $races;
+	}
+
+	/**
+	 * Titles the club set itself, keyed by event ID.
+	 *
+	 * @return array<string, string>
+	 */
+	public function titles_map(): array {
+		$map = get_option( RC_RCC_Plugin::OPTION_TITLES, array() );
+
+		return is_array( $map ) ? $map : array();
+	}
+
+	/**
+	 * Replace source titles with the club's own where one is set.
+	 *
+	 * `original_title` bleibt unangetastet – das Backend zeigt darüber weiter,
+	 * was die Quelle liefert, und ein geleertes Feld stellt sie wieder her.
+	 *
+	 * @param RC_RCC_Race[] $races Races to adjust (objects, by handle).
+	 * @return void
+	 */
+	private function apply_custom_titles( array $races ): void {
+		$map = $this->titles_map();
+
+		if ( empty( $map ) ) {
+			return;
+		}
+
+		foreach ( $races as $race ) {
+			$title = isset( $map[ $race->id ] ) ? trim( (string) $map[ $race->id ] ) : '';
+
+			if ( '' !== $title ) {
+				$race->title = $title;
+			}
+		}
 	}
 
 	/**

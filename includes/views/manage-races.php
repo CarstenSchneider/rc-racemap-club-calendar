@@ -8,6 +8,7 @@
  * @var array<string, bool>  $visibility  Aktuelle Sichtbarkeits-Zuordnung.
  * @var array<string, array> $documents   Eigene Dokumente je Event-ID.
  * @var array<int, array>    $custom      Selbst angelegte Termine (Rohdaten).
+ * @var array<string, string> $titles     Vom Verein gesetzte Titel je Event-ID.
  * @var WP_Error|null        $error       Letzter Abruffehler, falls vorhanden.
  * @var string               $refresh_url Nonce-URL zum erzwungenen Aktualisieren.
  *
@@ -25,6 +26,10 @@ $ctx = RC_RCC_Admin::view_context();
 
 	<p class="description">
 		<?php echo esc_html__( 'Entferne den Haken, um ein Rennen im Kalender auszublenden. Neue Rennen werden automatisch angezeigt. Die Sichtbarkeit wird pro Event-ID gespeichert – ein umbenanntes Rennen behält also seinen Zustand.', 'rc-racemap-club-calendar' ); ?>
+	</p>
+
+	<p class="description">
+		<?php echo esc_html__( 'Den Titel kannst du überschreiben – hilfreich, wenn MyRCM einen unklaren Namen liefert. Leer lassen übernimmt den Titel der Quelle, der im Feld als Platzhalter steht.', 'rc-racemap-club-calendar' ); ?>
 	</p>
 
 	<p class="description">
@@ -86,9 +91,22 @@ $ctx = RC_RCC_Admin::view_context();
 							</th>
 							<td><?php echo esc_html( $race->formatted_date() ); ?></td>
 							<td>
-								<strong><?php echo esc_html( $race->title ); ?></strong>
 								<?php if ( $race->is_custom() ) : ?>
+									<strong><?php echo esc_html( $race->title ); ?></strong>
 									<span class="rc-rcc-own-badge"><?php echo esc_html__( 'eigener Termin', 'rc-racemap-club-calendar' ); ?></span>
+								<?php else : ?>
+									<input
+										type="hidden"
+										name="rc_rcc_title_original[<?php echo esc_attr( $race->id ); ?>]"
+										value="<?php echo esc_attr( $race->original_title ); ?>"
+									/>
+									<input
+										type="text"
+										class="rc-rcc-title-field"
+										name="rc_rcc_title[<?php echo esc_attr( $race->id ); ?>]"
+										value="<?php echo esc_attr( (string) ( $titles[ $race->id ] ?? '' ) ); ?>"
+										placeholder="<?php echo esc_attr( $race->original_title ); ?>"
+									/>
 								<?php endif; ?>
 							</td>
 							<td><?php echo esc_html( $race->organizer ); ?></td>

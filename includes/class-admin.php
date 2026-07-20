@@ -345,6 +345,7 @@ class RC_RCC_Admin {
 		$visibility = $this->calendar->visibility_map();
 		$documents  = $this->calendar->documents_map();
 		$custom     = $this->calendar->custom_races_raw();
+		$titles     = $this->calendar->titles_map();
 		$error      = $this->calendar->api()->last_error();
 
 		$refresh_url = wp_nonce_url(
@@ -398,6 +399,7 @@ class RC_RCC_Admin {
 		update_option( RC_RCC_Plugin::OPTION_VISIBILITY, $map, false );
 
 		$this->save_documents( $known_ids );
+		$this->save_titles( $known_ids );
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -522,6 +524,48 @@ class RC_RCC_Admin {
 		[ $y, $m, $d ] = array_map( 'intval', explode( '-', $value ) );
 
 		return checkdate( $m, $d, $y ) ? $value : '';
+	}
+
+	/**
+	 * Die vom Verein gesetzten Titel speichern.
+	 *
+	 * Gespeichert wird nur, was vom Titel der Quelle abweicht. Ein geleertes
+	 * Feld – oder eines, in dem wieder der Originaltitel steht – entfernt die
+	 * Überschreibung, sodass künftige Änderungen der Quelle wieder durchschlagen.
+	 *
+	 * @param string[] $known_ids Event-IDs, die das Formular angezeigt hat.
+	 * @return void
+	 */
+	private function save_titles( array $known_ids ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce wurde im Aufrufer geprüft.
+		$posted = isset( $_POST['rc_rcc_title'] ) && is_array( $_POST['rc_rcc_title'] )
+			? wp_unslash( $_POST['rc_rcc_title'] )
+			: array();
+
+		$originals = isset( $_POST['rc_rcc_title_original'] ) && is_array( $_POST['rc_rcc_title_original'] )
+			? wp_unslash( $_POST['rc_rcc_title_original'] )
+			: array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$map = $this->calendar->titles_map();
+
+		foreach ( $known_ids as $id ) {
+			if ( '' === $id ) {
+				continue;
+			}
+
+			$title    = sanitize_text_field( (string) ( $posted[ $id ] ?? '' ) );
+			$original = sanitize_text_field( (string) ( $originals[ $id ] ?? '' ) );
+
+			if ( '' === $title || $title === $original ) {
+				unset( $map[ $id ] );
+				continue;
+			}
+
+			$map[ $id ] = $title;
+		}
+
+		update_option( RC_RCC_Plugin::OPTION_TITLES, $map, false );
 	}
 
 	/**

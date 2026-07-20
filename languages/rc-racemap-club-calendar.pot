@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.31\n"
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.32\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
 "Language-Team: RC RaceMap\n"
 "MIME-Version: 1.0\n"
@@ -16,12 +16,12 @@ msgid "RC RaceMap"
 msgstr ""
 
 #: includes/class-admin.php:104 includes/class-admin.php:105
-#: includes/class-admin.php:645
+#: includes/class-admin.php:689
 msgid "Einstellungen"
 msgstr ""
 
 #: includes/class-admin.php:113 includes/class-admin.php:114
-#: includes/views/manage-races.php:22
+#: includes/views/manage-races.php:23
 msgid "Rennen verwalten"
 msgstr ""
 
@@ -116,23 +116,23 @@ msgid ""
 "anzuzeigen:"
 msgstr ""
 
-#: includes/class-admin.php:373
+#: includes/class-admin.php:374
 msgid "Dazu bist du nicht berechtigt."
 msgstr ""
 
-#: includes/class-admin.php:423
+#: includes/class-admin.php:425
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr ""
 
-#: includes/class-admin.php:570 includes/class-race.php:669
+#: includes/class-admin.php:614 includes/class-race.php:681
 msgid "Dokument"
 msgstr ""
 
-#: includes/class-admin.php:628
+#: includes/class-admin.php:672
 msgid "Dokument auswählen"
 msgstr ""
 
-#: includes/class-admin.php:629
+#: includes/class-admin.php:673
 msgid "Dokument übernehmen"
 msgstr ""
 
@@ -159,99 +159,106 @@ msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
 msgstr ""
 
 #. translators: 1: start date, 2: end date of a multi-day event.
-#: includes/class-race.php:341
+#: includes/class-race.php:353
 #, php-format
 msgid "%1$s – %2$s"
 msgstr ""
 
-#: includes/class-race.php:538
+#: includes/class-race.php:550
 msgid "Nennung geöffnet"
 msgstr ""
 
-#: includes/class-race.php:540
+#: includes/class-race.php:552
 msgid "Nennung geschlossen"
 msgstr ""
 
-#: includes/class-race.php:542
+#: includes/class-race.php:554
 msgid "Nennung folgt"
 msgstr ""
 
-#: includes/views/manage-races.php:23
+#: includes/views/manage-races.php:24
 msgid "Daten aktualisieren"
 msgstr ""
 
-#: includes/views/manage-races.php:27
+#: includes/views/manage-races.php:28
 msgid ""
 "Entferne den Haken, um ein Rennen im Kalender auszublenden. Neue Rennen "
 "werden automatisch angezeigt. Die Sichtbarkeit wird pro Event-ID gespeichert "
 "– ein umbenanntes Rennen behält also seinen Zustand."
 msgstr ""
 
-#: includes/views/manage-races.php:31
+#: includes/views/manage-races.php:32
+msgid ""
+"Den Titel kannst du überschreiben – hilfreich, wenn MyRCM einen unklaren "
+"Namen liefert. Leer lassen übernimmt den Titel der Quelle, der im Feld als "
+"Platzhalter steht."
+msgstr ""
+
+#: includes/views/manage-races.php:36
 msgid ""
 "In der Spalte „Eigene Dokumente\" kannst du je Rennen PDFs hinterlegen – "
 "etwa Reglement, Ausschreibung oder Ergebnisse. Sie erscheinen im Kalender "
 "hinter den Dokumenten, die MyRCM oder RCK bereits mitliefern."
 msgstr ""
 
-#: includes/views/manage-races.php:46
+#: includes/views/manage-races.php:51
 msgid ""
 "Noch keine Rennen aus MyRCM, RCK oder DMC gefunden. Prüfe die Organisator-ID "
 "in den Einstellungen und aktualisiere dann. Eigene Termine kannst du "
 "trotzdem schon anlegen."
 msgstr ""
 
-#: includes/views/manage-races.php:52
+#: includes/views/manage-races.php:57
 msgid "Anzeigen"
 msgstr ""
 
-#: includes/views/manage-races.php:53
+#: includes/views/manage-races.php:58
 msgid "Datum"
 msgstr ""
 
-#: includes/views/manage-races.php:54
+#: includes/views/manage-races.php:59
 msgid "Titel"
 msgstr ""
 
-#: includes/views/manage-races.php:55
+#: includes/views/manage-races.php:60
 msgid "Veranstalter"
 msgstr ""
 
-#: includes/views/manage-races.php:56
+#: includes/views/manage-races.php:61
 msgid "Status"
 msgstr ""
 
-#: includes/views/manage-races.php:57
+#: includes/views/manage-races.php:62
 msgid "Eigene Dokumente"
 msgstr ""
 
-#: includes/views/manage-races.php:91
+#: includes/views/manage-races.php:96
 msgid "eigener Termin"
 msgstr ""
 
-#: includes/views/manage-races.php:104
+#: includes/views/manage-races.php:122
 msgid "Bezeichnung, z. B. Reglement"
 msgstr ""
 
-#: includes/views/manage-races.php:111
+#: includes/views/manage-races.php:129
 msgid "Adresse der Datei"
 msgstr ""
 
-#: includes/views/manage-races.php:114
+#: includes/views/manage-races.php:132
 msgid "Datei wählen"
 msgstr ""
 
-#: includes/views/manage-races.php:119
+#: includes/views/manage-races.php:137
 msgid ""
 "Leer lassen, wenn nichts hinterlegt werden soll. Eine Zeile leeren entfernt "
 "das Dokument."
 msgstr ""
 
-#: includes/views/manage-races.php:128
+#: includes/views/manage-races.php:146
 msgid "Eigene Termine"
 msgstr ""
 
-#: includes/views/manage-races.php:131
+#: includes/views/manage-races.php:149
 msgid ""
 "Für Rennen, die weder bei MyRCM noch bei RCK oder DMC stehen – Clublauf, "
 "Vereinsmeisterschaft, Trainingstag. Sie erscheinen im Kalender zwischen den "
@@ -259,45 +266,45 @@ msgid ""
 "lösche seine Bezeichnung und speichere."
 msgstr ""
 
-#: includes/views/manage-races.php:145
+#: includes/views/manage-races.php:163
 msgid "Bezeichnung"
 msgstr ""
 
-#: includes/views/manage-races.php:146
+#: includes/views/manage-races.php:164
 msgid "Von"
 msgstr ""
 
-#: includes/views/manage-races.php:147
+#: includes/views/manage-races.php:165
 msgid "Bis"
 msgstr ""
 
-#: includes/views/manage-races.php:148
+#: includes/views/manage-races.php:166
 msgid "Klassen"
 msgstr ""
 
-#: includes/views/manage-races.php:149
+#: includes/views/manage-races.php:167
 msgid "Link"
 msgstr ""
 
-#: includes/views/manage-races.php:162
+#: includes/views/manage-races.php:180
 msgid "z. B. Vereinsmeisterschaft"
 msgstr ""
 
-#: includes/views/manage-races.php:176
+#: includes/views/manage-races.php:194
 msgid "Mit Komma trennen"
 msgstr ""
 
-#: includes/views/manage-races.php:184
+#: includes/views/manage-races.php:202
 msgid "Optional, z. B. Anmeldung"
 msgstr ""
 
-#: includes/views/manage-races.php:193
+#: includes/views/manage-races.php:211
 msgid ""
 "Bis-Datum nur bei mehrtägigen Rennen ausfüllen. Nach dem Speichern kannst du "
 "dem Termin oben Dokumente zuordnen."
 msgstr ""
 
-#: includes/views/manage-races.php:196
+#: includes/views/manage-races.php:214
 msgid "Änderungen speichern"
 msgstr ""
 

@@ -70,3 +70,8 @@
 	font-weight: 400;
 	vertical-align: middle;
 }
+
+.rc-rcc-title-field {
+	width: 100%;
+	min-width: 12em;
+}

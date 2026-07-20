@@ -70,6 +70,13 @@ final class RC_RCC_Plugin {
 	public const OPTION_CUSTOM_RACES = 'rc_rcc_custom_races';
 
 	/**
+	 * Option holding club-supplied titles that replace the source's own.
+	 *
+	 * Shape: array<string event_id, string>
+	 */
+	public const OPTION_TITLES = 'rc_rcc_titles';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin

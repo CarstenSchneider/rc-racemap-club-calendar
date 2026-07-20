@@ -61,6 +61,13 @@ class RC_RCC_Race {
 	public string $title = '';
 
 	/**
+	 * The title as delivered by the source, before any club override.
+	 *
+	 * @var string
+	 */
+	public string $original_title = '';
+
+	/**
 	 * Organiser / hosting club name.
 	 *
 	 * @var string
@@ -173,6 +180,11 @@ class RC_RCC_Race {
 
 		// Title: real model uses `name`; older samples use `title`.
 		$race->title = self::first_string( $data, array( 'name', 'title' ) );
+
+		// Der Titel der Quelle, bevor der Verein ihn ggf. überschreibt. Wird im
+		// Backend als Platzhalter gezeigt, damit sichtbar bleibt, was MyRCM,
+		// RCK oder DMC eigentlich liefern.
+		$race->original_title = $race->title;
 
 		// Organiser: real model uses `hostName`; older samples use `organizer`.
 		$race->organizer = self::first_string( $data, array( 'hostName', 'organizer' ) );

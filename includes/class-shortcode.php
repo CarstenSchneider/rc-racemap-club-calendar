@@ -150,9 +150,13 @@ class RC_RCC_Shortcode {
 		 * Ziel der beiden Footer-Links: die Seite, auf der andere Vereine das
 		 * Plugin bekommen. Per Filter überschreibbar.
 		 *
+		 * Die Seite wird auf rcracemap.com clientseitig über den Hash geöffnet;
+		 * deshalb `#wordpress-plugin` statt eines Pfads. Der Pfad funktioniert
+		 * zwar auch (302 auf dieselbe Adresse), spart aber einen Umweg.
+		 *
 		 * @param string $url Standard-Adresse der Plugin-Seite.
 		 */
-		$plugin_url      = (string) apply_filters( 'rc_rcc_plugin_page_url', 'https://rcracemap.com/wordpress-plugin' );
+		$plugin_url      = (string) apply_filters( 'rc_rcc_plugin_page_url', 'https://rcracemap.com/#wordpress-plugin' );
 		$accent          = (string) sanitize_hex_color( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
 		$accent_class    = ( '' !== $accent ) ? ' rc-rcc--accent' : '';
 		$accent_style    = ( '' !== $accent ) ? '--rc-rcc-accent:' . $accent . ';' : '';
