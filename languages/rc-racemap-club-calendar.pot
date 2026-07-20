@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: RC RaceMap Club Calendar 1.0.35\n"
+"Project-Id-Version: RC RaceMap Club Calendar 1.0.40\n"
 "Report-Msgid-Bugs-To: https://rcracemap.com/\n"
 "Language-Team: RC RaceMap\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgid "RC RaceMap"
 msgstr ""
 
 #: includes/class-admin.php:110 includes/class-admin.php:111
-#: includes/class-admin.php:974
+#: includes/class-admin.php:1153
 msgid "Einstellungen"
 msgstr ""
 
@@ -141,16 +141,16 @@ msgstr ""
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr ""
 
-#: includes/class-admin.php:791 includes/class-admin.php:899
+#: includes/class-admin.php:970 includes/class-admin.php:1078
 #: includes/class-race.php:681
 msgid "Dokument"
 msgstr ""
 
-#: includes/class-admin.php:957
+#: includes/class-admin.php:1136
 msgid "Dokument auswählen"
 msgstr ""
 
-#: includes/class-admin.php:958
+#: includes/class-admin.php:1137
 msgid "Dokument übernehmen"
 msgstr ""
 
@@ -339,20 +339,28 @@ msgstr ""
 
 #: includes/views/manage-races.php:247
 msgid ""
-"Erwartet wird JSON: eine Liste von Rennen mit mindestens „from\" (JJJJ-MM-"
-"TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
-"erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
-"also statt zu verdoppeln."
+"Am einfachsten als Tabelle: eine Kopfzeile, darunter je Rennen eine Zeile. "
+"Erkannt werden die Spalten Von, Bis, Titel, Ausschreibung, Reglement, "
+"Ergebnisse, Teilnehmer und Klassen – nur Von und Titel sind Pflicht. Datum "
+"als 26.07.2025 oder 2025-07-26, mehrere Klassen mit Komma trennen. So lässt "
+"sich die Liste in Excel oder Numbers zusammenstellen und hier einfügen."
 msgstr ""
 
-#: includes/views/manage-races.php:251
+#: includes/views/manage-races.php:254
+msgid ""
+"Alternativ versteht das Feld JSON – eine Liste von Rennen mit mindestens "
+"„from\" und „name\". Ein erneuter Import überschreibt bestehende Einträge, "
+"korrigiert also statt zu verdoppeln."
+msgstr ""
+
+#: includes/views/manage-races.php:258
 msgid ""
 "Statt einer Liste kann auch ein Objekt mit den Schlüsseln „archive\", "
 "„titles\" und „documents\" eingefügt werden. Damit lassen sich Titel und "
 "Dokumente vorhandener Rennen in einem Zug setzen – jeweils nach Event-ID."
 msgstr ""
 
-#: includes/views/manage-races.php:260
+#: includes/views/manage-races.php:267
 msgid "Ins Archiv übernehmen"
 msgstr ""
 
@@ -382,34 +390,34 @@ msgstr ""
 msgid "MyRCM und RCK Daten via %s WordPress PlugIn"
 msgstr ""
 
-#: templates/race-item.php:35 templates/race-item.php:43
+#: templates/race-item.php:38 templates/race-item.php:46
 msgid "Ergebnisse"
 msgstr ""
 
-#: templates/race-item.php:40 templates/race-item.php:57
+#: templates/race-item.php:43 templates/race-item.php:60
 msgid "Zum Rennen"
 msgstr ""
 
-#: templates/race-item.php:47
+#: templates/race-item.php:50
 msgid "Nennung"
 msgstr ""
 
 #. translators: %s: Datum, ab dem die Nennung möglich ist.
-#: templates/race-item.php:53
+#: templates/race-item.php:56
 #, php-format
 msgid "Nennung ab %s"
 msgstr ""
 
-#: templates/race-item.php:64
+#: templates/race-item.php:67
 msgid "Ausschreibung"
 msgstr ""
 
-#: templates/race-item.php:67
+#: templates/race-item.php:70
 msgid "Reglement"
 msgstr ""
 
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:104
+#: templates/race-item.php:106
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"

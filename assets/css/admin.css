@@ -131,3 +131,15 @@
 	font-family: Consolas, Monaco, monospace;
 	font-size: 12px;
 }
+
+.rc-rcc-import-example {
+	max-width: 900px;
+	margin: 0 0 12px;
+	padding: 10px 12px;
+	overflow-x: auto;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	background: #f6f7f7;
+	font-size: 12px;
+	line-height: 1.6;
+}

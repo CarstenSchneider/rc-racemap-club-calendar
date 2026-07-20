@@ -116,9 +116,24 @@ der Kalender alles, was er einmal gesehen hat — ältere Rennen kennt er aber
 naturgemäß nicht.
 
 Wenn ihr eure Historie noch auf der alten Vereinsseite habt, lässt sie sich
-einmalig einspielen: **Rennen verwalten → Historie einspielen**. Erwartet wird
-eine Liste im JSON-Format. Melde dich, wenn du dabei Hilfe brauchst — für zwei
-Vereine haben wir das bereits gemacht.
+einmalig einspielen: **Rennen verwalten → Historie einspielen**.
+
+Am einfachsten als Tabelle. Leg sie in Excel, Numbers oder LibreOffice an, kopier
+sie und füg sie in das Feld ein:
+
+```
+Von;Bis;Titel;Ausschreibung;Reglement;Ergebnisse;Teilnehmer;Klassen
+26.07.2025;27.07.2025;RCK Kleinserie;https://…/aus.pdf;https://…/regl.pdf;https://…;42;Stock, Fun
+05.10.2025;;Clublauf Herbst;;;;;
+```
+
+Pflicht sind nur **Von** und **Titel**, alles andere kannst du weglassen — auch
+ganze Spalten. Das Datum darf `26.07.2025` oder `2025-07-26` heißen, mehrere
+Klassen trennst du mit Komma. Die Spalte **Ergebnisse** wird zum Button rechts,
+**Ausschreibung** und **Reglement** erscheinen als Links daneben.
+
+Ein zweiter Import derselben Tabelle korrigiert die Einträge, statt sie zu
+verdoppeln — du kannst also nachbessern und erneut einfügen.
 
 ## Updates
 

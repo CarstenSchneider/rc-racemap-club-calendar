@@ -520,9 +520,16 @@ class RC_RCC_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- direkt darüber geprüft.
 		$raw = isset( $_POST['rc_rcc_import'] ) ? (string) wp_unslash( $_POST['rc_rcc_import'] ) : '';
 
-		$data   = json_decode( trim( $raw ), true );
+		$raw    = trim( $raw );
+		$data   = json_decode( $raw, true );
 		$result = 'empty';
 		$count  = 0;
+
+		// Kein JSON? Dann als Tabelle lesen – die meisten Vereine haben ihre
+		// Historie als Liste und keine Lust auf JSON von Hand.
+		if ( ! is_array( $data ) && '' !== $raw ) {
+			$data = $this->parse_csv( $raw );
+		}
 
 		if ( ! is_array( $data ) ) {
 			$result = 'invalid';
@@ -730,6 +737,140 @@ class RC_RCC_Admin {
 		}
 
 		update_option( RC_RCC_Plugin::OPTION_CUSTOM_RACES, $saved, false );
+	}
+
+	/**
+	 * Eine eingefügte Tabelle in Renn-Zeilen übersetzen.
+	 *
+	 * Erwartet eine Kopfzeile. Erkannt werden – jeweils gross/klein egal:
+	 * `von`/`from`, `bis`/`to`, `titel`/`name`, `ausschreibung`, `reglement`,
+	 * `ergebnisse`, `teilnehmer`, `klassen`. Alles ausser Datum und Titel ist
+	 * freiwillig, unbekannte Spalten werden übergangen.
+	 *
+	 * Trennzeichen wird geraten (Semikolon oder Komma), Datumsangaben werden
+	 * sowohl als `2025-07-26` als auch als `26.07.2025` verstanden.
+	 *
+	 * @param string $raw Inhalt des Eingabefelds.
+	 * @return array<int, array<string, mixed>>|null Zeilen oder null, wenn unbrauchbar.
+	 */
+	private function parse_csv( string $raw ) {
+		$lines = preg_split( '/\r\n|\r|\n/', $raw );
+		$lines = array_values( array_filter( array_map( 'trim', (array) $lines ), 'strlen' ) );
+
+		if ( count( $lines ) < 2 ) {
+			return null;
+		}
+
+		$sep = ( substr_count( $lines[0], ';' ) >= substr_count( $lines[0], ',' ) ) ? ';' : ',';
+
+		$head = array_map(
+			static function ( $cell ) {
+				$cell = strtolower( trim( (string) $cell ) );
+
+				// Umlaute und Sonderzeichen aus der Kopfzeile werfen.
+				return preg_replace( '/[^a-z]/', '', strtr( $cell, array( 'ä' => 'a', 'ö' => 'o', 'ü' => 'u', 'ß' => 's' ) ) );
+			},
+			str_getcsv( array_shift( $lines ), $sep, '"', '\\' )
+		);
+
+		$alias = array(
+			// deutsch
+			'von'           => 'from',
+			'datum'         => 'from',
+			'bis'           => 'to',
+			'titel'         => 'name',
+			'rennen'        => 'name',
+			'ausschreibung' => 'announcement',
+			'reglement'     => 'rules',
+			'ergebnisse'    => 'results',
+			'teilnehmer'    => 'count',
+			'klassen'       => 'classes',
+			// englisch – Tabellen aus fremden Quellen kommen oft so
+			'from'          => 'from',
+			'start'         => 'from',
+			'to'            => 'to',
+			'end'           => 'to',
+			'name'          => 'name',
+			'title'         => 'name',
+			'race'          => 'name',
+			'announcement'  => 'announcement',
+			'rules'         => 'rules',
+			'results'       => 'results',
+			'participants'  => 'count',
+			'entries'       => 'count',
+			'classes'       => 'classes',
+		);
+
+		$rows = array();
+
+		foreach ( $lines as $line ) {
+			$cells = str_getcsv( $line, $sep, '"', '\\' );
+			$row   = array();
+
+			foreach ( $head as $i => $key ) {
+				if ( ! isset( $alias[ $key ], $cells[ $i ] ) ) {
+					continue;
+				}
+
+				$row[ $alias[ $key ] ] = trim( (string) $cells[ $i ] );
+			}
+
+			$from = $this->normalize_date( (string) ( $row['from'] ?? '' ) );
+
+			if ( '' === $from || '' === ( $row['name'] ?? '' ) ) {
+				continue;
+			}
+
+			$documents = array();
+			foreach ( array( 'announcement' => 'Ausschreibung', 'rules' => 'Reglement' ) as $key => $label ) {
+				if ( ! empty( $row[ $key ] ) ) {
+					$documents[] = array(
+						'url'   => $row[ $key ],
+						'type'  => ( 'announcement' === $key ) ? 'announcement' : 'rules',
+						'label' => $label,
+					);
+				}
+			}
+
+			$entry = array(
+				'from'      => $from,
+				'to'        => $this->normalize_date( (string) ( $row['to'] ?? '' ) ),
+				'name'      => $row['name'],
+				'url'       => $row['results'] ?? '',
+				'documents' => $documents,
+				'source'    => 'import',
+			);
+
+			if ( ! empty( $row['classes'] ) ) {
+				$entry['classes'] = array_values( array_filter( array_map( 'trim', explode( ',', $row['classes'] ) ), 'strlen' ) );
+			}
+
+			if ( isset( $row['count'] ) && is_numeric( $row['count'] ) ) {
+				$entry['registrationCount'] = (int) $row['count'];
+			}
+
+			$rows[] = $entry;
+		}
+
+		return $rows ? $rows : null;
+	}
+
+	/**
+	 * Ein Datum aus einer Tabelle vereinheitlichen.
+	 *
+	 * Versteht `2025-07-26` und `26.07.2025` (auch einstellig).
+	 *
+	 * @param string $value Rohwert.
+	 * @return string `YYYY-MM-DD` oder ''.
+	 */
+	private function normalize_date( string $value ): string {
+		$value = trim( $value );
+
+		if ( preg_match( '/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $value, $m ) ) {
+			$value = sprintf( '%04d-%02d-%02d', (int) $m[3], (int) $m[2], (int) $m[1] );
+		}
+
+		return $this->sanitize_date( $value );
 	}
 
 	/**

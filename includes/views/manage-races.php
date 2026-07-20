@@ -244,7 +244,14 @@ $ctx = RC_RCC_Admin::view_context();
 		</p>
 
 		<p class="description">
-			<?php echo esc_html__( 'Erwartet wird JSON: eine Liste von Rennen mit mindestens „from" (JJJJ-MM-TT) und „name". Optional „to", „url", „classes" und „documents". Ein erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert also statt zu verdoppeln.', 'rc-racemap-club-calendar' ); ?>
+			<?php echo esc_html__( 'Am einfachsten als Tabelle: eine Kopfzeile, darunter je Rennen eine Zeile. Erkannt werden die Spalten Von, Bis, Titel, Ausschreibung, Reglement, Ergebnisse, Teilnehmer und Klassen – nur Von und Titel sind Pflicht. Datum als 26.07.2025 oder 2025-07-26, mehrere Klassen mit Komma trennen. So lässt sich die Liste in Excel oder Numbers zusammenstellen und hier einfügen.', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
+		<pre class="rc-rcc-import-example">Von;Bis;Titel;Ausschreibung;Reglement;Ergebnisse;Teilnehmer;Klassen
+26.07.2025;27.07.2025;RCK Kleinserie;https://…/aus.pdf;https://…/regl.pdf;https://…;42;Stock, Fun</pre>
+
+		<p class="description">
+			<?php echo esc_html__( 'Alternativ versteht das Feld JSON – eine Liste von Rennen mit mindestens „from" und „name". Ein erneuter Import überschreibt bestehende Einträge, korrigiert also statt zu verdoppeln.', 'rc-racemap-club-calendar' ); ?>
 		</p>
 
 		<p class="description">
@@ -255,7 +262,7 @@ $ctx = RC_RCC_Admin::view_context();
 			<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['import_action'] ); ?>" />
 			<?php wp_nonce_field( $ctx['import_action'] ); ?>
 
-			<textarea name="rc_rcc_import" class="rc-rcc-import-field" rows="10" placeholder='[{"from":"2025-09-06","to":"2025-09-07","name":"BTM – Berlin Touring Masters"}]'></textarea>
+			<textarea name="rc_rcc_import" class="rc-rcc-import-field" rows="10" placeholder="Von;Bis;Titel&#10;06.09.2025;07.09.2025;BTM – Berlin Touring Masters" ></textarea>
 
 			<?php submit_button( __( 'Ins Archiv übernehmen', 'rc-racemap-club-calendar' ), 'secondary' ); ?>
 		</form>

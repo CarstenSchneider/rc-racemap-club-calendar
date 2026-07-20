@@ -20,7 +20,7 @@ msgid "RC RaceMap"
 msgstr "RC RaceMap"
 
 #: includes/class-admin.php:110 includes/class-admin.php:111
-#: includes/class-admin.php:974
+#: includes/class-admin.php:1153
 msgid "Einstellungen"
 msgstr "Settings"
 
@@ -160,16 +160,16 @@ msgstr "Nothing was imported – no entry had both a date and a label."
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr "Race visibility saved."
 
-#: includes/class-admin.php:791 includes/class-admin.php:899
+#: includes/class-admin.php:970 includes/class-admin.php:1078
 #: includes/class-race.php:681
 msgid "Dokument"
 msgstr "Document"
 
-#: includes/class-admin.php:957
+#: includes/class-admin.php:1136
 msgid "Dokument auswählen"
 msgstr "Select document"
 
-#: includes/class-admin.php:958
+#: includes/class-admin.php:1137
 msgid "Dokument übernehmen"
 msgstr "Use this document"
 
@@ -378,24 +378,31 @@ msgstr ""
 
 #: includes/views/manage-races.php:247
 msgid ""
-"Erwartet wird JSON: eine Liste von Rennen mit mindestens „from\" (JJJJ-MM-"
-"TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
-"erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
-"also statt zu verdoppeln."
-msgstr ""
-"JSON is expected: a list of races with at least \"from\" (YYYY-MM-DD) and "
-"\"name\". Optionally \"to\", \"url\", \"classes\" and \"documents\". "
-"Importing the same file again overwrites the entries, so it corrects rather "
-"than duplicates."
+"Am einfachsten als Tabelle: eine Kopfzeile, darunter je Rennen eine Zeile. "
+"Erkannt werden die Spalten Von, Bis, Titel, Ausschreibung, Reglement, "
+"Ergebnisse, Teilnehmer und Klassen – nur Von und Titel sind Pflicht. Datum "
+"als 26.07.2025 oder 2025-07-26, mehrere Klassen mit Komma trennen. So lässt "
+"sich die Liste in Excel oder Numbers zusammenstellen und hier einfügen."
+msgstr "A table is easiest: one header row, then one row per race. The columns From, To, Title, Announcement, Rules, Results, Participants and Classes are recognised – only From and Title are required. Dates as 26/07/2025 or 2025-07-26, separate multiple classes with commas. So you can put the list together in Excel or Numbers and paste it here."
 
-#: includes/views/manage-races.php:251
+#: includes/views/manage-races.php:254
+msgid ""
+"Alternativ versteht das Feld JSON – eine Liste von Rennen mit mindestens "
+"„from\" und „name\". Ein erneuter Import überschreibt bestehende Einträge, "
+"korrigiert also statt zu verdoppeln."
+msgstr "The field also accepts JSON – a list of races with at least \"from\" and \"name\". Importing again overwrites existing entries, so it corrects rather than duplicates."
+
+#: includes/views/manage-races.php:258
 msgid ""
 "Statt einer Liste kann auch ein Objekt mit den Schlüsseln „archive\", "
 "„titles\" und „documents\" eingefügt werden. Damit lassen sich Titel und "
 "Dokumente vorhandener Rennen in einem Zug setzen – jeweils nach Event-ID."
-msgstr "Instead of a list you can paste an object with the keys \"archive\", \"titles\" and \"documents\". That lets you set titles and documents for existing races in one go – each keyed by event ID."
+msgstr ""
+"Instead of a list you can paste an object with the keys \"archive\", "
+"\"titles\" and \"documents\". That lets you set titles and documents for "
+"existing races in one go – each keyed by event ID."
 
-#: includes/views/manage-races.php:260
+#: includes/views/manage-races.php:267
 msgid "Ins Archiv übernehmen"
 msgstr "Add to archive"
 
@@ -425,34 +432,34 @@ msgstr "There are no past races yet."
 msgid "MyRCM und RCK Daten via %s WordPress PlugIn"
 msgstr "MyRCM and RCK data via the %s WordPress plugin"
 
-#: templates/race-item.php:35 templates/race-item.php:43
+#: templates/race-item.php:38 templates/race-item.php:46
 msgid "Ergebnisse"
 msgstr "Results"
 
-#: templates/race-item.php:40 templates/race-item.php:57
+#: templates/race-item.php:43 templates/race-item.php:60
 msgid "Zum Rennen"
 msgstr "View race"
 
-#: templates/race-item.php:47
+#: templates/race-item.php:50
 msgid "Nennung"
 msgstr "Registration"
 
 #. translators: %s: Datum, ab dem die Nennung möglich ist.
-#: templates/race-item.php:53
+#: templates/race-item.php:56
 #, php-format
 msgid "Nennung ab %s"
 msgstr "Registration from %s"
 
-#: templates/race-item.php:64
+#: templates/race-item.php:67
 msgid "Ausschreibung"
 msgstr "Announcement"
 
-#: templates/race-item.php:67
+#: templates/race-item.php:70
 msgid "Reglement"
 msgstr "Regulations"
 
 #. translators: %d: Anzahl der Teilnehmer.
-#: templates/race-item.php:104
+#: templates/race-item.php:106
 #, php-format
 msgid "%d Teilnehmer"
 msgid_plural "%d Teilnehmer"
@@ -462,6 +469,17 @@ msgstr[1] "%d participants"
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr "Select year"
+
+#~ msgid ""
+#~ "Erwartet wird JSON: eine Liste von Rennen mit mindestens „from\" (JJJJ-MM-"
+#~ "TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
+#~ "erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
+#~ "also statt zu verdoppeln."
+#~ msgstr ""
+#~ "JSON is expected: a list of races with at least \"from\" (YYYY-MM-DD) and "
+#~ "\"name\". Optionally \"to\", \"url\", \"classes\" and \"documents\". "
+#~ "Importing the same file again overwrites the entries, so it corrects "
+#~ "rather than duplicates."
 
 #~ msgid ""
 #~ "Noch keine Rennen gefunden. Prüfe die Organisator-ID in den Einstellungen "
