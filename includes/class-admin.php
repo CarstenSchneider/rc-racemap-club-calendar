@@ -520,13 +520,22 @@ class RC_RCC_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- direkt darüber geprüft.
 		$raw = isset( $_POST['rc_rcc_import'] ) ? (string) wp_unslash( $_POST['rc_rcc_import'] ) : '';
 
-		$rows   = json_decode( trim( $raw ), true );
+		$data   = json_decode( trim( $raw ), true );
 		$result = 'empty';
 		$count  = 0;
 
-		if ( ! is_array( $rows ) ) {
+		if ( ! is_array( $data ) ) {
 			$result = 'invalid';
 		} else {
+			// Zwei Formen: eine blosse Liste = nur Archiv; ein Objekt kann
+			// zusätzlich Titel und Dokumente für bereits vorhandene Rennen
+			// mitbringen (beides pro Event-ID).
+			$is_list = array_key_exists( 0, $data ) || empty( $data );
+			$rows    = $is_list ? $data : (array) ( $data['archive'] ?? array() );
+
+			$count += $this->import_titles( $is_list ? array() : (array) ( $data['titles'] ?? array() ) );
+			$count += $this->import_documents( $is_list ? array() : (array) ( $data['documents'] ?? array() ) );
+
 			$archive = $this->calendar->archive_map();
 
 			foreach ( $rows as $row ) {
@@ -701,6 +710,105 @@ class RC_RCC_Admin {
 		[ $y, $m, $d ] = array_map( 'intval', explode( '-', $value ) );
 
 		return checkdate( $m, $d, $y ) ? $value : '';
+	}
+
+	/**
+	 * Titel-Überschreibungen aus einem Import übernehmen.
+	 *
+	 * @param array<string, mixed> $titles Event-ID => Titel.
+	 * @return int Anzahl übernommener Titel.
+	 */
+	private function import_titles( array $titles ): int {
+		if ( empty( $titles ) ) {
+			return 0;
+		}
+
+		$map   = $this->calendar->titles_map();
+		$count = 0;
+
+		foreach ( $titles as $id => $title ) {
+			$id    = sanitize_text_field( (string) $id );
+			$title = sanitize_text_field( (string) $title );
+
+			if ( '' === $id ) {
+				continue;
+			}
+
+			if ( '' === $title ) {
+				unset( $map[ $id ] );
+				continue;
+			}
+
+			$map[ $id ] = $title;
+			++$count;
+		}
+
+		update_option( RC_RCC_Plugin::OPTION_TITLES, $map, false );
+
+		return $count;
+	}
+
+	/**
+	 * Dokumente aus einem Import übernehmen.
+	 *
+	 * Ersetzt die Dokumente des jeweiligen Rennens vollständig, damit ein
+	 * korrigierter Import nicht an die alten anhängt.
+	 *
+	 * @param array<string, mixed> $documents Event-ID => Liste aus {label, url}.
+	 * @return int Anzahl übernommener Dokumente.
+	 */
+	private function import_documents( array $documents ): int {
+		if ( empty( $documents ) ) {
+			return 0;
+		}
+
+		$map   = $this->calendar->documents_map();
+		$count = 0;
+
+		foreach ( $documents as $id => $docs ) {
+			$id = sanitize_text_field( (string) $id );
+
+			if ( '' === $id || ! is_array( $docs ) ) {
+				continue;
+			}
+
+			$clean = array();
+
+			foreach ( $docs as $doc ) {
+				if ( ! is_array( $doc ) ) {
+					continue;
+				}
+
+				$url = esc_url_raw( trim( (string) ( $doc['url'] ?? '' ) ) );
+
+				if ( '' === $url ) {
+					continue;
+				}
+
+				$label = sanitize_text_field( (string) ( $doc['label'] ?? '' ) );
+
+				$clean[] = array(
+					'label' => ( '' !== $label ) ? $label : __( 'Dokument', 'rc-racemap-club-calendar' ),
+					'url'   => $url,
+				);
+
+				if ( count( $clean ) >= self::MAX_DOCUMENTS ) {
+					break;
+				}
+			}
+
+			if ( empty( $clean ) ) {
+				unset( $map[ $id ] );
+				continue;
+			}
+
+			$map[ $id ] = $clean;
+			$count     += count( $clean );
+		}
+
+		update_option( RC_RCC_Plugin::OPTION_DOCUMENTS, $map, false );
+
+		return $count;
 	}
 
 	/**

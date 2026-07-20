@@ -75,6 +75,7 @@ class RC_RCC_Calendar {
 		}
 
 		$races = array_merge( $races, $this->archived_races( $races ) );
+		$races = $this->suppress_shadowed_dmc( $races );
 		$races = array_merge( $races, $this->custom_races() );
 		$this->apply_custom_titles( $races );
 		$this->attach_custom_documents( $races );
@@ -161,6 +162,67 @@ class RC_RCC_Calendar {
 	 *
 	 * @return array<string, bool>
 	 */
+	/**
+	 * Drop DMC entries that stand for a race MyRCM or RCK already covers.
+	 *
+	 * Bei DMC melden Vereine ihre Rennen vor allem für die Versicherung; die
+	 * Ausschreibung für die Fahrer läuft über MyRCM bzw. RCK. Deshalb sind die
+	 * DMC-Titel oft administrativ („Sportkreismeisterschaft") statt so, wie der
+	 * Verein das Rennen ausschreibt.
+	 *
+	 * Die API entdoppelt das bereits – aber nur, solange sie beide Seiten
+	 * kennt. MyRCM-Rennen fallen dort nach rund sieben Wochen heraus; danach
+	 * steht der DMC-Eintrag allein da und würde neben dem archivierten
+	 * MyRCM-Rennen als zweite Zeile für dasselbe Wochenende erscheinen.
+	 *
+	 * @param RC_RCC_Race[] $races Aktuelle und archivierte Rennen.
+	 * @return RC_RCC_Race[]
+	 */
+	private function suppress_shadowed_dmc( array $races ): array {
+		// Zeiträume der Rennen aus den Fahrer-Quellen einsammeln.
+		$covered = array();
+
+		foreach ( $races as $race ) {
+			$source = strtolower( $race->source );
+
+			if ( false === strpos( $source, 'myrcm' ) && false === strpos( $source, 'rck' ) ) {
+				continue;
+			}
+
+			if ( null === $race->timestamp ) {
+				continue;
+			}
+
+			$covered[] = array( $race->timestamp, $race->timestamp_to ?? $race->timestamp );
+		}
+
+		if ( empty( $covered ) ) {
+			return $races;
+		}
+
+		return array_values(
+			array_filter(
+				$races,
+				static function ( RC_RCC_Race $race ) use ( $covered ) {
+					if ( 'dmc' !== strtolower( $race->source ) || null === $race->timestamp ) {
+						return true;
+					}
+
+					$from = $race->timestamp;
+					$to   = $race->timestamp_to ?? $race->timestamp;
+
+					foreach ( $covered as $span ) {
+						if ( $from <= $span[1] && $span[0] <= $to ) {
+							return false;
+						}
+					}
+
+					return true;
+				}
+			)
+		);
+	}
+
 	/**
 	 * Add the delivered rows to the local archive.
 	 *

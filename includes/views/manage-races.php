@@ -247,6 +247,10 @@ $ctx = RC_RCC_Admin::view_context();
 			<?php echo esc_html__( 'Erwartet wird JSON: eine Liste von Rennen mit mindestens „from" (JJJJ-MM-TT) und „name". Optional „to", „url", „classes" und „documents". Ein erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert also statt zu verdoppeln.', 'rc-racemap-club-calendar' ); ?>
 		</p>
 
+		<p class="description">
+			<?php echo esc_html__( 'Statt einer Liste kann auch ein Objekt mit den Schlüsseln „archive", „titles" und „documents" eingefügt werden. Damit lassen sich Titel und Dokumente vorhandener Rennen in einem Zug setzen – jeweils nach Event-ID.', 'rc-racemap-club-calendar' ); ?>
+		</p>
+
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['import_action'] ); ?>" />
 			<?php wp_nonce_field( $ctx['import_action'] ); ?>

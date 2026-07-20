@@ -20,7 +20,7 @@ msgid "RC RaceMap"
 msgstr "RC RaceMap"
 
 #: includes/class-admin.php:110 includes/class-admin.php:111
-#: includes/class-admin.php:866
+#: includes/class-admin.php:974
 msgid "Einstellungen"
 msgstr "Settings"
 
@@ -149,7 +149,8 @@ msgstr[1] "%d races imported into the archive."
 #: includes/class-admin.php:475
 msgid ""
 "Das war kein gültiges JSON. Bitte den kompletten Inhalt der Datei einfügen."
-msgstr "That was not valid JSON. Please paste the complete contents of the file."
+msgstr ""
+"That was not valid JSON. Please paste the complete contents of the file."
 
 #: includes/class-admin.php:480
 msgid "Es wurde nichts übernommen – kein Eintrag hatte Datum und Bezeichnung."
@@ -159,15 +160,16 @@ msgstr "Nothing was imported – no entry had both a date and a label."
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr "Race visibility saved."
 
-#: includes/class-admin.php:791 includes/class-race.php:681
+#: includes/class-admin.php:791 includes/class-admin.php:899
+#: includes/class-race.php:681
 msgid "Dokument"
 msgstr "Document"
 
-#: includes/class-admin.php:849
+#: includes/class-admin.php:957
 msgid "Dokument auswählen"
 msgstr "Select document"
 
-#: includes/class-admin.php:850
+#: includes/class-admin.php:958
 msgid "Dokument übernehmen"
 msgstr "Use this document"
 
@@ -369,7 +371,10 @@ msgid ""
 "Die Datenquelle reicht nur rund ein halbes Jahr zurück. Wenn du deine "
 "älteren Rennen bereits als Liste hast, kannst du sie hier einmalig ins "
 "Archiv übernehmen – danach bleiben sie dauerhaft im Tab „Vergangene Rennen\"."
-msgstr "The data source only goes back about six months. If you already have your older races as a list, you can import them here once – after that they stay in the \"Past races\" tab for good."
+msgstr ""
+"The data source only goes back about six months. If you already have your "
+"older races as a list, you can import them here once – after that they stay "
+"in the \"Past races\" tab for good."
 
 #: includes/views/manage-races.php:247
 msgid ""
@@ -377,9 +382,20 @@ msgid ""
 "TT) und „name\". Optional „to\", „url\", „classes\" und „documents\". Ein "
 "erneuter Import mit derselben Datei überschreibt die Einträge, korrigiert "
 "also statt zu verdoppeln."
-msgstr "JSON is expected: a list of races with at least \"from\" (YYYY-MM-DD) and \"name\". Optionally \"to\", \"url\", \"classes\" and \"documents\". Importing the same file again overwrites the entries, so it corrects rather than duplicates."
+msgstr ""
+"JSON is expected: a list of races with at least \"from\" (YYYY-MM-DD) and "
+"\"name\". Optionally \"to\", \"url\", \"classes\" and \"documents\". "
+"Importing the same file again overwrites the entries, so it corrects rather "
+"than duplicates."
 
-#: includes/views/manage-races.php:256
+#: includes/views/manage-races.php:251
+msgid ""
+"Statt einer Liste kann auch ein Objekt mit den Schlüsseln „archive\", "
+"„titles\" und „documents\" eingefügt werden. Damit lassen sich Titel und "
+"Dokumente vorhandener Rennen in einem Zug setzen – jeweils nach Event-ID."
+msgstr "Instead of a list you can paste an object with the keys \"archive\", \"titles\" and \"documents\". That lets you set titles and documents for existing races in one go – each keyed by event ID."
+
+#: includes/views/manage-races.php:260
 msgid "Ins Archiv übernehmen"
 msgstr "Add to archive"
 
