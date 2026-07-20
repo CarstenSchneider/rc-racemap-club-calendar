@@ -1,89 +1,236 @@
 # RC RaceMap Club Calendar — Projektkontext für Claude Code
 
-WordPress-Plugin, das die kommenden und vergangenen Renntermine **eines** RC-Modellbauvereins per Shortcode auf dessen Seite anzeigt. Zielgefühl: schlicht, schnell, wartungsarm, fügt sich vollständig ins aktive Theme ein.
+WordPress-Plugin, das die Renntermine **eines** RC-Modellbauvereins per Shortcode
+auf dessen Seite anzeigt. Zielgefühl: schlicht, schnell, wartungsarm, fügt sich
+vollständig ins aktive Theme ein.
 
-> Diese Datei ist der **verbindliche Einstieg** für jede Claude-Code-Sitzung (lokal oder Cloud). Repo = einzige Quelle der Wahrheit; Arbeit soll nahtlos über Rechner/Umgebungen hinweg weiterlaufen.
+> Verbindlicher Einstieg für jede Claude-Code-Sitzung. Repo = einzige Quelle der
+> Wahrheit.
 
-## Aktueller Stand (Handoff · v1.0.23)
+**Repo:** `CarstenSchneider/rc-racemap-club-calendar` (öffentlich, Branch `main`)
+**Stand:** v1.0.41
+**Im Einsatz:** tsvm-racing.de/rcracemap (`18244`), rcspeedracer.de/rcracemap (`45925`)
+**Anleitung für Vereine:** [`docs/anleitung.md`](docs/anleitung.md)
 
-**Live & fertig:** Echte Daten über die MyRCM-Org-ID (MyRCM + RCK, Endpoint `https://rcracemap.com/api/clubs/{id}`); zweistufige Navigation (Haupt-Tabs „Aktuelle Termine"/„Archiv" + Jahres-Pills, ohne Reload); Kontext-Links pro Rennen (vergangen → Ergebnisse, kommend → Nennung); MyRCM-Links in Seitensprache (`pLa=de`); Rennen-Sichtbarkeit im Backend; Auto-Updates (Default an, öffentliches Repo, kein Token nötig); PHP 7.4-kompatibel; Englisch-Übersetzung (en_US/en_GB). Getestet mit **TSV Mariendorf `18244`** und **RC Speedracer `45925`**.
+---
 
-**Design-Stand (v1.0.13–v1.0.23):** Renn-Zeile als 3-Spalten-Raster **Datum · Info (Titel/Meta/Klassen) · Aktion** (`templates/race-item.php`). Theme-**unabhängig & robust**: alle Layout-Regeln mit `.rc-rcc`-Vorfahren (Spezifität 0,2,0), damit Theme-`.entry-content …`-Regeln (0,1,1) Abstände/Farben nicht durchdrücken. Farbregeln für Links/Buttons als `.rc-rcc a.rc-rcc__…` (0,2,x), sonst überschreibt die Theme-`a`-Farbe den Button-Text (Akzent auf Akzent = unsichtbar!). **Hierarchie:** Titel groß/fett (1.4em), Datum kräftig (1.1em), **klickbare Elemente in Akzentfarbe + unterstrichen** (Teilnehmerzahl → Teilnehmerliste, Ausschreibung/Reglement, CTA), Klassen als leise Outline-Chips. **Akzentfarbe** im Admin per Farbwähler (`accent_color`, `RC_RCC_Shortcode::accent_inline_style()` setzt `--rc-rcc-accent` + kontrastierendes `--rc-rcc-on-accent` inline); leer = Theme-Textfarbe. Datum numerisch (`date_compact()`, „04-05.07.2026"). **Achtung Design-Regel (siehe Konventionen): Farben vom Theme/Akzent, keine hartkodierte Markenfarbe.** Vorschau-Widgets gegen simuliertes feindliches Theme-CSS testen; **tsvm-racing.de nutzt das Plugin NICHT** (eigener Theme-Kalender) — echte Plugin-URL zum Prüfen erfragen.
+## Was das Plugin kann
 
-**Roadmap – offen:**
-- **Schritt 1 – Branding + Kartenlink** (Design zugesagt, Umsetzung offen): Footer-Logo auf den eigenen Verein verlinken → `https://rcracemap.com/?club=<myrcmOrgId>`. Dabei **Domain-Fix** `rc-racemap.com` → `rcracemap.com` (steht noch im Footer von `templates/calendar.php` sowie in den Plugin-Header-URIs). Karten-Basis-URL als Filter/Konstante vorsehen. Logo/Optik-Feinschliff.
-- **Schritt 2 – Free/Paid + Ads:** „free" zeigt RC-RaceMap-Ads, „paid" nicht. Zum Testen faken: RC Speedracer = free, TSV Mariendorf = paid. Die API soll später `tier`/`ads` je Verein liefern.
+Rennen aus MyRCM, RCK und DMC automatisch; je Rennen ausblenden, umbenennen und
+eigene PDFs hinterlegen; eigene Termine für Rennen, die in keiner Quelle stehen;
+dauerhaftes Archiv; Historie als Tabelle oder JSON einspielen.
 
-**Externe Abhängigkeiten** (Projekt `myrcm-rc-map`, gebrieft in dessen `BRIEF-rc-racemap-plugin.md`, Branch `dev`):
-- **RCK-`hostName`-Fix:** Code vorhanden, aber `rck-races.json` noch nicht neu importiert → RCK zeigt vorerst leicht abweichende Vereins-/Venue-Namen (kein Plugin-Fehler).
-- **Volle Adresse:** API liefert nur `city` (Stadt), keine Straße → Plugin zeigt „Verein, Ort". Volle Adresse bräuchte ein API-Feld.
-- **`?club=`-Deeplink (Task C):** auf der Karte noch nicht gebaut. Ein unbekannter `?club=`-Parameter wird ignoriert → der Link degradiert sauber auf die allgemeine Karte, springt automatisch auf den Verein, sobald Task C live ist.
+Zwei Tabs — **Aktuelle Rennen** / **Vergangene Rennen** — je mit Jahres-Navigation,
+Umschaltung per Vanilla-JS ohne Reload.
 
-## Repo & Verteilung
+Die Renn-Zeile ist ein **Fünf-Spalten-Raster**: Datum · Rennen+Klassen ·
+Teilnehmer · Dokumente · Aktion (`templates/race-item.php`).
 
-- GitHub (**öffentlich**): `https://github.com/CarstenSchneider/rc-racemap-club-calendar` (Account `CarstenSchneider`, Default-Branch `main`). Öffentlich, damit die Auto-Updates ohne Token laufen.
-- Installierbare ZIP bauen (aus dem **Elternordner** des Plugins):
-  ```bash
-  zip -rq rc-racemap-club-calendar.zip rc-racemap-club-calendar \
-    -x "rc-racemap-club-calendar/.git/*" -x "rc-racemap-club-calendar/.gitignore" -x "*/.DS_Store"
-  ```
+## Aufbau
+
+```
+rc-racemap-club-calendar.php   Bootstrap, Version, Konstanten
+includes/
+  class-plugin.php             Singleton, Options-Konstanten, Defaults
+  class-api.php                HTTP-Abruf, Cache, Rohdaten (last_rows())
+  class-cache.php              Transients + Index
+  class-calendar.php           Zusammenführung aller Quellen
+  class-race.php               Wertobjekt, normalisiert die Rohdaten
+  class-shortcode.php          Rendering-Kontext, Inline-Icons, Template-Lookup
+  class-admin.php              Einstellungen, Rennverwaltung, Import
+  class-updater.php            plugin-update-checker (GitHub Releases)
+  views/manage-races.php       Backend: Rennliste, eigene Termine, Import
+templates/                     calendar.php · year-groups.php · race-item.php
+docs/                          anleitung.md · api-contract.md · rc-racemap-data-model.md
+.github/workflows/release-zip.yml
+```
+
+**`Calendar::all_races()` ist die zentrale Stelle.** Die Reihenfolge ist relevant:
+
+1. API abrufen
+2. archivieren — **nur bei fehlerfreiem Abruf**
+3. archivierte Rennen ergänzen, die die API nicht mehr liefert
+4. Titel-Überschreibungen anwenden
+5. DMC-Schatten unterdrücken
+6. eigene Termine anhängen
+7. eigene Dokumente anhängen
+
+## Speicherung
+
+Alles in `wp_options` der Vereins-Installation, **ohne Autoload** außer den
+Settings. Hochgeladene PDFs liegen als normale Medien-Anhänge.
+
+| Option | Inhalt |
+|---|---|
+| `rc_rcc_settings` | club_id, cache_ttl, accent_color, auto_update |
+| `rc_rcc_visibility` | Event-ID → bool |
+| `rc_rcc_titles` | Event-ID → eigener Titel |
+| `rc_rcc_documents` | Event-ID → `[{label, url}]`, max. 5 |
+| `rc_rcc_custom_races` | selbst angelegte Termine, max. 50 |
+| `rc_rcc_archive` | Event-ID → Rohdatensatz, wächst dauerhaft (~900 B/Rennen) |
+| `rc_rcc_cache_index` | Schlüssel der gesetzten Transients |
+
+Zuordnung **immer über die stabile Event-ID**, nie über den Titel. Neue Rennen
+sind automatisch sichtbar; nur ein explizites `false` blendet aus.
+`uninstall.php` räumt alle Optionen ab, die PDFs bleiben (gehören dem Verein).
+
+## Datenquelle
+
+`GET https://rcracemap.com/api/clubs/{myrcmOrgId}` — geliefert vom
+Schwesterprojekt `myrcm-rc-map` (Endpoint `api/clubs.php`), das MyRCM, RCK und
+DMC zusammenführt. Eingabe im Plugin ist die **MyRCM-Organisator-ID** (numerisch);
+`hostId` ist ein davon getrenntes Feld der Antwort, keine Nutzereingabe.
+
+Vertrag: [`docs/api-contract.md`](docs/api-contract.md) — dort stehen die
+`source`-Werte (`myrcm`, `rck-kleinserie`, `rck-challenge`, `dmc`, `myrcm+rck`),
+die Merge-Regeln und die Klassen-Union.
+
+`sample-data.json` ist Opt-in für lokale Entwicklung (Konstante
+`RC_RCC_USE_SAMPLE_DATA` / Filter `rc_rcc_use_sample_data`), wird aber weiterhin
+mit ausgeliefert — `class-api.php` lädt es als Rückfallebene.
+
+**Filter:** `rc_rcc_api_base_url` · `rc_rcc_runtime_club_id` ·
+`rc_rcc_plugin_page_url` · `rc_rcc_use_sample_data` · `rc_rcc_update_token`
+
+---
+
+## Entscheidungen und ihre Gründe
+
+**Kein eigenes Design.** Schriftart *und* Schriftgrößen kommen vom Theme
+(`font-family: inherit`, `font-size: inherit`, Abstufungen in `em`). Links erben
+die Linkfarbe. Bis v1.0.36 brachte das Plugin Inter mit (self-hosted) — entfernt,
+weil es auf Seiten mit eigener Hausschrift als Fremdkörper stand und 133 KB
+kostete.
+
+**Feste Spaltenbreiten in `em`**, bemessen am längsten real vorkommenden Inhalt.
+Engste Spalte ist die Aktion — der Hinweistext „Nennung ab 30. September 2026"
+füllt sie aus. Wer dort kürzt, erzeugt Umbrüche.
+
+**Aufteilung nach Renndatum, nicht nach Kalenderjahr.** Sonst leert sich der Tab
+„Vergangene Rennen" mitten in der Saison.
+
+**Dauerhaftes Archiv.** MyRCM/RCK-Rennen fallen nach rund **sieben Wochen** aus
+`races.json` (DMC führt den vollen Jahrgang — der Rückblick wirkt dadurch
+länger, als er ist). Frische API-Daten gewinnen über archivierte, damit spätere
+Korrekturen ankommen.
+
+**DMC-Schatten unterdrücken.** Vereine melden Rennen bei DMC vor allem für die
+Versicherung; ausgeschrieben wird über MyRCM/RCK. DMC-Titel sind deshalb
+administrativ („Sportkreismeisterschaft"). Fällt das MyRCM-Rennen aus den Daten,
+stünde der DMC-Eintrag neben dem archivierten. `suppress_shadowed_dmc()` läuft
+über die **komplette** Liste inkl. Archiv — sonst greift es nicht mehr, sobald
+auch der DMC-Eintrag archiviert ist.
+
+**Eigenes Dokument schlägt gleichnamiges der Quelle.** Wer etwas hinterlegt,
+meint es so, womöglich als korrigierte Fassung. Andersherum hätte der Verein
+keine Möglichkeit zu übersteuern.
+
+**Datum wird nicht im Plugin korrigiert.** MyRCM führt manche Rennen eintägig,
+obwohl sie übers Wochenende gehen. Gehört an die Quelle — sonst pflegt jeder
+Verein Korrekturen lokal und die Karte bleibt falsch.
+
+**Vier Einstellungen.** club_id, Aktualisierungsintervall, Akzentfarbe,
+automatische Updates. Das GitHub-Token ist entfallen: das Repo ist öffentlich,
+der Updater kommt ohne aus, und der Erklärtext dazu war schlicht falsch.
 
 ## Konventionen
 
-- **Sprache:** Deutsch als **Basissprache** im Quelltext, aber **immer** i18n-Funktionen (`__()`, `esc_html__()` …), Textdomain `rc-racemap-club-calendar`.
-- **PHP 7.4+** (Mindestanforderung wegen Zielserver mit PHP 7.4; Ziel/Empfehlung bleibt 8.x). Daher **keine** PHP-8-only-Syntax verwenden: kein `match`, keine Union-Types/`mixed` in Signaturen, keine Constructor-Promotion, keine nachgestellten Kommas in Funktions-Parameterlisten, keine `str_contains`/`str_starts_with`/`str_ends_with`. WordPress Coding Standards, OOP mit klarer Schichtentrennung, keine God-Class.
-- **Sicherheit:** alle Ausgaben escapen, alle Eingaben sanitisieren, Nonces für Admin-Aktionen, minimale Rechte (`manage_options`).
-- **Design:** CSS nur Layout; Farben/Fonts vom Theme (`inherit`/`currentColor`). Keine externen Libs im Frontend. Templates unter `templates/` sind theme-überschreibbar.
+- **Deutsch als Quellsprache**, aber immer i18n-Funktionen (Textdomain
+  `rc-racemap-club-calendar`). Es gibt kein `de_DE.mo`; übersetzt werden `en_US`
+  und `en_GB`.
+- **PHP 7.4+**: kein `match`, keine Union-Types, keine Constructor-Promotion,
+  kein `str_contains`/`str_starts_with`.
+- **Sicherheit:** Ausgaben escapen, Eingaben sanitisieren, Nonces für
+  Admin-Aktionen, `manage_options`.
+- **CSS nur Layout.** Templates unter `templates/` sind theme-überschreibbar
+  (`wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`).
+- **Release-Notes richten sich an Vereine**, nicht an Entwickler.
 
-## Architektur (`includes/`)
+---
 
-| Datei | Aufgabe |
-|---|---|
-| `class-plugin.php` | Orchestrator (Singleton), verdrahtet Komponenten |
-| `class-race.php` | Wertobjekt: normalisiert Rohdaten → typisiertes Rennen |
-| `class-api.php` | **Einzige** Datenquelle: `GET {base}/api/clubs/{club-id}` + Sample-Fallback |
-| `class-cache.php` | Transients-Wrapper |
-| `class-calendar.php` | Businesslogik: Jahres-Gruppierung (`current_groups()`/`archive_groups()`), Sichtbarkeit, Memo |
-| `class-admin.php` (+ `views/`) | Einstellungen + Rennen-Sichtbarkeit |
-| `class-shortcode.php` | Frontend-Rendering über `templates/` |
-| `class-updater.php` (+ `lib/plugin-update-checker/`) | GitHub-Auto-Updates |
+## Release
 
-Shortcode: `[rc_racemap_club_calendar]` (optionaler künftiger Parameter `club="…"` bereits vorbereitet). **Zweistufige Navigation** (serverseitig gerendert, Umschaltung per Vanilla-JS ohne Reload): Haupt-Tabs **„Aktuelle Termine"** (dieses Jahr + Zukunft, aufsteigend) / **„Archiv"** (frühere Jahre, absteigend); innerhalb jedes Tabs eine **Jahres-Navigation** (Pills, `templates/year-groups.php`). Aktions-Link/Status richten sich **pro Rennen am Datum** (vergangen → Ergebnisse, kommend → Nennung), nicht am Tab. Kalender-Logik: `current_groups()` / `archive_groups()` (nach Jahr gruppiert).
+1. Version an **drei** Stellen: Header und `RC_RCC_VERSION` in
+   `rc-racemap-club-calendar.php`, `Stable tag` in `readme.txt`. Header und
+   Konstante sind schon einmal auseinandergelaufen — der Workflow prüft es jetzt.
+2. `git commit` + `git push origin main`
+3. `gh release create vX.Y.Z --title "…" --notes-file …`
 
-## Sichtbarkeit von Rennen
+`.github/workflows/release-zip.yml` baut daraufhin ein installierbares Paket und
+hängt es als **`rc-racemap-club-calendar.zip`** an — fester Name, deshalb
+funktioniert `…/releases/latest/download/rc-racemap-club-calendar.zip` dauerhaft.
+Der Workflow prüft Versionsgleichheit, Vollständigkeit (inkl. `includes/lib` und
+`sample-data.json`) und dass keine Entwicklungsdateien mitgehen. Per
+`workflow_dispatch` lässt sich das ZIP an ein älteres Release nachreichen.
 
-Immer über **stabile Event-ID** (nie Titel). Neue Rennen sind automatisch sichtbar; nur ein explizites `false` in `rc_rcc_visibility` blendet aus.
+`class-updater.php` ruft `enableReleaseAssets()` — ohne das installieren die
+automatischen Updates GitHubs „Source code"-Archiv, also den rohen Repo-Inhalt.
+`PREFER_` statt `REQUIRE_`, damit ältere Releases installierbar bleiben.
+Auto-Install ist strikt auf `RC_RCC_BASENAME` begrenzt; Verbreitung im
+wp-cron-Fenster (~12 h).
 
-## Datenquelle & echtes Datenmodell
+### Übersetzungen
 
-**Datenquelle (ab v1.0.9): Live-API.** `class-api.php` lädt `GET {base}/api/clubs/{myrcmOrgId}`; `base` = **`https://rcracemap.com`** (Endpoint `api/clubs.php` im Projekt `myrcm-rc-map`, deployt auf Hetzner, CORS offen). Eingabe = **MyRCM-Org-ID** (numerisch, z. B. 18244/45925). Antwort `{club, events}` (MyRCM+RCK gemerged, `source`-Feld je Event, Vereinsmeta name/website/lat/lng). **Domain ist `rcracemap.com` – NICHT `rc-racemap.com`** (der alte Footer-Link war falsch, für Schritt 1 relevant). Die statischen Snapshots (Repo rc-racemap-data) waren die Zwischenlösung und sind durch die Live-API abgelöst. Vertrag: [`docs/api-contract.md`](docs/api-contract.md).
+```bash
+xgettext … -o languages/rc-racemap-club-calendar.pot -f <dateiliste>
+msgmerge --no-fuzzy-matching --update <lang>.po <pot>
+msgfmt --check -o <lang>.mo <lang>.po
+msgcmp <lang>.po <pot>          # muss still bleiben
+```
 
-Offen (myrcm-rc-map-Seite): Der RCK-`hostName`-Fix ist im Code, aber der deployte `rck-races.json`-Stand ist noch nicht neu importiert → RCK zeigt vorerst weiter leicht abweichende Namen.
+Mehrzeilige `msgid` beim Prüfen nicht per `grep "^msgid"` suchen — umgebrochene
+Strings fallen sonst durch.
 
-Sample-Daten (`sample-data.json`) sind jetzt **Opt-in** für lokale Entwicklung: Konstante `RC_RCC_USE_SAMPLE_DATA` oder Filter `rc_rcc_use_sample_data`. Basis-URL überschreibbar via Konstante `RC_RCC_API_BASE_URL` / Filter `rc_rcc_api_base_url`.
+---
 
-Das kanonische Renn-Datenmodell stammt aus dem Schwesterprojekt `myrcm-rc-map` (`races.json`) → dokumentiert in **[`docs/rc-racemap-data-model.md`](docs/rc-racemap-data-model.md)**. Der **API-Vertrag** (Endpoint + Antwortform, den die Live-API erfüllen muss) steht in **[`docs/api-contract.md`](docs/api-contract.md)**; das Briefing an `myrcm-rc-map` (RCK-Namensfix + API bereitstellen) liegt dort als `BRIEF-rc-racemap-plugin.md`. Wichtige Abweichungen des aktuellen Plugin-Modells vom Realmodell (offener TODO):
-- Einzel-`date` → **`from`/`to`-Bereich**
-- `organizer`/`track` flach → `hostId`(Slug)/`hostName` + `venueName`/`venueLocation`
-- `classes` als Strings → auch **Objekte `{name, entries}`**
-- fester `links{}`-Satz → **`documents[]`** mit `{type, label, url}`
-- **Eingabe im Plugin = MyRCM-Organisator-ID** (numerisch, z. B. `16961`) – Vereine kennen nur ihre MyRCM-ID, keine RaceMap-Slugs. Diese ID geht als `{club-id}` an die API; die RaceMap-Seite mappt sie auf den Verein. Das Datenfeld `hostId` (Slug wie `rcsf-singen-e-v`) ist davon getrennt und nur Teil der Renn-Antwort, **nicht** die Nutzereingabe.
+## Stolperfallen
 
-## Auto-Update-Workflow (GitHub Releases)
+**CSS-Spezifität.** Reset auf `.rc-rcc.rc-rcc li` (0,2,1) schlägt Theme-Regeln
+(0,1,1); Komponenten auf (0,3,0) schlagen den Reset; **Media Queries brauchen
+dieselbe Spezifität wie die Basisregel**, sonst greift das Desktop-Raster nicht.
 
-1. Änderung umsetzen, **Versionsnummer** im Header von `rc-racemap-club-calendar.php` erhöhen (SemVer).
-2. `git commit` + `git push origin main`.
-3. `gh release create vX.Y.Z --title "vX.Y.Z" --notes "…" --latest` und die gebaute ZIP als Asset anhängen (`gh release upload`).
-4. Seiten zeigen das Update im Backend. **Kein Token nötig** – das Repo ist öffentlich, PUC liest Releases anonym. Das Token-Feld/​die Konstante `RC_RCC_UPDATE_TOKEN` bleiben optional (Altlast); ein auf einer Seite eingetragenes **ungültiges** Token führt aber zu 401 – dann Feld leeren.
-5. **Auto-Install:** Setting `auto_update` (Default **an**) installiert neue Releases selbstständig. Umgesetzt über den `auto_update_plugin`-Filter in `class-updater.php::filter_auto_update()`, **strikt auf `RC_RCC_BASENAME` begrenzt** – andere Plugins/Themes/Core bleiben unberührt. Pull-Modell: kein aktiver Push möglich; Verbreitung erfolgt automatisch im wp-cron-Fenster (~12 h).
+**Leere Grid-Zellen.** `:empty` greift nicht bei Whitespace. Das Template gibt
+leere Zellen deshalb gar nicht aus — sonst belegen sie auf Mobil eine eigene
+Zeile.
 
-## Nächste Schritte & Ideen
+**`str_getcsv()`** braucht alle vier Parameter, sonst warnt PHP 8.4 bei jedem
+Import ins Fehlerprotokoll.
 
-Aktuelle Roadmap + offene Abhängigkeiten siehe **[Aktueller Stand](#aktueller-stand-handoff--v1012)** oben (Schritt 1 Branding/Kartenlink, Schritt 2 Free/Paid+Ads).
+**Die MyRCM-Veranstalterseite ist nicht nach Verein gefiltert.** `dId[O]=…`
+liefert auch fremde Events — beim Zuordnen von Event-IDs immer den Veranstalter
+gegenprüfen.
 
-Ideen für später (nicht beauftragt): iCal/Export, Serien-Filter, Countdown bis zum nächsten Rennen, Gutenberg-Block, volle Adresse (sobald API-Feld vorhanden).
+**Query-Strings an Assets.** Manche Performance-Plugins entfernen `?ver=`; dann
+behalten Browser und Caches alte CSS. Beim Prüfen mit `Cache-Control: no-cache`
+arbeiten, sonst misst man den Cache.
 
-## Umgebung / Tooling-Hinweise
+**Sprache.** `wp_date()` folgt WordPress. Fehlen die deutschen Sprachdateien des
+Kerns, bleiben Monatsnamen englisch, obwohl die Sprache auf Deutsch steht.
+Erkennungszeichen: „Howdy" statt „Hallo" in der Adminleiste.
 
-- `gh` CLI wird genutzt (lokal unter `~/.local/bin/gh`). In einer neuen Umgebung ggf. `gh auth login` bzw. Git-Zugang neu herstellen.
-- **PHP-CLI** liegt unter `~/.local/bin/php` (statischer Build von static-php.dev; in neuer Umgebung ggf. neu holen: `curl -sL https://dl.static-php.dev/static-php-cli/common/php-8.4.8-cli-macos-aarch64.tar.gz | tar xz`). **Vor jedem Release nutzen:** `php -l` auf alle geänderten Dateien **und** ein Stub-Test der Datenlogik (WP-Funktionen stubben, `RC_RCC_Race::from_array` + `RC_RCC_Calendar` gegen `sample-data.json` laufen lassen, prüfen dass beide Tabs Rennen erhalten). Voll ausführen lässt sich das Plugin nur auf echten WP-Seiten (TSV Mariendorf, RC Speedracer).
+**Regex über PHP-Templates.** `</li>` trifft zuerst die Klassen-Pillen, nicht das
+Listenelement. Hat in dieser Sitzung zweimal Dateien zerschnitten.
+
+---
+
+## Umgebung
+
+- `gh` CLI unter `~/.local/bin/gh`.
+- **PHP-CLI** unter `~/.local/bin/php` (statischer Build von static-php.dev).
+- **Vor jedem Release:** `php -l` auf alle geänderten Dateien, `node --check` für
+  JS, Klammerbilanz der CSS, `msgcmp` für beide Sprachen — und ein Stub-Test der
+  Datenlogik (WP-Funktionen stubben, `RC_RCC_Race::from_array()` gegen echte
+  API-Daten laufen lassen).
+- Voll ausführen lässt sich das Plugin nur auf echten WP-Seiten. Für Layout gibt
+  es eine lokale Vorschau (`dev-preview.html`, gitignored) mit dem echten CSS und
+  einem bewusst abweichenden Test-Theme.
+
+## Offen
+
+- `docs/anleitung.md` auf `rcracemap.com/#wordpress-plugin` übernehmen.
+- **Free/Paid + Ads:** „free" zeigt RC-RaceMap-Ads, „paid" nicht. Die API soll
+  perspektivisch `tier`/`ads` je Verein liefern.
+- Teilnehmerzahlen fehlen bei reinen RCK-Rennen — die Nennung läuft über RCK,
+  MyRCM führt keine Liste, RCK hält keine Historie vor.
+- Ideen, nicht beauftragt: iCal-Export, Serien-Filter, Gutenberg-Block, volle
+  Adresse (sobald die API ein Feld dafür hat).
