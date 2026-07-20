@@ -538,6 +538,19 @@ class RC_RCC_Admin {
 
 			$archive = $this->calendar->archive_map();
 
+			// `remove` nimmt Event-IDs aus dem Archiv. Nötig, weil ein Import
+			// bestehende Einträge ersetzt, aber nichts entfernt: wird eine Zeile
+			// aus der Datei gestrichen oder mit einer anderen zusammengeführt,
+			// bliebe die alte sonst als Karteileiche stehen.
+			foreach ( (array) ( $is_list ? array() : ( $data['remove'] ?? array() ) ) as $remove_id ) {
+				$remove_id = sanitize_text_field( (string) $remove_id );
+
+				if ( '' !== $remove_id && isset( $archive[ $remove_id ] ) ) {
+					unset( $archive[ $remove_id ] );
+					++$count;
+				}
+			}
+
 			foreach ( $rows as $row ) {
 				if ( ! is_array( $row ) ) {
 					continue;
@@ -576,10 +589,27 @@ class RC_RCC_Admin {
 					);
 				}
 
+				// Klassen: Strings oder {name, entries} – die Nennzahl je Klasse
+				// bleibt erhalten, damit die Pillen sie wie sonst auch zeigen.
 				$classes = array();
 				foreach ( (array) ( $row['classes'] ?? array() ) as $class ) {
-					$name = is_array( $class ) ? (string) ( $class['name'] ?? '' ) : (string) $class;
-					$name = sanitize_text_field( $name );
+					if ( is_array( $class ) ) {
+						$name = sanitize_text_field( (string) ( $class['name'] ?? '' ) );
+
+						if ( '' === $name ) {
+							continue;
+						}
+
+						$classes[] = isset( $class['entries'] ) && is_numeric( $class['entries'] )
+							? array(
+								'name'    => $name,
+								'entries' => absint( $class['entries'] ),
+							)
+							: $name;
+						continue;
+					}
+
+					$name = sanitize_text_field( (string) $class );
 
 					if ( '' !== $name ) {
 						$classes[] = $name;
@@ -596,6 +626,14 @@ class RC_RCC_Admin {
 					'documents' => $documents,
 					'source'    => sanitize_text_field( (string) ( $row['source'] ?? 'import' ) ),
 				);
+
+				if ( isset( $row['registrationCount'] ) && is_numeric( $row['registrationCount'] ) ) {
+					$archive[ $id ]['registrationCount'] = absint( $row['registrationCount'] );
+				}
+
+				if ( ! empty( $row['registrationListUrl'] ) ) {
+					$archive[ $id ]['registrationListUrl'] = esc_url_raw( trim( (string) $row['registrationListUrl'] ) );
+				}
 
 				++$count;
 			}
