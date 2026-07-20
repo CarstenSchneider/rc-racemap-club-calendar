@@ -61,6 +61,8 @@ jobs:
             --exclude='docs' \
             --exclude='dev-preview.html' \
             --exclude='build' \
+            --exclude='*.po' \
+            --exclude='*.pot' \
             ./ build/$slug/
           cd build && zip -qr ../$slug.zip $slug
           cd .. && unzip -l $slug.zip | tail -3
@@ -86,6 +88,10 @@ jobs:
               echo "::error::gehoert nicht ins ZIP: $f"; exit 1
             fi
           done
+          # Uebersetzungs-Quelltexte gehoeren nicht ins Paket (nur .mo wirkt).
+          if unzip -l $slug.zip | grep -qE '\.(po|pot)$'; then
+            echo "::error::.po/.pot im ZIP – nur .mo gehoert hinein"; exit 1
+          fi
           echo "Paket vollstaendig."
 
       - name: An das Release hängen
