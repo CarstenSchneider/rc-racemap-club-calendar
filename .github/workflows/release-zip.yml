@@ -1,0 +1,94 @@
+name: Release-ZIP anhängen
+
+# Baut ein installierbares Plugin-ZIP und hängt es an das Release.
+#
+# Warum: GitHubs automatische „Source code"-Archive heißen nach dem Tag
+# (v1.0.32.zip) und enthalten den rohen Repo-Inhalt. Damit gibt es weder einen
+# stabilen Direktlink noch ein sauber installierbares Paket. Dieses Asset heißt
+# immer gleich und ist über
+#   …/releases/latest/download/rc-racemap-club-calendar.zip
+# erreichbar – ohne Nachpflege bei jedem Release.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag, an das das ZIP gehängt wird (z. B. v1.0.32)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Tag bestimmen
+        id: tag
+        run: echo "value=${{ github.event.inputs.tag || github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.value }}
+
+      - name: Version gegen den Tag prüfen
+        run: |
+          header=$(grep -m1 '^ \* Version:' rc-racemap-club-calendar.php | tr -d ' ' | cut -d: -f2)
+          const=$(grep -m1 "RC_RCC_VERSION" rc-racemap-club-calendar.php | sed "s/.*'\([0-9.]*\)'.*/\1/")
+          tag="${{ steps.tag.outputs.value }}"
+          tag="${tag#v}"
+          echo "Header=$header  Konstante=$const  Tag=$tag"
+          # Header und Konstante liefen schon einmal auseinander – hier faellt das auf.
+          if [ "$header" != "$const" ] || [ "$header" != "$tag" ]; then
+            echo "::error::Version stimmt nicht ueberein (Header $header, Konstante $const, Tag $tag)"
+            exit 1
+          fi
+
+      - name: Paket bauen
+        run: |
+          slug=rc-racemap-club-calendar
+          mkdir -p build/$slug
+          # Nur das, was zur Laufzeit gebraucht wird. sample-data.json bleibt
+          # drin: class-api.php laedt es als Rueckfallebene.
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='CLAUDE.md' \
+            --exclude='docs' \
+            --exclude='dev-preview.html' \
+            --exclude='build' \
+            ./ build/$slug/
+          cd build && zip -qr ../$slug.zip $slug
+          cd .. && unzip -l $slug.zip | tail -3
+
+      - name: Prüfen, dass das Paket vollständig ist
+        run: |
+          slug=rc-racemap-club-calendar
+          for f in \
+            "$slug/$slug.php" \
+            "$slug/uninstall.php" \
+            "$slug/includes/class-plugin.php" \
+            "$slug/includes/lib/plugin-update-checker/plugin-update-checker.php" \
+            "$slug/templates/calendar.php" \
+            "$slug/assets/css/frontend.css" \
+            "$slug/sample-data.json" \
+            "$slug/languages/$slug-en_US.mo"
+          do
+            unzip -l $slug.zip | grep -q " $f\$" || { echo "::error::fehlt im ZIP: $f"; exit 1; }
+          done
+          # Entwicklungsdateien duerfen nicht mitgeliefert werden.
+          for f in CLAUDE.md docs/ dev-preview.html; do
+            if unzip -l $slug.zip | grep -q "$f"; then
+              echo "::error::gehoert nicht ins ZIP: $f"; exit 1
+            fi
+          done
+          echo "Paket vollstaendig."
+
+      - name: An das Release hängen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ steps.tag.outputs.value }}" rc-racemap-club-calendar.zip --clobber

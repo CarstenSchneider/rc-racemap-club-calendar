@@ -62,6 +62,15 @@ class RC_RCC_Updater {
 			$checker->getVcsApi()->setReleaseVersionFilter( '/^v?\d+\.\d+/' );
 		}
 
+		// Das gebaute Plugin-ZIP bevorzugen, das der Release-Workflow anhängt.
+		// Ohne diese Zeile installiert WordPress GitHubs „Source code"-Archiv,
+		// also den rohen Repo-Inhalt samt Entwicklungsdateien.
+		// PREFER_ (nicht REQUIRE_) heißt: ältere Releases ohne dieses Asset
+		// bleiben installierbar, sie fallen auf das Quellarchiv zurück.
+		if ( method_exists( $checker->getVcsApi(), 'enableReleaseAssets' ) ) {
+			$checker->getVcsApi()->enableReleaseAssets( '/^rc-racemap-club-calendar\.zip$/' );
+		}
+
 		// Authentifizierung (nur nötig, falls das Repo privat ist – bei
 		// öffentlichem Repo bleibt das Token leer und wird nicht gesetzt).
 		$token = $this->token();
