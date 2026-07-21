@@ -367,8 +367,13 @@ class RC_RCC_Admin {
 		krsort( $years );
 
 		// Vorauswahl: das laufende Jahr, sonst das jüngste vorhandene.
+		// WICHTIG: PHP wandelt numerische Array-Keys ("2024") automatisch in
+		// Integers um. Der Jahr-Vergleich unten (in_array strict) und die
+		// Auswahl aus $_GET sind aber Strings — ohne diese Angleichung schlägt
+		// der strikte Vergleich immer fehl und jedes Jahr fällt aufs Standardjahr
+		// zurück (man kommt nie in ältere Jahre).
 		$current_year = (string) wp_date( 'Y' );
-		$year_keys    = array_keys( $years );
+		$year_keys    = array_map( 'strval', array_keys( $years ) );
 		$default_year = in_array( $current_year, $year_keys, true )
 			? $current_year
 			: (string) ( $year_keys[0] ?? $current_year );
