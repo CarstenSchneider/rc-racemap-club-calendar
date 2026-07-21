@@ -8,9 +8,10 @@ vollständig ins aktive Theme ein.
 > Wahrheit.
 
 **Repo:** `CarstenSchneider/rc-racemap-club-calendar` (öffentlich, Branch `main`)
-**Stand:** v1.0.41
+**Stand:** v1.0.43
 **Im Einsatz:** tsvm-racing.de/rcracemap (`18244`), rcspeedracer.de/rcracemap (`45925`)
 **Anleitung für Vereine:** [`docs/anleitung.md`](docs/anleitung.md)
+**Sprachen:** de (Quelle), en, fr, nl, it, es, cs, pl — folgt `get_locale()`
 
 ---
 
@@ -18,7 +19,8 @@ vollständig ins aktive Theme ein.
 
 Rennen aus MyRCM, RCK und DMC automatisch; je Rennen ausblenden, umbenennen und
 eigene PDFs hinterlegen; eigene Termine für Rennen, die in keiner Quelle stehen;
-dauerhaftes Archiv; Historie als Tabelle oder JSON einspielen.
+dauerhaftes Archiv; Historie als Tabelle (CSV, achtsprachig) oder JSON
+einspielen. Achtsprachig, folgt der WordPress-Sprache.
 
 Zwei Tabs — **Aktuelle Rennen** / **Vergangene Rennen** — je mit Jahres-Navigation,
 Umschaltung per Vanilla-JS ohne Reload.
@@ -135,9 +137,11 @@ der Updater kommt ohne aus, und der Erklärtext dazu war schlicht falsch.
 
 ## Konventionen
 
-- **Deutsch als Quellsprache**, aber immer i18n-Funktionen (Textdomain
-  `rc-racemap-club-calendar`). Es gibt kein `de_DE.mo`; übersetzt werden `en_US`
-  und `en_GB`.
+- **Deutsch als Quellsprache** (die `msgid` sind deutsch), aber immer
+  i18n-Funktionen (Textdomain `rc-racemap-club-calendar`). Es gibt kein
+  `de_DE.mo`; übersetzt sind `en_US`, `en_GB`, `fr_FR`, `nl_NL`, `it_IT`,
+  `es_ES`, `cs_CZ`, `pl_PL`. Terminologie **konsistent mit der Web-App** — die
+  Frontend-Labels stammen aus deren `TRANSLATIONS`. cs/pl haben 3 Plural-Formen.
 - **PHP 7.4+**: kein `match`, keine Union-Types, keine Constructor-Promotion,
   kein `str_contains`/`str_starts_with`.
 - **Sicherheit:** Ausgaben escapen, Eingaben sanitisieren, Nonces für
@@ -169,6 +173,11 @@ automatischen Updates GitHubs „Source code"-Archiv, also den rohen Repo-Inhalt
 Auto-Install ist strikt auf `RC_RCC_BASENAME` begrenzt; Verbreitung im
 wp-cron-Fenster (~12 h).
 
+Der Workflow schließt `*.po`/`*.pot` aus dem Paket aus (nur `.mo` wirkt zur
+Laufzeit) und bricht ab, wenn doch welche drin sind. `docs/`, `CLAUDE.md` und
+`dev-preview.html` bleiben ebenfalls draußen. Quelltexte der Übersetzung bleiben
+im Repo.
+
 ### Übersetzungen
 
 ```bash
@@ -180,6 +189,12 @@ msgcmp <lang>.po <pot>          # muss still bleiben
 
 Mehrzeilige `msgid` beim Prüfen nicht per `grep "^msgid"` suchen — umgebrochene
 Strings fallen sonst durch.
+
+Die sechs nicht-englischen Übersetzungen liefert die **App-Session** (konsistente
+Terminologie), das Plugin legt sie ab, kompiliert und committet. **Keine `msgid`
+ändern, nachdem Übersetzungen geliefert sind** — das bricht den betroffenen
+String in allen Sprachen (in dieser Sitzung um Haaresbreite passiert). Wer den
+deutschen Quelltext ändert, muss alle Sprachen nachziehen lassen.
 
 ---
 
@@ -195,6 +210,12 @@ Zeile.
 
 **`str_getcsv()`** braucht alle vier Parameter, sonst warnt PHP 8.4 bei jedem
 Import ins Fehlerprotokoll.
+
+**CSV-Header-Transliteration.** Der Import (`parse_csv` in `class-admin.php`)
+kennt die Spaltennamen in allen acht Sprachen. `normalize_header()`
+transliteriert diakritische Zeichen (é→e, ł→l, á→a …) statt sie zu entfernen —
+sonst würde „Résultats" zu „rsultats" und der Alias griffe nicht. Neue
+Spaltennamen als **transliterierten** ASCII-Schlüssel in die `$alias`-Map.
 
 **Die MyRCM-Veranstalterseite ist nicht nach Verein gefiltert.** `dId[O]=…`
 liefert auch fremde Events — beim Zuordnen von Event-IDs immer den Veranstalter
@@ -218,9 +239,9 @@ Listenelement. Hat in dieser Sitzung zweimal Dateien zerschnitten.
 - `gh` CLI unter `~/.local/bin/gh`.
 - **PHP-CLI** unter `~/.local/bin/php` (statischer Build von static-php.dev).
 - **Vor jedem Release:** `php -l` auf alle geänderten Dateien, `node --check` für
-  JS, Klammerbilanz der CSS, `msgcmp` für beide Sprachen — und ein Stub-Test der
-  Datenlogik (WP-Funktionen stubben, `RC_RCC_Race::from_array()` gegen echte
-  API-Daten laufen lassen).
+  JS, Klammerbilanz der CSS, `msgfmt --check` + `msgcmp` für **alle acht**
+  Sprachen — und ein Stub-Test der Datenlogik (WP-Funktionen stubben,
+  `RC_RCC_Race::from_array()` gegen echte API-Daten laufen lassen).
 - Voll ausführen lässt sich das Plugin nur auf echten WP-Seiten. Für Layout gibt
   es eine lokale Vorschau (`dev-preview.html`, gitignored) mit dem echten CSS und
   einem bewusst abweichenden Test-Theme.
