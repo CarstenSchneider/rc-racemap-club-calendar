@@ -739,7 +739,10 @@ class RC_RCC_Race {
 			return '';
 		}
 
-		if ( ! preg_match( '/dId(?:\[|%5B)E(?:\]|%5D)=(\d+)/i', $event_url, $m ) ) {
+		// Event-ID aus alter (dId[E]=…) UND neuer v9-URL (/live/…, /report/…,
+		// /organizers/<org>/<id>) ziehen – der Kalender läuft mit beiden Ständen.
+		if ( ! preg_match( '/dId(?:\[|%5B)E(?:\]|%5D)=(\d+)/i', $event_url, $m )
+			&& ! preg_match( '#/(?:live|report|organizers/\d+)/(\d+)#i', $event_url, $m ) ) {
 			return '';
 		}
 
@@ -755,12 +758,12 @@ class RC_RCC_Race {
 	 * @return string
 	 */
 	private static function myrcm_results_url( string $event_id, string $host, string $lang ): string {
-		$url = 'https://www.myrcm.ch/myrcm/main?hId%5B1%5D=search&dId%5BE%5D=' . $event_id;
-		if ( '' !== $host ) {
-			$url .= '&dFi=' . rawurlencode( $host );
-		}
-		$url .= '&pLa=' . $lang;
+		// MyRCM v9: die Ergebnis-/Berichtseite liegt unter /<lang>/report/<id>.
+		// Die alte Route (/myrcm/main?hId[1]=search&dId[E]=…) leitet im Redesign
+		// nur noch auf eine Übersicht um. $host wird hier nicht mehr gebraucht.
+		unset( $host );
+		$lang = ( '' !== $lang ) ? $lang : 'de';
 
-		return $url;
+		return 'https://www.myrcm.ch/' . rawurlencode( $lang ) . '/report/' . rawurlencode( $event_id );
 	}
 }
