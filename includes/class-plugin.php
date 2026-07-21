@@ -100,6 +100,16 @@ final class RC_RCC_Plugin {
 	public const OPTION_DATA_STAMP = 'rc_rcc_data_stamp';
 
 	/**
+	 * Option holding the plugin version last seen at runtime.
+	 *
+	 * Weicht sie von RC_RCC_VERSION ab, gab es ein Update – dann wird der
+	 * Renndaten-Cache einmal geleert. Auto-Updates deaktivieren das Plugin
+	 * nicht, also greift die deactivate()-Leerung dabei nicht; ohne diesen
+	 * Abgleich blieben nach einem Update die alten Daten bis zum Cache-Ablauf.
+	 */
+	public const OPTION_VERSION = 'rc_rcc_version';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin
@@ -145,6 +155,7 @@ final class RC_RCC_Plugin {
 	 */
 	public function init(): void {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this, 'maybe_upgrade' ) );
 
 		// GitHub-basierte Auto-Updates (läuft auch bei Cron-Update-Checks,
 		// daher unabhängig vom Admin-Kontext registrieren).
@@ -188,6 +199,24 @@ final class RC_RCC_Plugin {
 		}
 
 		update_option( self::OPTION_SETTINGS, array_merge( $defaults, $existing ) );
+	}
+
+	/**
+	 * Nach einem Plugin-Update einmal den Renndaten-Cache leeren.
+	 *
+	 * Sorgt dafür, dass datenabhängige Änderungen (z. B. neue Felder aus der
+	 * API) sofort greifen, statt bis zum Cache-Ablauf zu warten. Läuft nur,
+	 * wenn sich die Version geändert hat.
+	 *
+	 * @return void
+	 */
+	public function maybe_upgrade(): void {
+		if ( get_option( self::OPTION_VERSION ) === RC_RCC_VERSION ) {
+			return;
+		}
+
+		$this->cache->flush_all();
+		update_option( self::OPTION_VERSION, RC_RCC_VERSION );
 	}
 
 	/**

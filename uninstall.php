@@ -24,6 +24,7 @@ $rc_rcc_options = array(
 	'rc_rcc_archive',
 	'rc_rcc_last_fetch',
 	'rc_rcc_data_stamp',
+	'rc_rcc_version',
 	'rc_rcc_cache_index',
 );
 

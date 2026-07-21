@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.45
+Stable tag: 1.0.46
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.46 =
+* Nach einem Update wird der Datencache einmal geleert – Änderungen an der Datenquelle greifen sofort statt erst nach Cache-Ablauf.
 
 = 1.0.45 =
 * „Stand" zeigt jetzt den Import-Zeitpunkt der Datenquelle statt der Abrufzeit des Plugins. Erscheint, sobald die Quelle ihn liefert.
