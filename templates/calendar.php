@@ -13,6 +13,7 @@
  * @var array<int, RC_RCC_Race[]>  $archive_groups Frühere Jahre → Rennen.
  * @var string                     $logo_url        URL des Logos.
  * @var string                     $plugin_url      Link zur Plugin-Seite.
+ * @var int                        $last_fetch      Unix-Zeit des letzten Abrufs (0 = nie).
  * @var string                     $accent_class    Optionale Akzent-Klasse.
  * @var string                     $accent_style    Optionaler Inline-Style (Akzentfarbe).
  *
@@ -80,6 +81,24 @@ defined( 'ABSPATH' ) || exit;
 	</div>
 
 	<div class="rc-rcc__footer">
+		<?php if ( $last_fetch > 0 ) : ?>
+			<span class="rc-rcc__updated">
+				<?php
+				printf(
+					/* translators: %s: Zeitpunkt des letzten Datenabrufs. */
+					esc_html__( 'Stand: %s', 'rc-racemap-club-calendar' ),
+					esc_html(
+						wp_date(
+							/* translators: PHP-Datumsformat für die „Stand:"-Anzeige – Uhrzeit und kurzes Datum. */
+							_x( 'H:i\\h, d.m.y', 'Zeitpunkt-Format der Stand-Anzeige', 'rc-racemap-club-calendar' ),
+							$last_fetch
+						)
+					)
+				);
+				?>
+			</span>
+		<?php endif; ?>
+
 		<span class="rc-rcc__credit">
 			<?php
 			printf(

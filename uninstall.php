@@ -22,6 +22,7 @@ $rc_rcc_options = array(
 	'rc_rcc_custom_races',
 	'rc_rcc_titles',
 	'rc_rcc_archive',
+	'rc_rcc_last_fetch',
 	'rc_rcc_cache_index',
 );
 

@@ -99,6 +99,9 @@ class RC_RCC_Api {
 
 		$this->cache->set( $cache_key, $raw, $cache_ttl );
 
+		// Zeitpunkt des frischen Abrufs merken – Grundlage der „Stand:"-Anzeige.
+		update_option( RC_RCC_Plugin::OPTION_LAST_FETCH, time(), false );
+
 		return $this->hydrate( $raw );
 	}
 

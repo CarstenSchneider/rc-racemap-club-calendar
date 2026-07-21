@@ -15,12 +15,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: includes/class-admin.php:99 includes/class-admin.php:100
-#: templates/calendar.php:92
+#: templates/calendar.php:111
 msgid "RC RaceMap"
 msgstr "RC RaceMap"
 
 #: includes/class-admin.php:110 includes/class-admin.php:111
-#: includes/class-admin.php:1153
+#: includes/class-admin.php:1189
 msgid "Einstellungen"
 msgstr "Settings"
 
@@ -160,40 +160,48 @@ msgstr "Nothing was imported – no entry had both a date and a label."
 msgid "Sichtbarkeit der Rennen gespeichert."
 msgstr "Race visibility saved."
 
-#: includes/class-admin.php:970 includes/class-admin.php:1078
+#: includes/class-admin.php:1006 includes/class-admin.php:1114
 #: includes/class-race.php:681
 msgid "Dokument"
 msgstr "Document"
 
-#: includes/class-admin.php:1136
+#: includes/class-admin.php:1172
 msgid "Dokument auswählen"
 msgstr "Select document"
 
-#: includes/class-admin.php:1137
+#: includes/class-admin.php:1173
 msgid "Dokument übernehmen"
 msgstr "Use this document"
 
-#: includes/class-api.php:147
+#: includes/class-api.php:150
 msgid "Keine Club-ID konfiguriert."
 msgstr "No club ID configured."
 
 #. translators: %d: HTTP-Statuscode.
-#: includes/class-api.php:172
+#: includes/class-api.php:175
 #, php-format
 msgid "Die RC-RaceMap-API hat mit HTTP-Status %d geantwortet."
 msgstr "The RC RaceMap API responded with HTTP status %d."
 
-#: includes/class-api.php:182
+#: includes/class-api.php:185
 msgid "Die RC-RaceMap-API hat ungültiges JSON zurückgegeben."
 msgstr "The RC RaceMap API returned invalid JSON."
 
-#: includes/class-api.php:286
+#: includes/class-api.php:289
 msgid "Die Datei mit Beispieldaten fehlt."
 msgstr "The sample data file is missing."
 
-#: includes/class-api.php:293
+#: includes/class-api.php:296
 msgid "Die Beispieldaten-Datei enthält kein gültiges JSON."
 msgstr "The sample data file does not contain valid JSON."
+
+#: includes/class-calendar.php:448 templates/race-item.php:67
+msgid "Ausschreibung"
+msgstr "Race announcement"
+
+#: includes/class-calendar.php:449 templates/race-item.php:70
+msgid "Reglement"
+msgstr "Rules"
 
 #. translators: 1: start date, 2: end date of a multi-day event.
 #: includes/class-race.php:353
@@ -383,14 +391,22 @@ msgid ""
 "Ergebnisse, Teilnehmer und Klassen – nur Von und Titel sind Pflicht. Datum "
 "als 26.07.2025 oder 2025-07-26, mehrere Klassen mit Komma trennen. So lässt "
 "sich die Liste in Excel oder Numbers zusammenstellen und hier einfügen."
-msgstr "A table is easiest: one header row, then one row per race. The columns From, To, Title, Announcement, Rules, Results, Participants and Classes are recognised – only From and Title are required. Dates as 26/07/2025 or 2025-07-26, separate multiple classes with commas. So you can put the list together in Excel or Numbers and paste it here."
+msgstr ""
+"A table is easiest: one header row, then one row per race. The columns From, "
+"To, Title, Announcement, Rules, Results, Participants and Classes are "
+"recognised – only From and Title are required. Dates as 26/07/2025 or "
+"2025-07-26, separate multiple classes with commas. So you can put the list "
+"together in Excel or Numbers and paste it here."
 
 #: includes/views/manage-races.php:254
 msgid ""
 "Alternativ versteht das Feld JSON – eine Liste von Rennen mit mindestens "
 "„from\" und „name\". Ein erneuter Import überschreibt bestehende Einträge, "
 "korrigiert also statt zu verdoppeln."
-msgstr "The field also accepts JSON – a list of races with at least \"from\" and \"name\". Importing again overwrites existing entries, so it corrects rather than duplicates."
+msgstr ""
+"The field also accepts JSON – a list of races with at least \"from\" and "
+"\"name\". Importing again overwrites existing entries, so it corrects rather "
+"than duplicates."
 
 #: includes/views/manage-races.php:258
 msgid ""
@@ -406,28 +422,40 @@ msgstr ""
 msgid "Ins Archiv übernehmen"
 msgstr "Add to archive"
 
-#: templates/calendar.php:25
+#: templates/calendar.php:26
 msgid "Rennkalender"
 msgstr "Race calendar"
 
-#: templates/calendar.php:35
+#: templates/calendar.php:36
 msgid "Aktuelle Rennen"
 msgstr "Upcoming races"
 
-#: templates/calendar.php:47
+#: templates/calendar.php:48
 msgid "Vergangene Rennen"
 msgstr "Past races"
 
-#: templates/calendar.php:61
+#: templates/calendar.php:62
 msgid "Aktuell sind keine Rennen vorhanden."
 msgstr "There are currently no races."
 
-#: templates/calendar.php:77
+#: templates/calendar.php:78
 msgid "Es sind noch keine vergangenen Rennen vorhanden."
 msgstr "There are no past races yet."
 
+#. translators: %s: Zeitpunkt des letzten Datenabrufs.
+#: templates/calendar.php:89
+#, php-format
+msgid "Stand: %s"
+msgstr "Updated: %s"
+
+#. translators: PHP-Datumsformat für die „Stand:"-Anzeige – Uhrzeit und kurzes Datum.
+#: templates/calendar.php:93
+msgctxt "Zeitpunkt-Format der Stand-Anzeige"
+msgid "H:i\\h, d.m.y"
+msgstr "H:i, d/m/y"
+
 #. translators: %s: „RC RaceMap" als Link zur Karte.
-#: templates/calendar.php:87
+#: templates/calendar.php:106
 #, php-format
 msgid "MyRCM und RCK Daten via %s WordPress PlugIn"
 msgstr "MyRCM and RCK data via the %s WordPress plugin"
@@ -449,14 +477,6 @@ msgstr "Register"
 #, php-format
 msgid "Nennung ab %s"
 msgstr "Registration from %s"
-
-#: templates/race-item.php:67
-msgid "Ausschreibung"
-msgstr "Race announcement"
-
-#: templates/race-item.php:70
-msgid "Reglement"
-msgstr "Rules"
 
 #. translators: %d: Anzahl der Teilnehmer.
 #: templates/race-item.php:106

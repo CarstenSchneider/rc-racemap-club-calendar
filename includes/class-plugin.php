@@ -89,6 +89,16 @@ final class RC_RCC_Plugin {
 	public const OPTION_ARCHIVE = 'rc_rcc_archive';
 
 	/**
+	 * Option holding the timestamp of the last successful API fetch.
+	 *
+	 * Unix time; die „Stand:"-Anzeige im Fußbereich liest sie. Zeigt an, wie
+	 * aktuell die dargestellten Daten sind – nicht wann die Quelle importiert
+	 * hat (das liefert die API nicht), sondern wann das Plugin sie zuletzt
+	 * frisch geholt hat.
+	 */
+	public const OPTION_LAST_FETCH = 'rc_rcc_last_fetch';
+
+	/**
 	 * Retrieve the singleton instance.
 	 *
 	 * @return RC_RCC_Plugin
