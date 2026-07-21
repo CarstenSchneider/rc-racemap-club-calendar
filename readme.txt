@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.47
+Stable tag: 1.0.48
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ Das Plugin bringt bewusst **kein eigenes Design** mit, sondern übernimmt Schrif
 = Funktionen =
 
 * Zwei Tabs: **Aktuelle Rennen** und **Vergangene Rennen** – Wechsel ohne Seitenreload, je Tab eine Jahres-Navigation
-* Pro Rennen: Datum, Titel, Rennklassen mit Nennzahl, Teilnehmerzahl, Dokumente, Aktion (Nennung / Ergebnisse / Zum Rennen)
+* Pro Rennen: Datum, Titel, Rennklassen mit Nennzahl, Teilnehmerzahl, Dokumente, Aktion (Nennung / Ergebnisse / „Nennung ab …")
 * Rennen im Backend ein-/ausblenden, umbenennen und mit eigenen PDFs versehen (gespeichert pro Event-ID)
 * Eigene Termine für Rennen, die in keiner Quelle stehen
 * Dauerhaftes Archiv: einmal angezeigte Rennen bleiben erhalten, auch wenn die Quelle sie nicht mehr führt
@@ -68,6 +68,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.48 =
+* „Ergebnisse" erscheint nur noch, wenn es eine echte Ergebnisseite gibt (MyRCM). Sonst kein Button – Ergebnisse stehen auf MyRCM oder als hochgeladenes PDF in der Dokumentspalte.
 
 = 1.0.47 =
 * Datum als Kalenderblatt (Tag groß, Monatsband in der Akzentfarbe, Jahr dezent); mehrtägige Rennen zeigen zwei Blätter.

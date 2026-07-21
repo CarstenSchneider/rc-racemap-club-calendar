@@ -34,9 +34,14 @@ $cta_note     = '';
 $cta_note_url = '';
 
 if ( $rc_is_past ) {
-	// Vorbei → Ergebnisse: bevorzugt die MyRCM-Ergebnisseite, sonst das Event.
-	$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
-	$cta_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
+	// Vorbei → „Ergebnisse" nur, wenn es eine echte Ergebnisseite gibt (MyRCM).
+	// Ohne die keinen Button: Ergebnisse sieht man auf MyRCM oder als vom Verein
+	// hochgeladenes PDF (Dokumentspalte) – ein Link auf die reine Event-Seite
+	// wäre irreführend.
+	if ( '' !== $race->results_url ) {
+		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+		$cta_url   = $race->results_url;
+	}
 } elseif ( $race->is_registration_open() ) {
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
 	$cta_url   = $event_url;
