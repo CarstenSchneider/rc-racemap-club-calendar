@@ -50,7 +50,9 @@ if ( $rc_is_past ) {
 	$cta_note     = sprintf(
 		/* translators: %s: Datum, ab dem die Nennung möglich ist. */
 		__( 'Nennung ab %s', 'rc-racemap-club-calendar' ),
-		wp_date( (string) get_option( 'date_format' ), $race->registration_opens )
+		// Kompaktes, lokalisiertes Datum („3 Aug 2026") – passt in die schmale
+		// Aktionsspalte auf eine Zeile, statt das lange Theme-Datumsformat.
+		wp_date( 'j M Y', $race->registration_opens )
 	);
 	$cta_note_url = $event_url;
 } else {

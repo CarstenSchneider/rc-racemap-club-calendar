@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.49
+Stable tag: 1.0.50
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,10 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.50 =
+* Nennung-Button etwas kompakter und mit gleichem Eckenradius wie das Kalenderblatt.
+* „Nennung ab …" nutzt ein kürzeres Datum (z. B. „3 Aug 2026") und bricht den Pfeil nicht mehr in eine eigene Zeile um.
 
 = 1.0.49 =
 * „Ergebnisse" führt wieder auf die richtige Seite: MyRCM hat die Ergebnis-URL im Redesign geändert (jetzt /report/<id>). Der alte Link landete auf einer Übersicht. Funktioniert mit alten wie neuen Datenständen.
