@@ -51,6 +51,13 @@ class RC_RCC_Api {
 	private array $last_rows = array();
 
 	/**
+	 * Data timestamp from the most recent successful API response (Unix, 0=none).
+	 *
+	 * @var int
+	 */
+	private int $last_data_stamp = 0;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param RC_RCC_Cache $cache Cache component.
@@ -99,8 +106,11 @@ class RC_RCC_Api {
 
 		$this->cache->set( $cache_key, $raw, $cache_ttl );
 
-		// Zeitpunkt des frischen Abrufs merken – Grundlage der „Stand:"-Anzeige.
-		update_option( RC_RCC_Plugin::OPTION_LAST_FETCH, time(), false );
+		// Daten-Stand der Quelle merken – Grundlage der „Stand:"-Anzeige. Nur
+		// wenn die API einen liefert; sonst bleibt der alte Wert (oder keiner).
+		if ( $this->last_data_stamp > 0 ) {
+			update_option( RC_RCC_Plugin::OPTION_DATA_STAMP, $this->last_data_stamp, false );
+		}
 
 		return $this->hydrate( $raw );
 	}
@@ -185,6 +195,8 @@ class RC_RCC_Api {
 			return new WP_Error( 'rc_rcc_bad_json', __( 'Die RC-RaceMap-API hat ungültiges JSON zurückgegeben.', 'rc-racemap-club-calendar' ) );
 		}
 
+		$this->last_data_stamp = $this->extract_data_stamp( $response, is_array( $data ) ? $data : array() );
+
 		return $this->extract_events( $data );
 	}
 
@@ -197,6 +209,43 @@ class RC_RCC_Api {
 	 * @param mixed $data Decoded JSON.
 	 * @return array<int, array<string, mixed>>
 	 */
+	/**
+	 * Den Daten-Stand aus der Antwort lesen.
+	 *
+	 * Zuerst das Body-Feld `generatedAt` (klarer Vertrag), sonst der
+	 * HTTP-`Last-Modified`-Header. Beides als Unix-Zeit; 0 wenn keiner da ist.
+	 *
+	 * @param array|WP_Error       $response wp_remote_get-Antwort.
+	 * @param array<string, mixed> $data     Dekodierter Body.
+	 * @return int
+	 */
+	private function extract_data_stamp( $response, array $data ): int {
+		$raw = '';
+
+		if ( isset( $data['generatedAt'] ) && is_string( $data['generatedAt'] ) ) {
+			$raw = $data['generatedAt'];
+		} else {
+			$raw = (string) wp_remote_retrieve_header( $response, 'last-modified' );
+		}
+
+		if ( '' === $raw ) {
+			return 0;
+		}
+
+		$ts = strtotime( $raw );
+
+		return ( false !== $ts ) ? $ts : 0;
+	}
+
+	/**
+	 * The data timestamp behind the most recent response.
+	 *
+	 * @return int
+	 */
+	public function last_data_stamp(): int {
+		return $this->last_data_stamp;
+	}
+
 	private function extract_events( $data ): array {
 		if ( is_array( $data ) && isset( $data['events'] ) && is_array( $data['events'] ) ) {
 			$data = $data['events'];

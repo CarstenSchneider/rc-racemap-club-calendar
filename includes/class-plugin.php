@@ -89,14 +89,15 @@ final class RC_RCC_Plugin {
 	public const OPTION_ARCHIVE = 'rc_rcc_archive';
 
 	/**
-	 * Option holding the timestamp of the last successful API fetch.
+	 * Option holding the source's data timestamp (Unix time).
 	 *
-	 * Unix time; die „Stand:"-Anzeige im Fußbereich liest sie. Zeigt an, wie
-	 * aktuell die dargestellten Daten sind – nicht wann die Quelle importiert
-	 * hat (das liefert die API nicht), sondern wann das Plugin sie zuletzt
-	 * frisch geholt hat.
+	 * Die „Stand:"-Anzeige liest sie. Es ist der **Daten-Stand** – wann die
+	 * Quelle zuletzt importiert hat, nicht wann das Plugin abgerufen hat. Kommt
+	 * aus dem API-Feld `generatedAt` oder dem `Last-Modified`-Header. Liefert
+	 * die API keinen, bleibt sie leer und die Anzeige entfällt (lieber nichts
+	 * als eine vorgetäuschte Frische).
 	 */
-	public const OPTION_LAST_FETCH = 'rc_rcc_last_fetch';
+	public const OPTION_DATA_STAMP = 'rc_rcc_data_stamp';
 
 	/**
 	 * Retrieve the singleton instance.

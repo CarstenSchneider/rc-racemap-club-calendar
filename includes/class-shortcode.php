@@ -157,7 +157,7 @@ class RC_RCC_Shortcode {
 		 * @param string $url Standard-Adresse der Plugin-Seite.
 		 */
 		$plugin_url      = (string) apply_filters( 'rc_rcc_plugin_page_url', 'https://rcracemap.com/#wordpress-plugin' );
-		$last_fetch      = (int) get_option( RC_RCC_Plugin::OPTION_LAST_FETCH, 0 );
+		$data_stamp      = (int) get_option( RC_RCC_Plugin::OPTION_DATA_STAMP, 0 );
 		$accent          = (string) sanitize_hex_color( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
 		$accent_class    = ( '' !== $accent ) ? ' rc-rcc--accent' : '';
 		$accent_style    = ( '' !== $accent ) ? '--rc-rcc-accent:' . $accent . ';' : '';
