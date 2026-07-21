@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.50
+Stable tag: 1.0.51
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.51 =
+* MyRCM-Links (Nennung, Ergebnisse) öffnen wieder in der Seitensprache. Nach dem MyRCM-Redesign steckt die Sprache im Pfad (/de/…, /en/…); der Kalender biegt sie jetzt korrekt auf die WordPress-Sprache um.
 
 = 1.0.50 =
 * Nennung-Button etwas kompakter und mit gleichem Eckenradius wie das Kalenderblatt.

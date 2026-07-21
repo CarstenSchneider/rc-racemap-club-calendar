@@ -703,8 +703,12 @@ class RC_RCC_Race {
 	}
 
 	/**
-	 * Set the `pLa` (language) parameter on a myrcm.ch URL. Non-MyRCM URLs are
-	 * returned unchanged.
+	 * Stellt eine myrcm.ch-URL auf die Seitensprache um. Nicht-MyRCM-URLs bleiben
+	 * unverändert.
+	 *
+	 * MyRCM v9 trägt die Sprache im Pfad-Präfix (/en/live/…, /de/report/…). Ältere
+	 * Links nutzten den `pLa`-Query. Beide Fälle werden abgedeckt: erst das
+	 * Präfix umbiegen, sonst den Query.
 	 *
 	 * @param string $url  URL.
 	 * @param string $lang Two-letter language code.
@@ -715,6 +719,20 @@ class RC_RCC_Race {
 			return $url;
 		}
 
+		// v9: Sprach-Präfix im Pfad auf die Seitensprache umschreiben.
+		$count = 0;
+		$url   = (string) preg_replace(
+			'#(//www\.myrcm\.ch)/(?:de|en|fr|it|nl|es|cs|pl)(/|$)#i',
+			'${1}/' . $lang . '${2}',
+			$url,
+			1,
+			$count
+		);
+		if ( $count > 0 ) {
+			return $url;
+		}
+
+		// Legacy: pLa-Query setzen/ersetzen.
 		if ( preg_match( '/[?&]pLa=/', $url ) ) {
 			return (string) preg_replace( '/([?&]pLa=)[^&]*/', '${1}' . $lang, $url );
 		}
