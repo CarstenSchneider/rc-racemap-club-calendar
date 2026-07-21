@@ -160,7 +160,21 @@ class RC_RCC_Shortcode {
 		$data_stamp      = (int) get_option( RC_RCC_Plugin::OPTION_DATA_STAMP, 0 );
 		$accent          = (string) sanitize_hex_color( (string) RC_RCC_Plugin::get_setting( 'accent_color', '' ) );
 		$accent_class    = ( '' !== $accent ) ? ' rc-rcc--accent' : '';
-		$accent_style    = ( '' !== $accent ) ? '--rc-rcc-accent:' . $accent . ';' : '';
+		$accent_style    = '';
+		if ( '' !== $accent ) {
+			// Kontrast-Tinte für gefüllte Flächen (Nennung-Button-Label,
+			// Monatsband des Kalenderblatts): bei heller Akzentfarbe dunkle
+			// Schrift, sonst weiß – sonst wird Weiß auf hellem Akzent unlesbar.
+			$hex = ltrim( $accent, '#' );
+			if ( 3 === strlen( $hex ) ) {
+				$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+			}
+			$lum = ( 0.299 * hexdec( substr( $hex, 0, 2 ) )
+				+ 0.587 * hexdec( substr( $hex, 2, 2 ) )
+				+ 0.114 * hexdec( substr( $hex, 4, 2 ) ) ) / 255;
+			$ink          = ( $lum > 0.62 ) ? '#111111' : '#ffffff';
+			$accent_style = '--rc-rcc-accent:' . $accent . ';--rc-rcc-accent-ink:' . $ink . ';';
+		}
 
 		ob_start();
 		require RC_RCC_PATH . 'templates/calendar.php';

@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.46
+Stable tag: 1.0.47
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,12 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.47 =
+* Datum als Kalenderblatt (Tag groß, Monatsband in der Akzentfarbe, Jahr dezent); mehrtägige Rennen zeigen zwei Blätter.
+* „Nennung ab <Datum>" ist jetzt ein Link zur MyRCM-Nennseite (unterstrichen, mit Pfeil, in der Linkfarbe).
+* Aktion je Rennen klarer: nur noch Nennung, Ergebnisse oder „Nennung ab …" – kein „Zum Rennen" mehr.
+* Gefüllter Nennung-Button und Monatsband nutzen bei heller Akzentfarbe automatisch dunkle Schrift (bessere Lesbarkeit).
 
 = 1.0.46 =
 * Nach einem Update wird der Datencache einmal geleert – Änderungen an der Datenquelle greifen sofort statt erst nach Cache-Ablauf.

@@ -26,38 +26,32 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 $rc_is_past = ! $race->is_upcoming();
 $event_url  = $race->links['registration'] ?? '';
 
-// Spalte 5 bestimmen: Button-Link oder Hinweistext.
-$cta_url   = '';
-$cta_label = '';
-$cta_note  = '';
+// Spalte 5 bestimmen: es gibt nur drei Zustände – Ergebnisse (vorbei),
+// Nennung (Button) oder „Nennung ab …" (verlinkter Hinweis). Kein „Zum Rennen".
+$cta_url      = '';
+$cta_label    = '';
+$cta_note     = '';
+$cta_note_url = '';
 
 if ( $rc_is_past ) {
-	if ( '' !== $race->results_url ) {
-		// Gilt auch für zusammengeführte Events: der Event-Link zeigt auf RCK,
-		// die Ergebnisse liegen auf MyRCM.
-		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
-		$cta_url   = $race->results_url;
-	} elseif ( $race->is_rck() || $race->is_custom() ) {
-		// Reine RCK-Rennen und eigene Termine haben keine Ergebnisseite – dann
-		// auf das Event. Ergebnisse kann der Verein als Dokument hinterlegen.
-		$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
-		$cta_url   = $event_url;
-	} else {
-		$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
-		$cta_url   = $event_url;
-	}
+	// Vorbei → Ergebnisse: bevorzugt die MyRCM-Ergebnisseite, sonst das Event.
+	$cta_label = __( 'Ergebnisse', 'rc-racemap-club-calendar' );
+	$cta_url   = ( '' !== $race->results_url ) ? $race->results_url : $event_url;
 } elseif ( $race->is_registration_open() ) {
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
 	$cta_url   = $event_url;
 } elseif ( null !== $race->registration_opens && $race->registration_opens > time() ) {
-	// Nennung startet erst später → Hinweistext statt Button.
-	$cta_note = sprintf(
+	// Nennung startet erst später → verlinkter Hinweis auf MyRCM.
+	$cta_note     = sprintf(
 		/* translators: %s: Datum, ab dem die Nennung möglich ist. */
 		__( 'Nennung ab %s', 'rc-racemap-club-calendar' ),
 		wp_date( (string) get_option( 'date_format' ), $race->registration_opens )
 	);
+	$cta_note_url = $event_url;
 } else {
-	$cta_label = __( 'Zum Rennen', 'rc-racemap-club-calendar' );
+	// Kommend, aber (noch) nicht als „offen" gemeldet (z. B. nur nach Login) →
+	// trotzdem zur Nennung führen.
+	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
 	$cta_url   = $event_url;
 }
 
@@ -81,7 +75,21 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 <li class="rc-rcc__item rc-rcc__item--<?php echo $rc_is_past ? 'past' : 'upcoming'; ?>">
 	<div class="rc-rcc__cell rc-rcc__date">
 		<?php if ( null !== $race->timestamp ) : ?>
-			<time datetime="<?php echo esc_attr( wp_date( 'Y-m-d', $race->timestamp ) ); ?>" title="<?php echo esc_attr( $race->formatted_date() ); ?>"><?php echo esc_html( $race->date_compact() ); ?></time>
+			<?php
+			$rc_sheets = array( $race->timestamp );
+			if ( $race->is_multi_day() && null !== $race->timestamp_to ) {
+				$rc_sheets[] = $race->timestamp_to;
+			}
+			?>
+			<span class="rc-rcc__sheets" title="<?php echo esc_attr( $race->formatted_date() ); ?>">
+				<?php foreach ( $rc_sheets as $rc_ts ) : ?>
+					<time class="rc-rcc__sheet" datetime="<?php echo esc_attr( wp_date( 'Y-m-d', $rc_ts ) ); ?>">
+						<span class="rc-rcc__sheet-day"><?php echo esc_html( wp_date( 'd', $rc_ts ) ); ?></span>
+						<span class="rc-rcc__sheet-month"><?php echo esc_html( wp_date( 'M', $rc_ts ) ); ?></span>
+						<span class="rc-rcc__sheet-year"><?php echo esc_html( wp_date( 'Y', $rc_ts ) ); ?></span>
+					</time>
+				<?php endforeach; ?>
+			</span>
 		<?php else : ?>
 			<?php echo esc_html( $race->date_compact() ); ?>
 		<?php endif; ?>
@@ -128,7 +136,11 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 	<?php if ( '' !== $cta_note || '' !== $cta_url ) : ?>
 		<div class="rc-rcc__cell rc-rcc__action">
 			<?php if ( '' !== $cta_note ) : ?>
-				<span class="rc-rcc__cta-note"><?php echo esc_html( $cta_note ); ?></span>
+				<?php if ( '' !== $cta_note_url ) : ?>
+					<a class="rc-rcc__cta-note" href="<?php echo esc_url( $cta_note_url ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__cta-note-label"><?php echo esc_html( $cta_note ); ?></span><?php echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?></a>
+				<?php else : ?>
+					<span class="rc-rcc__cta-note"><span class="rc-rcc__cta-note-label"><?php echo esc_html( $cta_note ); ?></span></span>
+				<?php endif; ?>
 			<?php else : ?>
 				<a class="rc-rcc__cta" href="<?php echo esc_url( $cta_url ); ?>" rel="noopener noreferrer" target="_blank"><span class="rc-rcc__cta-label"><?php echo esc_html( $cta_label ); ?></span></a>
 			<?php endif; ?>

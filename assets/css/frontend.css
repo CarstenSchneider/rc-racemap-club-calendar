@@ -183,6 +183,48 @@
 	text-decoration: none;
 }
 
+/* Kalenderblatt: Tag groß, Monatsband in Akzentfarbe, Jahr dezent. Ein Blatt
+   pro Datum – zwei nebeneinander bei mehrtägigen Rennen. Alles em-basiert,
+   damit es die Theme-Schriftgröße mitnimmt. */
+.rc-rcc .rc-rcc__sheets {
+	display: inline-flex;
+	gap: 0.3em;
+	white-space: nowrap;
+}
+.rc-rcc .rc-rcc__sheet {
+	display: block;
+	border: 1px solid var(--rc-rcc-line);
+	border-radius: 6px;
+	overflow: hidden;
+	text-align: center;
+	min-width: 2.9em;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+	text-decoration: none;
+}
+.rc-rcc .rc-rcc__sheet-day {
+	display: block;
+	font-size: 1.15em;
+	font-weight: 700;
+	color: var(--rc-rcc-accent, var(--rc-rcc-text));
+	padding: 0.15em 0.3em 0.1em;
+}
+.rc-rcc .rc-rcc__sheet-month {
+	display: block;
+	background: var(--rc-rcc-accent, var(--rc-rcc-text));
+	color: var(--rc-rcc-accent-ink, #ffffff);
+	font-size: 0.7em;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	padding: 0.25em 0;
+}
+.rc-rcc .rc-rcc__sheet-year {
+	display: block;
+	font-size: 0.7em;
+	color: var(--rc-rcc-muted);
+	padding: 0.15em 0;
+}
+
 /* 2 – Rennen + Klassen */
 .rc-rcc .rc-rcc__race {
 	min-width: 0;
@@ -307,7 +349,11 @@
 	display: inline-block;
 	font-size: 0.875em;
 	font-weight: 600;
-	color: var(--rc-rcc-muted);
+	text-decoration: none;
+}
+.rc-rcc .rc-rcc__cta-note-label {
+	text-decoration: underline;
+	text-underline-offset: 3px;
 }
 
 /* --- Vergangene Rennen: alles 30 %, nur der Button bleibt voll ----------- */
@@ -336,7 +382,7 @@
 		   „Ausschreibung TEC", Hinweis „Nennung ab 30. September 2026".
 		   Die Aktionsspalte ist die engste – der Hinweistext füllt sie aus.
 		   Was hier gespart wird, kommt den Klassen-Pillen zugute. */
-		grid-template-columns: 8em minmax( 0, 1fr ) 4.5em 10em 12.5em;
+		grid-template-columns: 9.5em minmax( 0, 1fr ) 4.5em 10em 12.5em;
 		grid-template-areas: "date race ppl docs action";
 		align-items: start;
 		column-gap: 20px;
@@ -412,7 +458,8 @@
 
 .rc-rcc--accent .rc-rcc__ppl-link:not(.rc-rcc__ppl-link--static),
 .rc-rcc--accent .rc-rcc__doc,
-.rc-rcc--accent .rc-rcc__cta {
+.rc-rcc--accent .rc-rcc__cta,
+.rc-rcc--accent a.rc-rcc__cta-note {
 	color: var(--rc-rcc-accent);
 }
 
@@ -421,8 +468,14 @@
 .rc-rcc a.rc-rcc__doc:hover,
 .rc-rcc a.rc-rcc__doc:focus-visible,
 .rc-rcc a.rc-rcc__ppl-link:hover,
-.rc-rcc a.rc-rcc__ppl-link:focus-visible {
+.rc-rcc a.rc-rcc__ppl-link:focus-visible,
+.rc-rcc a.rc-rcc__cta-note:hover,
+.rc-rcc a.rc-rcc__cta-note:focus-visible {
 	filter: brightness( 0.8 );
+}
+.rc-rcc a.rc-rcc__cta-note:hover .rc-rcc__cta-note-label,
+.rc-rcc a.rc-rcc__cta-note:focus-visible .rc-rcc__cta-note-label {
+	text-decoration-thickness: 2px;
 }
 
 .rc-rcc a.rc-rcc__doc:hover .rc-rcc__doc-label,
