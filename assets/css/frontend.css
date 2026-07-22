@@ -285,15 +285,26 @@
 	padding: 0 0.75em;
 	color: inherit;
 	text-decoration: none;
+	transition: background-color 0.12s ease, color 0.12s ease;
 }
+/* Hover: Pille invertieren — deutlicheres Klick-Signal als ein Underline. */
 .rc-rcc a.rc-rcc__class-link:hover,
 .rc-rcc a.rc-rcc__class-link:focus-visible {
-	color: var(--rc-rcc-text);
+	background: var(--rc-rcc-text);
+	color: var(--rc-rcc-tag-bg);
+}
+.rc-rcc .rc-rcc__class--link:hover {
+	border-color: var(--rc-rcc-text);
 }
 .rc-rcc .rc-rcc__class-link .rc-rcc__icon {
 	width: 0.85em;
 	height: 0.85em;
-	opacity: 0.6;
+	color: inherit;
+}
+/* Nicht verlinkte Pillen (DMC/RCK ohne Teilnehmer-URL oder 0 Nennungen):
+   gedämpft, damit die klickbaren sich abheben. */
+.rc-rcc .rc-rcc__class--plain {
+	opacity: 0.62;
 }
 
 /* 3 – Teilnehmer (Link → Theme-Linkfarbe, keine eigene Farbe) */

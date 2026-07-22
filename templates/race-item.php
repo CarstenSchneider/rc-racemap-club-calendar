@@ -113,12 +113,16 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 						if ( null !== $class['entries'] ) {
 							$rc_class_inner .= ' <span class="rc-rcc__class-entries">(' . esc_html( (string) $class['entries'] ) . ')</span>';
 						}
-						$rc_class_url = ! empty( $class['participantsUrl'] ) ? (string) $class['participantsUrl'] : '';
+						// Link nur mit Teilnehmer-URL UND Nennungen (>0). Die v9-
+						// Teilnehmerliste ist bei 0 Nennungen leer; DMC/RCK liefern
+						// keine URL → dann gedämpfte, nicht klickbare Pille.
+						$rc_has_entries = null !== $class['entries'] && (int) $class['entries'] > 0;
+						$rc_class_url = ( ! empty( $class['participantsUrl'] ) && $rc_has_entries ) ? (string) $class['participantsUrl'] : '';
 						if ( '' !== $rc_class_url ) :
 						?>
 						<li class="rc-rcc__class rc-rcc__class--link"><a class="rc-rcc__class-link" href="<?php echo esc_url( $rc_class_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php echo esc_attr__( 'Teilnehmer dieser Klasse', 'rc-racemap-club-calendar' ); ?>"><?php echo $rc_class_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte + konstantes Inline-SVG. ?></a></li>
 						<?php else : ?>
-						<li class="rc-rcc__class"><?php echo $rc_class_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte. ?></li>
+						<li class="rc-rcc__class rc-rcc__class--plain"><?php echo $rc_class_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte. ?></li>
 						<?php endif; ?>
 				<?php endforeach; ?>
 			</ul>
