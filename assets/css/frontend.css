@@ -276,6 +276,10 @@
    Der Link füllt die Pille aus; Pfeil signalisiert die Klickbarkeit. */
 .rc-rcc.rc-rcc .rc-rcc__class--link {
 	padding: 0;
+	/* Der innere <a> bekommt beim Hover einen dunklen Hintergrund. Ohne Clip
+	   ragt dessen rechteckige Ecke über den runden Pillenrand (verdeckt ihn).
+	   overflow:hidden beschneidet den Hover-BG exakt auf die Pillenform. */
+	overflow: hidden;
 }
 .rc-rcc .rc-rcc__class-link,
 .rc-rcc a.rc-rcc__class-link:hover,
@@ -298,6 +302,8 @@
 	gap: 0.35em;
 	height: 100%;
 	padding: 0 0.75em;
+	/* Radius der Pille erben, damit der Hover-Hintergrund rund ist. */
+	border-radius: inherit;
 	transition: background-color 0.12s ease, color 0.12s ease;
 }
 /* Hover: Pille invertieren — deutlicheres Klick-Signal als ein Underline. */

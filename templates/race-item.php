@@ -113,24 +113,15 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 						if ( null !== $class['entries'] ) {
 							$rc_class_inner .= ' <span class="rc-rcc__class-entries">(' . esc_html( (string) $class['entries'] ) . ')</span>';
 						}
-						// Link nur mit Nennungen (>0): bei 0 Nennungen ist die
-						// MyRCM-Teilnehmerliste leer. Zwei Linkquellen:
-						//   1. per-Klasse-URL (v9-Live-Import) → exakte Klassenliste.
-						//   2. Archiv-Import (Vergangenheit) hat keine per-Klasse-URL,
-						//      aber die Event-Report-Seite /report/<id> (aus der MyRCM-
-						//      Event-URL abgeleitet, = $race->results_url) zeigt die
-						//      Teilnehmer je Klasse über ein Dropdown.
-						// DMC/RCK-Events (keine MyRCM-Event-ID) → gar keine URL →
-						// gedämpfte, nicht klickbare Pille.
+						// Link nur mit per-Klasse-Teilnehmer-URL UND Nennungen (>0).
+						// Die URL zeigt exakt auf die Teilnehmerliste DIESER Klasse
+						// (/report/<eventId>/<classId>). Ein Event-Level-Fallback
+						// (/report/<eventId> ohne classId) wäre irreführend – die
+						// Report-Seite öffnet dann mit einer Default-Klasse, nicht der
+						// angeklickten. Fehlt die per-Klasse-URL (Archiv-Import, DMC,
+						// RCK) → gedämpfte, nicht klickbare Pille (Zahl bleibt sichtbar).
 						$rc_has_entries = null !== $class['entries'] && (int) $class['entries'] > 0;
-						$rc_class_url   = '';
-						if ( $rc_has_entries ) {
-							if ( ! empty( $class['participantsUrl'] ) ) {
-								$rc_class_url = (string) $class['participantsUrl'];
-							} elseif ( '' !== $race->results_url ) {
-								$rc_class_url = $race->results_url;
-							}
-						}
+						$rc_class_url   = ( $rc_has_entries && ! empty( $class['participantsUrl'] ) ) ? (string) $class['participantsUrl'] : '';
 						if ( '' !== $rc_class_url ) :
 						?>
 						<li class="rc-rcc__class rc-rcc__class--link"><a class="rc-rcc__class-link" href="<?php echo esc_url( $rc_class_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php echo esc_attr__( 'Teilnehmer dieser Klasse', 'rc-racemap-club-calendar' ); ?>"><?php echo $rc_class_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte + konstantes Inline-SVG. ?></a></li>
