@@ -96,6 +96,65 @@ mit ausgeliefert — `class-api.php` lädt es als Rückfallebene.
 
 ---
 
+## Auto-Archiv & Teilnehmer-Links (Klassen-Pillen)
+
+**Auto-Archiv:** `RC_RCC_Calendar::archive_rows()` schreibt bei jedem
+erfolgreichen API-Abruf **jede gelieferte Zeile** nach `rc_rcc_archive`, keyed
+nach der **API-`id`** (`<clubSlug>-<from>-myrcm-event-<eventId>` bzw.
+`…-rck-…` / `dmc-…`). `archived_races()` rendert daraus alles, was die aktuelle
+API-Antwort nicht mehr enthält (Fenster ~6 Wochen). **Es gibt keine Dedup nach
+Titel/Datum** — nur die id entscheidet. Ein Datei-Import mit abweichender id
+überschreibt einen auto-archivierten Datensatz daher **nicht**, sondern legt
+einen Parallel-Datensatz an (beide werden gerendert).
+
+**Klassen-Pillen sind klickbar**, wenn die Klasse eine per-Klasse
+`participantsUrl` trägt (`…/report/<eventId>/<classId>?reportKey=100&reportType=participants`)
+UND `entries > 0`. Die API liefert sie seit **2026-07-21**. Problem: die API
+lieferte bis **2026-07-10** die MyRCM-**Vollhistorie**, d. h. alle Alt-Events
+wurden bereits **ohne** `participantsUrl` auto-archiviert → ihre Pillen sind
+stumm. Ein Datei-Import konnte das wegen des id-Konflikts nicht heilen.
+
+**Lösung — Admin-Button „Teilnehmer-Links nachtragen"** (v1.0.61+,
+*Rennen verwalten*, `handle_enrich_participants`): geht `rc_rcc_archive` durch,
+zieht je Event die **eventId** (aus id `myrcm-event-<n>` oder aus `url`
+`dId[E]=`/`/report/`/`/live/`), holt das **KLASSE-`<option value>`-Dropdown** von
+`myrcm.ch/de/report/<eventId>` (`fetch_myrcm_classmap`, Transient
+`rc_rcc_cmap_<eid>`), matcht Klassennamen (normalisiert + Levenshtein ≤2) und
+schreibt `participantsUrl` **in place** in `rc_rcc_archive` (id bleibt, kein
+Import). Einmalig pro Vereins-WP; neue Events kommen ohnehin schon verlinkt.
+**v1.0.63:** Fallback über `fetch_myrcm_org_datemap` — eventId per `from`-Datum
+aus `/de/organizers/<clubId>` (für Datensätze, deren `url` ein Ergebnis-PDF ist
+und deren id kein `myrcm-event-<n>` trägt).
+
+**Bekannte, offen gelassene Grenze (auf Wunsch hier gestoppt, 2026-07-23):**
+Ein Event bleibt stumm, wenn **alle drei** zutreffen: (1) gespeicherte id ohne
+`myrcm-event-<n>` (Alt-`archive-…`-Form), (2) `url` ist ein Ergebnis-PDF statt
+der MyRCM-URL, (3) Event ist **älter als ~12 Monate** → nicht mehr im
+Organizer-Fenster. Dann ist die eventId automatisch **nicht** ableitbar.
+Belegtes Beispiel: TSV Mariendorf, „TEC – Tamiya Euro Cup" 05.07.2025
+(eventId 88293). **Reine RCK-Events** (`rck-kleinserie`/`rck-challenge`) haben
+gar keine Klassen/Teilnehmerliste auf MyRCM → korrekt stumm, kein Bug.
+
+Möglicher Weg für die Restfälle (nicht umgesetzt): Datei-Import der
+angereicherten Archiv-JSON. Skripte dafür liegen im **Map-Repo**
+(`scripts/enrich-archive-participants.js` = participantsUrl je Klasse via Report-
+Dropdown; `scripts/fix-archive-ids.js` = ids aufs Auto-Archiv-Schema
+`<slug>-<from>-myrcm-event-<eid>` + `remove`-Liste für Alt-Waisen). **Aber:** die
+Datei-Importe dieses Vereins blieben in dieser Sitzung wirkungslos, obwohl der
+Import-Code (per CLI-Stub) korrekt speichert und der Button-POST funktioniert —
+**Verdacht: eine WAF/Security-Schicht blockt den großen Multi-URL-POST des
+Textarea-Imports still**, während der winzige Button-POST durchgeht. Nicht
+verifiziert.
+
+**Diagnose-Technik (falls wieder „Import wirkt nicht"):** sichtbaren
+Versions-Marker + HTML-Kommentar mit `participantsUrl`-Zählung ins Rendering
+bauen (`templates/calendar.php`), Seite per `curl` mit Cache-Buster holen und den
+Kommentar lesen → trennt Code-/Cache-Problem (läuft neuer Code?) von
+Daten-Problem (steht die URL wirklich gespeichert?). In v1.0.62 wieder entfernt;
+die Version bleibt als `data-rc-rcc-version` am `.rc-rcc`-Wrapper.
+
+---
+
 ## Entscheidungen und ihre Gründe
 
 **Kein eigenes Design.** Schriftart *und* Schriftgrößen kommen vom Theme
@@ -253,5 +312,9 @@ Listenelement. Hat in dieser Sitzung zweimal Dateien zerschnitten.
   perspektivisch `tier`/`ads` je Verein liefern.
 - Teilnehmerzahlen fehlen bei reinen RCK-Rennen — die Nennung läuft über RCK,
   MyRCM führt keine Liste, RCK hält keine Historie vor.
+- **Archiv-Teilnehmer-Links Restfälle** (>12 Mon. + PDF-`url` + id ohne
+  `myrcm-event-<n>`) bleiben stumm — siehe „Auto-Archiv & Teilnehmer-Links".
+  Bewusst offen gelassen (2026-07-23). Kandidaten: Datei-Import robuster machen
+  bzw. WAF-Verdacht beim Textarea-Import prüfen.
 - Ideen, nicht beauftragt: iCal-Export, Serien-Filter, Gutenberg-Block, volle
   Adresse (sobald die API ein Feld dafür hat).
