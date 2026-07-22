@@ -601,8 +601,11 @@ class RC_RCC_Admin {
 					);
 				}
 
-				// Klassen: Strings oder {name, entries} – die Nennzahl je Klasse
-				// bleibt erhalten, damit die Pillen sie wie sonst auch zeigen.
+				// Klassen: Strings oder {name, entries, participantsUrl} – die
+				// Nennzahl je Klasse bleibt erhalten (Pillen zeigen sie), ebenso
+				// die per-Klasse-Teilnehmer-URL (macht die Pille klickbar). Ohne
+				// das Durchreichen von participantsUrl wären angereicherte
+				// Archiv-Importe zwar mit Zahlen, aber ohne Links.
 				$classes = array();
 				foreach ( (array) ( $row['classes'] ?? array() ) as $class ) {
 					if ( is_array( $class ) ) {
@@ -612,12 +615,23 @@ class RC_RCC_Admin {
 							continue;
 						}
 
-						$classes[] = isset( $class['entries'] ) && is_numeric( $class['entries'] )
-							? array(
-								'name'    => $name,
-								'entries' => absint( $class['entries'] ),
-							)
-							: $name;
+						$has_entries = isset( $class['entries'] ) && is_numeric( $class['entries'] );
+						$purl        = isset( $class['participantsUrl'] )
+							? esc_url_raw( trim( (string) $class['participantsUrl'] ) )
+							: '';
+
+						if ( $has_entries || '' !== $purl ) {
+							$entry = array( 'name' => $name );
+							if ( $has_entries ) {
+								$entry['entries'] = absint( $class['entries'] );
+							}
+							if ( '' !== $purl ) {
+								$entry['participantsUrl'] = $purl;
+							}
+							$classes[] = $entry;
+						} else {
+							$classes[] = $name;
+						}
 						continue;
 					}
 
