@@ -260,6 +260,27 @@ class RC_RCC_Race {
 			$race->results_url = self::derive_results_url( $race->links['participants'] ?? '', $race->organizer, $lang );
 		}
 
+		// v9: Die Teilnehmer-/Nennliste lag früher auf der bkg-Route
+		// (hId[1]=bkg&dId[E]=…). Die ist im Redesign tot und leitet auf die
+		// generische /de/live-Übersicht um. Die Nennliste steht jetzt auf der
+		// Report-Seite (/report/<eventId>) – dieselbe Event-ID wie die
+		// Ergebnisse. Aus der alten URL bzw. der Event-ID neu aufbauen.
+		if ( ! empty( $race->links['participants'] ) ) {
+			$participants_report = self::derive_results_url( $race->links['participants'], $race->organizer, $lang );
+
+			if ( '' === $participants_report && preg_match( '/myrcm-event-(\d+)/i', $race->id, $m ) ) {
+				$participants_report = self::myrcm_results_url( $m[1], $race->organizer, $lang );
+			}
+
+			if ( '' === $participants_report ) {
+				$participants_report = self::derive_results_url( $race->links['registration'] ?? '', $race->organizer, $lang );
+			}
+
+			if ( '' !== $participants_report ) {
+				$race->links['participants'] = $participants_report;
+			}
+		}
+
 		return $race;
 	}
 
