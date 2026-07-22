@@ -107,6 +107,7 @@ defined( 'ABSPATH' ) || exit;
 				'<a class="rc-rcc__credit-link" href="' . esc_url( $plugin_url ) . '" rel="noopener noreferrer" target="_blank">RC RaceMap</a>'
 			); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Vorlage escaped, Link separat escaped.
 			?>
+			<span class="rc-rcc__version"> · v<?php echo esc_html( RC_RCC_VERSION ); ?></span>
 		</span>
 		<a href="<?php echo esc_url( $plugin_url ); ?>" class="rc-rcc__brand" rel="noopener noreferrer" target="_blank" aria-label="<?php echo esc_attr__( 'RC RaceMap', 'rc-racemap-club-calendar' ); ?>">
 			<?php echo RC_RCC_Shortcode::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
