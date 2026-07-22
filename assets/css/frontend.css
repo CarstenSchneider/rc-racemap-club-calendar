@@ -277,14 +277,27 @@
 .rc-rcc.rc-rcc .rc-rcc__class--link {
 	padding: 0;
 }
+.rc-rcc .rc-rcc__class-link,
+.rc-rcc a.rc-rcc__class-link:hover,
+.rc-rcc a.rc-rcc__class-link:focus-visible,
+.rc-rcc a.rc-rcc__class-link:visited {
+	/* !important, weil manche Vereins-Themes bei a:hover einen Underline
+	   erzwingen — die Pille signalisiert die Klickbarkeit per Invert, nicht
+	   per Unterstreichung. */
+	text-decoration: none !important;
+}
+.rc-rcc .rc-rcc__class-link,
+.rc-rcc a.rc-rcc__class-link:visited {
+	/* :visited mitfassen, damit eine geklickte Pille NICHT die (oft violette)
+	   Theme-Besuchtfarbe annimmt, sondern die normale Pillenfarbe behält. */
+	color: inherit;
+}
 .rc-rcc .rc-rcc__class-link {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.35em;
 	height: 100%;
 	padding: 0 0.75em;
-	color: inherit;
-	text-decoration: none;
 	transition: background-color 0.12s ease, color 0.12s ease;
 }
 /* Hover: Pille invertieren — deutlicheres Klick-Signal als ein Underline. */
@@ -302,9 +315,11 @@
 	color: inherit;
 }
 /* Nicht verlinkte Pillen (DMC/RCK ohne Teilnehmer-URL oder 0 Nennungen):
-   gedämpft, damit die klickbaren sich abheben. */
+   dezent zurückgenommen, aber klar lesbar. Kein starkes opacity-Dimmen mehr —
+   das machte grau-auf-grau unleserlich. Der Unterschied zu den klickbaren
+   Pillen liegt ohnehin im Pfeil ↗ und dem Hover-Invert. */
 .rc-rcc .rc-rcc__class--plain {
-	opacity: 0.62;
+	opacity: 0.85;
 }
 
 /* 3 – Teilnehmer (Link → Theme-Linkfarbe, keine eigene Farbe) */

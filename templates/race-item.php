@@ -113,11 +113,24 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 						if ( null !== $class['entries'] ) {
 							$rc_class_inner .= ' <span class="rc-rcc__class-entries">(' . esc_html( (string) $class['entries'] ) . ')</span>';
 						}
-						// Link nur mit Teilnehmer-URL UND Nennungen (>0). Die v9-
-						// Teilnehmerliste ist bei 0 Nennungen leer; DMC/RCK liefern
-						// keine URL → dann gedämpfte, nicht klickbare Pille.
+						// Link nur mit Nennungen (>0): bei 0 Nennungen ist die
+						// MyRCM-Teilnehmerliste leer. Zwei Linkquellen:
+						//   1. per-Klasse-URL (v9-Live-Import) → exakte Klassenliste.
+						//   2. Archiv-Import (Vergangenheit) hat keine per-Klasse-URL,
+						//      aber die Event-Report-Seite /report/<id> (aus der MyRCM-
+						//      Event-URL abgeleitet, = $race->results_url) zeigt die
+						//      Teilnehmer je Klasse über ein Dropdown.
+						// DMC/RCK-Events (keine MyRCM-Event-ID) → gar keine URL →
+						// gedämpfte, nicht klickbare Pille.
 						$rc_has_entries = null !== $class['entries'] && (int) $class['entries'] > 0;
-						$rc_class_url = ( ! empty( $class['participantsUrl'] ) && $rc_has_entries ) ? (string) $class['participantsUrl'] : '';
+						$rc_class_url   = '';
+						if ( $rc_has_entries ) {
+							if ( ! empty( $class['participantsUrl'] ) ) {
+								$rc_class_url = (string) $class['participantsUrl'];
+							} elseif ( '' !== $race->results_url ) {
+								$rc_class_url = $race->results_url;
+							}
+						}
 						if ( '' !== $rc_class_url ) :
 						?>
 						<li class="rc-rcc__class rc-rcc__class--link"><a class="rc-rcc__class-link" href="<?php echo esc_url( $rc_class_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php echo esc_attr__( 'Teilnehmer dieser Klasse', 'rc-racemap-club-calendar' ); ?>"><?php echo $rc_class_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte + konstantes Inline-SVG. ?></a></li>
