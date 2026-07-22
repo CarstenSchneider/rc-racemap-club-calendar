@@ -21,41 +21,8 @@
  */
 
 defined( 'ABSPATH' ) || exit;
-
-// --- Temporäre Diagnose (rcc-diag): zeigt, was tatsächlich in den gerenderten
-// Rennen an per-Klasse-Teilnehmer-URLs steckt. Als HTML-Kommentar, damit für
-// Besucher unsichtbar. Wird nach der Fehlersuche wieder entfernt.
-$rc_diag_total = 0;
-$rc_diag_purl  = 0;
-$rc_diag_e94105 = 'nicht gefunden';
-foreach ( array( $current_groups, $archive_groups ) as $rc_diag_grp ) {
-	foreach ( $rc_diag_grp as $rc_diag_races ) {
-		foreach ( $rc_diag_races as $rc_diag_r ) {
-			$rc_diag_total++;
-			$rc_diag_n = 0;
-			foreach ( (array) $rc_diag_r->classes as $rc_diag_c ) {
-				if ( ! empty( $rc_diag_c['participantsUrl'] ) ) {
-					$rc_diag_n++;
-				}
-			}
-			if ( $rc_diag_n > 0 ) {
-				$rc_diag_purl++;
-			}
-			if ( false !== strpos( (string) $rc_diag_r->id, '94105' ) ) {
-				$rc_diag_e94105 = 'id=' . $rc_diag_r->id . ' classes=' . count( (array) $rc_diag_r->classes ) . ' mitURL=' . $rc_diag_n;
-			}
-		}
-	}
-}
-printf(
-	"\n<!-- rcc-diag v=%s races=%d purlRaces=%d e94105:[%s] -->\n",
-	esc_html( RC_RCC_VERSION ),
-	(int) $rc_diag_total,
-	(int) $rc_diag_purl,
-	esc_html( $rc_diag_e94105 )
-);
 ?>
-<div class="rc-rcc<?php echo esc_attr( $accent_class ); ?>" id="<?php echo esc_attr( $uid ); ?>" data-rc-rcc<?php echo ( '' !== $accent_style ) ? ' style="' . esc_attr( $accent_style ) . '"' : ''; ?>>
+<div class="rc-rcc<?php echo esc_attr( $accent_class ); ?>" id="<?php echo esc_attr( $uid ); ?>" data-rc-rcc data-rc-rcc-version="<?php echo esc_attr( RC_RCC_VERSION ); ?>"<?php echo ( '' !== $accent_style ) ? ' style="' . esc_attr( $accent_style ) . '"' : ''; ?>>
 	<div class="rc-rcc__tabs" role="tablist" aria-label="<?php echo esc_attr__( 'Rennkalender', 'rc-racemap-club-calendar' ); ?>">
 		<button
 			type="button"
@@ -140,7 +107,6 @@ printf(
 				'<a class="rc-rcc__credit-link" href="' . esc_url( $plugin_url ) . '" rel="noopener noreferrer" target="_blank">RC RaceMap</a>'
 			); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Vorlage escaped, Link separat escaped.
 			?>
-			<span class="rc-rcc__version"> · v<?php echo esc_html( RC_RCC_VERSION ); ?></span>
 		</span>
 		<a href="<?php echo esc_url( $plugin_url ); ?>" class="rc-rcc__brand" rel="noopener noreferrer" target="_blank" aria-label="<?php echo esc_attr__( 'RC RaceMap', 'rc-racemap-club-calendar' ); ?>">
 			<?php echo RC_RCC_Shortcode::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstantes Inline-SVG. ?>
