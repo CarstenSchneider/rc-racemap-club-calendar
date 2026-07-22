@@ -734,13 +734,26 @@ class RC_RCC_Admin {
 		$updated   = 0;
 		$classmaps = array();
 
+		// Fallback-Quelle für die Event-ID: manche Datensätze tragen als url ein
+		// Ergebnis-PDF statt der MyRCM-Event-URL und haben eine id ohne
+		// „myrcm-event-<n>". Über die Organizer-Seite lässt sich die eventId dann
+		// per Datum nachschlagen (soweit MyRCM das Event noch listet).
+		$club_id = (string) RC_RCC_Plugin::get_setting( 'club_id', '' );
+		$org_map = '' !== $club_id ? $this->fetch_myrcm_org_datemap( $club_id ) : array();
+
 		foreach ( $archive as $id => $row ) {
 			if ( ! is_array( $row ) || empty( $row['classes'] ) || ! is_array( $row['classes'] ) ) {
 				continue;
 			}
 
-			// Nur MyRCM-Events mit ableitbarer Event-ID.
+			// Event-ID: aus id/url, sonst per Datum über die Organizer-Seite.
 			$event_id = self::myrcm_event_id_from( (string) $id, $row );
+			if ( '' === $event_id ) {
+				$from = isset( $row['from'] ) ? (string) $row['from'] : '';
+				if ( '' !== $from && isset( $org_map[ $from ] ) ) {
+					$event_id = (string) $org_map[ $from ];
+				}
+			}
 			if ( '' === $event_id ) {
 				continue;
 			}
@@ -863,6 +876,57 @@ class RC_RCC_Admin {
 
 		// Bei Treffern lange cachen; bei Fehlschlag kurz (erneuter Versuch später).
 		set_transient( $cache_key, $map, empty( $map ) ? HOUR_IN_SECONDS : MONTH_IN_SECONDS );
+		return $map;
+	}
+
+	/**
+	 * Datum → Event-ID aus der MyRCM-Organizer-Seite.
+	 *
+	 * Liest /de/organizers/<clubId>, sammelt die Event-Links
+	 * (/de/organizers/<clubId>/<eventId>) samt zugehörigem Datum und gibt
+	 * [ 'YYYY-MM-DD' => eventId ] zurück. MyRCM listet nur ein rollierendes
+	 * Fenster (~12 Monate) – ältere Events tauchen hier nicht auf. Ergebnis
+	 * wird als Transient zwischengespeichert.
+	 *
+	 * @param string $club_id MyRCM-Organizer-ID.
+	 * @return array<string, string>
+	 */
+	private function fetch_myrcm_org_datemap( string $club_id ): array {
+		$cache_key = 'rc_rcc_orgdates_' . $club_id;
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = wp_remote_get(
+			'https://www.myrcm.ch/de/organizers/' . rawurlencode( $club_id ),
+			array(
+				'timeout'    => 15,
+				'user-agent' => 'rc-racemap-club-calendar',
+			)
+		);
+
+		$map = array();
+		if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+			$html = (string) wp_remote_retrieve_body( $response );
+			if ( preg_match_all( '#/organizers/' . preg_quote( $club_id, '#' ) . '/(\d+)"#', $html, $matches, PREG_OFFSET_CAPTURE ) ) {
+				foreach ( $matches[1] as $i => $hit ) {
+					$eid    = $hit[0];
+					$offset = (int) $matches[0][ $i ][1];
+					// Datum im Umfeld des Links suchen (DD.MM.YYYY oder DD.MM.YY).
+					$window = substr( $html, max( 0, $offset - 320 ), 460 );
+					if ( preg_match( '/(\d{1,2})\.(\d{2})\.(\d{2,4})/', $window, $d ) ) {
+						$year = strlen( $d[3] ) === 2 ? '20' . $d[3] : $d[3];
+						$key  = sprintf( '%04d-%02d-%02d', (int) $year, (int) $d[2], (int) $d[1] );
+						if ( ! isset( $map[ $key ] ) ) {
+							$map[ $key ] = $eid;
+						}
+					}
+				}
+			}
+		}
+
+		set_transient( $cache_key, $map, empty( $map ) ? HOUR_IN_SECONDS : DAY_IN_SECONDS );
 		return $map;
 	}
 
