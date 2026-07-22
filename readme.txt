@@ -4,7 +4,7 @@ Tags: rc, racing, calendar, myrcm, motorsport
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.53
+Stable tag: 1.0.54
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,9 @@ indem sie unter `wp-content/themes/DEIN-THEME/rc-racemap-club-calendar/`
 abgelegt werden. Zusätzlich stehen CSS-Custom-Properties (`--rc-rcc-*`) bereit.
 
 == Changelog ==
+
+= 1.0.54 =
+* Klassen-Pillen sind jetzt Links zur Teilnehmerliste der jeweiligen Klasse (MyRCM v9 hat keine kombinierte Gesamtliste mehr). Die Gesamt-Teilnehmerzahl wird weiter angezeigt, aber ohne Link. Verlinkte Pillen erscheinen für neu aktualisierte Rennen; Archiv-Rennen zeigen die Pillen wie bisher.
 
 = 1.0.53 =
 * Teilnehmer-Links repariert: sie zeigten (v.a. bei älteren Rennen) auf die tote MyRCM-Altroute und landeten auf einer generischen Übersicht. Sie führen jetzt korrekt auf die Nennliste des Events (/report/<id>).

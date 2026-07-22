@@ -108,7 +108,18 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 		<?php if ( ! empty( $race->classes ) ) : ?>
 			<ul class="rc-rcc__classes">
 				<?php foreach ( $race->classes as $class ) : ?>
-					<li class="rc-rcc__class"><?php echo esc_html( $class['name'] ); ?><?php if ( null !== $class['entries'] ) : ?> <span class="rc-rcc__class-entries">(<?php echo esc_html( (string) $class['entries'] ); ?>)</span><?php endif; ?></li>
+<?php
+						$rc_class_inner = esc_html( $class['name'] );
+						if ( null !== $class['entries'] ) {
+							$rc_class_inner .= ' <span class="rc-rcc__class-entries">(' . esc_html( (string) $class['entries'] ) . ')</span>';
+						}
+						$rc_class_url = ! empty( $class['participantsUrl'] ) ? (string) $class['participantsUrl'] : '';
+						if ( '' !== $rc_class_url ) :
+						?>
+						<li class="rc-rcc__class rc-rcc__class--link"><a class="rc-rcc__class-link" href="<?php echo esc_url( $rc_class_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php echo esc_attr__( 'Teilnehmer dieser Klasse', 'rc-racemap-club-calendar' ); ?>"><?php echo $rc_class_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte + konstantes Inline-SVG. ?></a></li>
+						<?php else : ?>
+						<li class="rc-rcc__class"><?php echo $rc_class_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte. ?></li>
+						<?php endif; ?>
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
@@ -124,11 +135,8 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 		$ppl_inner = RC_RCC_Shortcode::icon( 'users' ) . '<span class="rc-rcc__ppl-count">' . esc_html( (string) (int) $race->participant_count ) . '</span>';
 		?>
 		<div class="rc-rcc__cell rc-rcc__ppl">
-			<?php if ( '' !== $participants_url ) : ?>
-				<a class="rc-rcc__ppl-link" href="<?php echo esc_url( $participants_url ); ?>" title="<?php echo esc_attr( $ppl_label ); ?>" rel="noopener noreferrer" target="_blank"><?php echo $ppl_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstante Inline-SVGs + escapte Zahl. ?></a>
-			<?php else : ?>
-				<span class="rc-rcc__ppl-link rc-rcc__ppl-link--static" title="<?php echo esc_attr( $ppl_label ); ?>"><?php echo $ppl_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstante Inline-SVGs + escapte Zahl. ?></span>
-			<?php endif; ?>
+			<?php // v9: Es gibt keine kombinierte Teilnehmerliste mehr (nur pro Klasse, über die Klassen-Pillen). Daher nur die Zahl, kein Link. ?>
+			<span class="rc-rcc__ppl-link rc-rcc__ppl-link--static" title="<?php echo esc_attr( $ppl_label ); ?>"><?php echo $ppl_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Konstante Inline-SVGs + escapte Zahl. ?></span>
 		</div>
 	<?php endif; ?>
 

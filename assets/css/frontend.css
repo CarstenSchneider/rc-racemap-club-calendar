@@ -272,6 +272,30 @@
 	color: inherit;
 }
 
+/* Verlinkte Klassen-Pille (v9): führt zur Teilnehmerliste dieser Klasse.
+   Der Link füllt die Pille aus; Pfeil signalisiert die Klickbarkeit. */
+.rc-rcc.rc-rcc .rc-rcc__class--link {
+	padding: 0;
+}
+.rc-rcc .rc-rcc__class-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	height: 100%;
+	padding: 0 0.75em;
+	color: inherit;
+	text-decoration: none;
+}
+.rc-rcc a.rc-rcc__class-link:hover,
+.rc-rcc a.rc-rcc__class-link:focus-visible {
+	color: var(--rc-rcc-text);
+}
+.rc-rcc .rc-rcc__class-link .rc-rcc__icon {
+	width: 0.85em;
+	height: 0.85em;
+	opacity: 0.6;
+}
+
 /* 3 – Teilnehmer (Link → Theme-Linkfarbe, keine eigene Farbe) */
 .rc-rcc .rc-rcc__ppl-link {
 	display: inline-flex;

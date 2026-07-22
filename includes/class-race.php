@@ -243,6 +243,12 @@ class RC_RCC_Race {
 		foreach ( $race->extra_links as $i => $doc ) {
 			$race->extra_links[ $i ]['url'] = self::localize_myrcm_url( $doc['url'], $lang );
 		}
+		// v9: Teilnehmer-URL je Klasse auf die Seitensprache umstellen.
+		foreach ( $race->classes as $i => $class ) {
+			if ( ! empty( $class['participantsUrl'] ) ) {
+				$race->classes[ $i ]['participantsUrl'] = self::localize_myrcm_url( (string) $class['participantsUrl'], $lang );
+			}
+		}
 		// Bei zusammengeführten Events (`source: myrcm+rck`) zeigt der Event-Link
 		// auf RCK, die Ergebnisse liegen aber weiter auf MyRCM. Drei Stufen,
 		// absteigend nach Verlässlichkeit:
@@ -518,10 +524,17 @@ class RC_RCC_Race {
 					? (int) $entry['entries']
 					: null;
 
-				$classes[] = array(
+				$class = array(
 					'name'    => $name,
 					'entries' => $entries,
 				);
+
+				// v9: pro Klasse die Teilnehmer-URL (MyRCM /report/<id>/<klasse>).
+				if ( isset( $entry['participantsUrl'] ) && '' !== trim( (string) $entry['participantsUrl'] ) ) {
+					$class['participantsUrl'] = esc_url_raw( trim( (string) $entry['participantsUrl'] ) );
+				}
+
+				$classes[] = $class;
 				continue;
 			}
 
