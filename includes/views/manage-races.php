@@ -266,5 +266,17 @@ $ctx = RC_RCC_Admin::view_context();
 
 			<?php submit_button( __( 'Ins Archiv übernehmen', 'rc-racemap-club-calendar' ), 'secondary' ); ?>
 		</form>
+
+		<?php if ( ! empty( $ctx['enrich_action'] ) ) : ?>
+			<hr />
+			<p class="description">
+				<?php esc_html_e( 'Ältere MyRCM-Rennen haben teils keine klickbaren Klassen-Teilnehmer-Links. Dieser Vorgang holt sie direkt von MyRCM und trägt sie nach – ohne Datei-Import. Kann einige Sekunden dauern.', 'rc-racemap-club-calendar' ); ?>
+			</p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="<?php echo esc_attr( $ctx['enrich_action'] ); ?>" />
+				<?php wp_nonce_field( $ctx['enrich_action'] ); ?>
+				<?php submit_button( __( 'Teilnehmer-Links nachtragen', 'rc-racemap-club-calendar' ), 'secondary' ); ?>
+			</form>
+		<?php endif; ?>
 	</details>
 </div>

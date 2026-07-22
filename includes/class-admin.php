@@ -55,6 +55,11 @@ class RC_RCC_Admin {
 	private const ACTION_IMPORT_ARCHIVE = 'rc_rcc_import_archive';
 
 	/**
+	 * Action: Teilnehmer-Links für archivierte MyRCM-Events nachtragen.
+	 */
+	private const ACTION_ENRICH_PARTICIPANTS = 'rc_rcc_enrich_participants';
+
+	/**
 	 * Erforderliche Berechtigung für alle Seiten.
 	 */
 	private const CAPABILITY = 'manage_options';
@@ -86,6 +91,7 @@ class RC_RCC_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_post_' . self::ACTION_SAVE_VISIBILITY, array( $this, 'handle_save_visibility' ) );
 		add_action( 'admin_post_' . self::ACTION_IMPORT_ARCHIVE, array( $this, 'handle_import_archive' ) );
+		add_action( 'admin_post_' . self::ACTION_ENRICH_PARTICIPANTS, array( $this, 'handle_enrich_participants' ) );
 		add_filter( 'plugin_action_links_' . RC_RCC_BASENAME, array( $this, 'add_settings_link' ) );
 	}
 
@@ -486,6 +492,28 @@ class RC_RCC_Admin {
 				);
 			}
 		}
+
+		if ( isset( $_GET['rc_rcc_enriched'] ) ) {
+			$e_state = sanitize_text_field( wp_unslash( $_GET['rc_rcc_enriched'] ) );
+			$e_count = isset( $_GET['rc_rcc_enriched_n'] ) ? absint( $_GET['rc_rcc_enriched_n'] ) : 0;
+			if ( 'ok' === $e_state ) {
+				printf(
+					'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+					esc_html(
+						sprintf(
+							/* translators: %d: Anzahl der Events, die Teilnehmer-Links bekommen haben. */
+							_n( '%d Event mit Teilnehmer-Links versehen.', '%d Events mit Teilnehmer-Links versehen.', $e_count, 'rc-racemap-club-calendar' ),
+							$e_count
+						)
+					)
+				);
+			} else {
+				printf(
+					'<div class="notice notice-warning is-dismissible"><p>%s</p></div>',
+					esc_html__( 'Keine Teilnehmer-Links nachgetragen (alles bereits vorhanden oder MyRCM nicht erreichbar).', 'rc-racemap-club-calendar' )
+				);
+			}
+		}
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( isset( $_GET['rc_rcc_updated'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reines Anzeige-Flag nach sicherem Redirect.
@@ -681,6 +709,199 @@ class RC_RCC_Admin {
 			)
 		);
 		exit;
+	}
+
+	/**
+	 * Teilnehmer-Links für archivierte MyRCM-Events nachtragen.
+	 *
+	 * Ältere MyRCM-Events wurden vom Plugin auto-archiviert, bevor die Quelle
+	 * per-Klasse-Teilnehmer-URLs lieferte – ihre Klassen-Pillen sind daher nicht
+	 * klickbar. Dieser Ein-Klick-Vorgang holt die Klassen-IDs direkt vom
+	 * KLASSE-Dropdown der MyRCM-Report-Seite (/de/report/<eventId>) und schreibt
+	 * die participantsUrl je Klasse in die vorhandenen Archiv-Datensätze. Kein
+	 * Datei-Import nötig; die Datensätze behalten ihre id.
+	 *
+	 * @return void
+	 */
+	public function handle_enrich_participants(): void {
+		if ( ! current_user_can( self::CAPABILITY ) ) {
+			wp_die( esc_html__( 'Dazu bist du nicht berechtigt.', 'rc-racemap-club-calendar' ) );
+		}
+
+		check_admin_referer( self::ACTION_ENRICH_PARTICIPANTS );
+
+		$archive   = $this->calendar->archive_map();
+		$updated   = 0;
+		$classmaps = array();
+
+		foreach ( $archive as $id => $row ) {
+			if ( ! is_array( $row ) || empty( $row['classes'] ) || ! is_array( $row['classes'] ) ) {
+				continue;
+			}
+
+			// Nur MyRCM-Events mit ableitbarer Event-ID.
+			$event_id = self::myrcm_event_id_from( (string) $id, $row );
+			if ( '' === $event_id ) {
+				continue;
+			}
+
+			// Fehlt an mindestens einer Klasse die URL? Sonst überspringen.
+			$needs = false;
+			foreach ( $row['classes'] as $class ) {
+				if ( is_array( $class ) && empty( $class['participantsUrl'] ) ) {
+					$needs = true;
+					break;
+				}
+			}
+			if ( ! $needs ) {
+				continue;
+			}
+
+			if ( ! isset( $classmaps[ $event_id ] ) ) {
+				$classmaps[ $event_id ] = $this->fetch_myrcm_classmap( $event_id );
+			}
+			$map = $classmaps[ $event_id ];
+			if ( empty( $map ) ) {
+				continue;
+			}
+
+			$changed = false;
+			foreach ( $row['classes'] as $i => $class ) {
+				if ( ! is_array( $class ) || ! empty( $class['participantsUrl'] ) ) {
+					continue;
+				}
+				$class_id = self::match_class_id( (string) ( $class['name'] ?? '' ), $map );
+				if ( '' !== $class_id ) {
+					$row['classes'][ $i ]['participantsUrl'] = 'https://www.myrcm.ch/de/report/' . $event_id . '/' . $class_id . '?reportKey=100&reportType=participants';
+					$changed = true;
+				}
+			}
+
+			if ( $changed ) {
+				$archive[ $id ] = $row;
+				++$updated;
+			}
+		}
+
+		if ( $updated > 0 ) {
+			update_option( RC_RCC_Plugin::OPTION_ARCHIVE, $archive, false );
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'             => self::PAGE_RACES,
+					'rc_rcc_enriched'  => $updated > 0 ? 'ok' : 'none',
+					'rc_rcc_enriched_n' => (int) $updated,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * MyRCM-Event-ID aus id/URL eines Archiv-Datensatzes ziehen.
+	 *
+	 * @param string               $id  Datensatz-ID.
+	 * @param array<string, mixed> $row Datensatz.
+	 * @return string Event-ID oder ''.
+	 */
+	private static function myrcm_event_id_from( string $id, array $row ): string {
+		if ( preg_match( '/myrcm-event-(\d+)/i', $id, $m ) ) {
+			return $m[1];
+		}
+		$urls = array( (string) ( $row['url'] ?? '' ), (string) ( $row['detailUrl'] ?? '' ) );
+		foreach ( $urls as $u ) {
+			if ( preg_match( '/dId(?:\[|%5B)E(?:\]|%5D)=(\d+)/i', $u, $m ) ) {
+				return $m[1];
+			}
+			if ( preg_match( '#/(?:live|report)/(\d+)#i', $u, $m ) ) {
+				return $m[1];
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Klassenname → Klassen-ID aus der MyRCM-Report-Seite.
+	 *
+	 * Liest das KLASSE-<select> von /de/report/<eventId> und gibt
+	 * [ normalisierterName => classId ] zurück. Ergebnis wird als Transient
+	 * zwischengespeichert (myrcm.ch nur einmal je Event befragen).
+	 *
+	 * @param string $event_id MyRCM-Event-ID.
+	 * @return array<string, string>
+	 */
+	private function fetch_myrcm_classmap( string $event_id ): array {
+		$cache_key = 'rc_rcc_cmap_' . $event_id;
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = wp_remote_get(
+			'https://www.myrcm.ch/de/report/' . rawurlencode( $event_id ),
+			array(
+				'timeout'    => 15,
+				'user-agent' => 'rc-racemap-club-calendar',
+			)
+		);
+
+		$map = array();
+		if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+			$html = (string) wp_remote_retrieve_body( $response );
+			if ( preg_match_all( '/<option[^>]*value="(\d+)"[^>]*>([^<]*)<\/option>/i', $html, $matches, PREG_SET_ORDER ) ) {
+				foreach ( $matches as $mm ) {
+					$name = self::normalise_class_name( html_entity_decode( $mm[2], ENT_QUOTES ) );
+					if ( '' !== $name && ! isset( $map[ $name ] ) ) {
+						$map[ $name ] = $mm[1];
+					}
+				}
+			}
+		}
+
+		// Bei Treffern lange cachen; bei Fehlschlag kurz (erneuter Versuch später).
+		set_transient( $cache_key, $map, empty( $map ) ? HOUR_IN_SECONDS : MONTH_IN_SECONDS );
+		return $map;
+	}
+
+	/**
+	 * Klassennamen auf ein vergleichbares Kürzel normalisieren.
+	 *
+	 * @param string $name Klassenname.
+	 * @return string
+	 */
+	private static function normalise_class_name( string $name ): string {
+		return preg_replace( '/[^a-z0-9]/', '', strtolower( $name ) );
+	}
+
+	/**
+	 * Klassennamen tolerant gegen die classId-Map matchen.
+	 *
+	 * @param string                $name Klassenname aus dem Datensatz.
+	 * @param array<string, string> $map  normalisierterName => classId.
+	 * @return string classId oder ''.
+	 */
+	private static function match_class_id( string $name, array $map ): string {
+		$n = self::normalise_class_name( $name );
+		if ( '' === $n ) {
+			return '';
+		}
+		if ( isset( $map[ $n ] ) ) {
+			return $map[ $n ];
+		}
+		// Kleine Editdistanz zulassen (z. B. „Gentlemen" vs „Gentleman").
+		$best    = '';
+		$best_d  = PHP_INT_MAX;
+		foreach ( $map as $key => $cid ) {
+			$d = levenshtein( $n, $key );
+			if ( $d < $best_d ) {
+				$best_d = $d;
+				$best   = $cid;
+			}
+		}
+		return ( $best_d <= 2 ) ? $best : '';
 	}
 
 	/**
@@ -1222,6 +1443,7 @@ class RC_RCC_Admin {
 		return array(
 			'action'         => self::ACTION_SAVE_VISIBILITY,
 			'import_action'  => self::ACTION_IMPORT_ARCHIVE,
+			'enrich_action'  => self::ACTION_ENRICH_PARTICIPANTS,
 			'page_races'     => self::PAGE_RACES,
 		);
 	}
