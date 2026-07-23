@@ -61,6 +61,8 @@ jobs:
             --exclude='docs' \
             --exclude='dev-preview.html' \
             --exclude='build' \
+            --exclude='build-wporg' \
+            --exclude='scripts' \
             --exclude='*.po' \
             --exclude='*.pot' \
             ./ build/$slug/

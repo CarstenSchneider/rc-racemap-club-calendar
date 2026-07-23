@@ -145,7 +145,12 @@ final class RC_RCC_Plugin {
 		require_once RC_RCC_PATH . 'includes/class-calendar.php';
 		require_once RC_RCC_PATH . 'includes/class-admin.php';
 		require_once RC_RCC_PATH . 'includes/class-shortcode.php';
-		require_once RC_RCC_PATH . 'includes/class-updater.php';
+		// Der GitHub-Selbst-Updater ist optional: der WordPress.org-Build lässt
+		// class-updater.php (und die plugin-update-checker-Lib) weg — Updates
+		// kommen dort über den WP-Core. Nur laden, wenn vorhanden.
+		if ( is_readable( RC_RCC_PATH . 'includes/class-updater.php' ) ) {
+			require_once RC_RCC_PATH . 'includes/class-updater.php';
+		}
 	}
 
 	/**
@@ -158,8 +163,11 @@ final class RC_RCC_Plugin {
 		add_action( 'init', array( $this, 'maybe_upgrade' ) );
 
 		// GitHub-basierte Auto-Updates (läuft auch bei Cron-Update-Checks,
-		// daher unabhängig vom Admin-Kontext registrieren).
-		( new RC_RCC_Updater() )->register();
+		// daher unabhängig vom Admin-Kontext registrieren). Im WP.org-Build
+		// fehlt die Klasse → übersprungen (Updates via WP-Core).
+		if ( class_exists( 'RC_RCC_Updater' ) ) {
+			( new RC_RCC_Updater() )->register();
+		}
 
 		// Admin UI only in wp-admin.
 		if ( is_admin() ) {

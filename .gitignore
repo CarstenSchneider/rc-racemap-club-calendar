@@ -21,3 +21,6 @@ Thumbs.db
 
 # Lokale Design-Vorschau (kein Plugin-Bestandteil)
 dev-preview.html
+
+# WordPress.org-Build-Output
+/build-wporg/
