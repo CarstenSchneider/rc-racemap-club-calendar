@@ -123,29 +123,36 @@ zieht je Event die **eventId** (aus id `myrcm-event-<n>` oder aus `url`
 `rc_rcc_cmap_<eid>`), matcht Klassennamen (normalisiert + Levenshtein ≤2) und
 schreibt `participantsUrl` **in place** in `rc_rcc_archive` (id bleibt, kein
 Import). Einmalig pro Vereins-WP; neue Events kommen ohnehin schon verlinkt.
-**v1.0.63:** Fallback über `fetch_myrcm_org_datemap` — eventId per `from`-Datum
-aus `/de/organizers/<clubId>` (für Datensätze, deren `url` ein Ergebnis-PDF ist
-und deren id kein `myrcm-event-<n>` trägt).
+**v1.0.65:** ergänzt auch **fehlende** MyRCM-Klassen (RCK-Events, die als reiner
+`source:import` OHNE Klassen ankamen, bekommen ihre Klassen-Pillen); matcht die
+eventId per `from` UND `to`; `race-item.php` verlinkt vergangene Events, sobald
+eine `participantsUrl` da ist (Teilnehmerliste gefüllt, auch ohne Nennzahl).
 
-**Bekannte, offen gelassene Grenze (auf Wunsch hier gestoppt, 2026-07-23):**
-Ein Event bleibt stumm, wenn **alle drei** zutreffen: (1) gespeicherte id ohne
-`myrcm-event-<n>` (Alt-`archive-…`-Form), (2) `url` ist ein Ergebnis-PDF statt
-der MyRCM-URL, (3) Event ist **älter als ~12 Monate** → nicht mehr im
-Organizer-Fenster. Dann ist die eventId automatisch **nicht** ableitbar.
-Belegtes Beispiel: TSV Mariendorf, „TEC – Tamiya Euro Cup" 05.07.2025
-(eventId 88293). **Reine RCK-Events** (`rck-kleinserie`/`rck-challenge`) haben
-gar keine Klassen/Teilnehmerliste auf MyRCM → korrekt stumm, kein Bug.
+**v1.0.66 — volle Historie + Vereinsdaten-Vorrang (löst die frühere Grenze):**
+- **eventId über die MyRCM-Such-API** `/rest/v1/search?type=events&limit=100&q=<Keyword>`
+  (`fetch_myrcm_event_datemap`). `limit=100` hebt den 20-Cap auf → **gesamte
+  Vereinshistorie**, nicht nur die ~11 Monate der Organizer-Seite. Treffer-`meta`
+  = „Verein · Ort · Land · Datum", `url` = `/de/archive/<eventId>`; jeder Tag der
+  Spanne → eventId. Keyword = längstes Wort des Vereinsnamens (`myrcm_search_keyword`:
+  „Mariendorf", „Speedracer", „Braunschweig"); Filter: Keyword muss im `meta`
+  stehen. Org-Seite (`fetch_myrcm_org_datemap`) bleibt nur noch Fallback.
+  → Der frühere „88293/2025-07 nicht auffindbar"-Fall ist damit **erledigt**;
+  verifiziert: alle 11 TSV-RCK/TEC-Läufe lösen auf und bekommen ihre Klassen.
+- **„Vereinsdaten schlagen Import/MyRCM" (`class-race.php` `from_array`):** zeigt
+  der Event-`url` auf ein **Ergebnis-PDF des Vereins** (`…/tsvmariendorf-…27.7.25.pdf`)
+  statt auf eine MyRCM-Event-Seite, füllt DAS den Ergebnisse-Button (nicht der
+  MyRCM-Report). Erkennung: `url` endet auf `.pdf`. Ein eigenes „Ergebnisse"-
+  Dokument (`attach_custom_documents`) überschreibt weiterhin noch expliziter.
 
-Möglicher Weg für die Restfälle (nicht umgesetzt): Datei-Import der
-angereicherten Archiv-JSON. Skripte dafür liegen im **Map-Repo**
-(`scripts/enrich-archive-participants.js` = participantsUrl je Klasse via Report-
-Dropdown; `scripts/fix-archive-ids.js` = ids aufs Auto-Archiv-Schema
-`<slug>-<from>-myrcm-event-<eid>` + `remove`-Liste für Alt-Waisen). **Aber:** die
-Datei-Importe dieses Vereins blieben in dieser Sitzung wirkungslos, obwohl der
-Import-Code (per CLI-Stub) korrekt speichert und der Button-POST funktioniert —
-**Verdacht: eine WAF/Security-Schicht blockt den großen Multi-URL-POST des
-Textarea-Imports still**, während der winzige Button-POST durchgeht. Nicht
-verifiziert.
+**Reine RCK-Events, die es NICHT auf MyRCM gibt** (nur rck-solutions, kein
+Timing über RC-Timing) haben dort keine Klassenliste → bleiben korrekt ohne
+Pillen. RCK-Serien-Läufe laufen aber i. d. R. über MyRCM (RC-Timing) und werden
+so vollständig.
+
+Map-Repo-Skripte (`scripts/enrich-archive-participants.js`,
+`scripts/fix-archive-ids.js`) für den Datei-Import-Weg existieren noch, sind aber
+durch den Button überflüssig. (Frühere Datei-Importe dieses Vereins blieben
+wirkungslos — Verdacht: WAF blockt den großen Textarea-POST; Button-POST geht.)
 
 **Diagnose-Technik (falls wieder „Import wirkt nicht"):** sichtbaren
 Versions-Marker + HTML-Kommentar mit `participantsUrl`-Zählung ins Rendering
