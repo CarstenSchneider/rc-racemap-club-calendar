@@ -266,6 +266,19 @@ class RC_RCC_Race {
 			$race->results_url = self::derive_results_url( $race->links['participants'] ?? '', $race->organizer, $lang );
 		}
 
+		// „Vereinsdaten schlagen Import/MyRCM": Zeigt der Event-`url` selbst auf
+		// ein Dokument (das Ergebnis-PDF des Vereins, z. B.
+		// …/tsvmariendorf-rck-ks-27.7.25.pdf) statt auf eine MyRCM-Event-Seite,
+		// ist DAS das maßgebliche Vereins-Ergebnis und gewinnt über den
+		// abgeleiteten MyRCM-Ergebnislink. Ein eigenes „Ergebnisse"-Dokument in
+		// attach_custom_documents überschreibt später noch expliziter.
+		$reg_url = (string) ( $race->links['registration'] ?? '' );
+		if ( '' !== $reg_url && preg_match( '#\.pdf(\?|\#|$)#i', $reg_url ) ) {
+			$race->results_url = $reg_url;
+			// Ein PDF ist kein Nennungs-/Event-Link → nicht als solcher missbrauchen.
+			unset( $race->links['registration'] );
+		}
+
 		// v9: Die Teilnehmer-/Nennliste lag früher auf der bkg-Route
 		// (hId[1]=bkg&dId[E]=…). Die ist im Redesign tot und leitet auf die
 		// generische /de/live-Übersicht um. Die Nennliste steht jetzt auf der

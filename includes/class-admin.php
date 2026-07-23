@@ -736,10 +736,29 @@ class RC_RCC_Admin {
 
 		// Fallback-Quelle für die Event-ID: manche Datensätze tragen als url ein
 		// Ergebnis-PDF statt der MyRCM-Event-URL und haben eine id ohne
-		// „myrcm-event-<n>". Über die Organizer-Seite lässt sich die eventId dann
-		// per Datum nachschlagen (soweit MyRCM das Event noch listet).
-		$club_id = (string) RC_RCC_Plugin::get_setting( 'club_id', '' );
-		$org_map = '' !== $club_id ? $this->fetch_myrcm_org_datemap( $club_id ) : array();
+		// „myrcm-event-<n>". Dann wird die eventId per Datum nachgeschlagen.
+		// Primär über die MyRCM-Such-API (volle Historie), Fallback Org-Seite
+		// (nur ~letzte 11 Monate).
+		$club_id   = (string) RC_RCC_Plugin::get_setting( 'club_id', '' );
+		$host_name = '';
+		foreach ( $archive as $r ) {
+			if ( is_array( $r ) && ! empty( $r['hostName'] ) ) {
+				$host_name = (string) $r['hostName'];
+				break;
+			}
+		}
+		if ( '' === $host_name ) {
+			foreach ( $this->calendar->all_races() as $race ) {
+				if ( '' !== $race->organizer ) {
+					$host_name = $race->organizer;
+					break;
+				}
+			}
+		}
+		$org_map = ( '' !== $host_name ) ? $this->fetch_myrcm_event_datemap( $host_name ) : array();
+		if ( empty( $org_map ) && '' !== $club_id ) {
+			$org_map = $this->fetch_myrcm_org_datemap( $club_id );
+		}
 
 		foreach ( $archive as $id => $row ) {
 			if ( ! is_array( $row ) ) {
@@ -969,6 +988,121 @@ class RC_RCC_Admin {
 
 		set_transient( $cache_key, $map, empty( $map ) ? HOUR_IN_SECONDS : DAY_IN_SECONDS );
 		return $map;
+	}
+
+	/**
+	 * Datum → Event-ID über die MyRCM-Such-API (volle Historie).
+	 *
+	 * Sucht `/rest/v1/search?type=events&q=<Keyword>` (Keyword = markantestes Wort
+	 * des Vereinsnamens). Jedes Treffer-`meta` trägt „Verein · Ort · Land · Datum",
+	 * die `url` ist `/de/archive/<eventId>`. Anders als die Organizer-Seite (nur
+	 * ~11 Monate) reicht die Suche über die gesamte Historie (bis 20 Treffer).
+	 * Jeder Tag der Datumsspanne wird auf die eventId gemappt (from UND to).
+	 *
+	 * @param string $host_name Vereinsname (Suchbasis).
+	 * @return array<string, string>  'YYYY-MM-DD' => eventId
+	 */
+	private function fetch_myrcm_event_datemap( string $host_name ): array {
+		$keyword = self::myrcm_search_keyword( $host_name );
+		if ( '' === $keyword ) {
+			return array();
+		}
+
+		$cache_key = 'rc_rcc_evmap_' . md5( strtolower( $keyword ) );
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		// limit=100 hebt den Standard-Cap (20) auf → volle Vereinshistorie.
+		$response = wp_remote_get(
+			'https://www.myrcm.ch/rest/v1/search?type=events&limit=100&q=' . rawurlencode( $keyword ),
+			array(
+				'timeout'    => 15,
+				'user-agent' => 'rc-racemap-club-calendar',
+				'headers'    => array( 'Accept' => 'application/json' ),
+			)
+		);
+
+		$map = array();
+		if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+			$data    = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+			$results = ( is_array( $data ) && isset( $data['RESULTS'] ) && is_array( $data['RESULTS'] ) ) ? $data['RESULTS'] : array();
+			foreach ( $results as $r ) {
+				if ( ! is_array( $r ) ) {
+					continue;
+				}
+				$meta = (string) ( $r['meta'] ?? ( $r['subtitle'] ?? '' ) );
+				$url  = (string) ( $r['url'] ?? '' );
+				// Nur Events dieses Vereins: das Keyword muss im meta stehen.
+				if ( false === stripos( $meta, $keyword ) ) {
+					continue;
+				}
+				if ( ! preg_match( '#/(\d+)\s*$#', $url, $m ) ) {
+					continue;
+				}
+				$eid = $m[1];
+				foreach ( self::parse_meta_dates( $meta ) as $day ) {
+					if ( ! isset( $map[ $day ] ) ) {
+						$map[ $day ] = $eid;
+					}
+				}
+			}
+		}
+
+		set_transient( $cache_key, $map, empty( $map ) ? HOUR_IN_SECONDS : DAY_IN_SECONDS );
+		return $map;
+	}
+
+	/**
+	 * Markantestes Wort eines Vereinsnamens als Such-Keyword.
+	 *
+	 * Nimmt das längste rein alphabetische Wort (≥5 Zeichen) — z. B.
+	 * „Mariendorf", „Speedracer", „Braunschweig". Einzelbegriff, weil die
+	 * Such-API mehrere Wörter als UND verknüpft (und dann oft 0 liefert).
+	 *
+	 * @param string $host_name Vereinsname.
+	 * @return string
+	 */
+	private static function myrcm_search_keyword( string $host_name ): string {
+		if ( ! preg_match_all( '/[A-Za-zÀ-ÿ]{5,}/u', $host_name, $m ) ) {
+			return '';
+		}
+		$words = $m[0];
+		usort(
+			$words,
+			static function ( $a, $b ) {
+				return mb_strlen( $b ) <=> mb_strlen( $a );
+			}
+		);
+		return (string) $words[0];
+	}
+
+	/**
+	 * Datumsspanne aus dem meta-Feld eines Such-Treffers in Y-m-d-Tage zerlegen.
+	 *
+	 * Beispiele: „… · 25.07–26.07.2026" → [2026-07-25, 2026-07-26];
+	 * „… · 21.06.2026" → [2026-06-21]; „… · 29.11–06.12.2026" → [2026-11-29,
+	 * 2026-12-06]. Das Jahr steht am Ende und gilt für alle Teil-Daten.
+	 *
+	 * @param string $meta meta/subtitle des Treffers.
+	 * @return array<int, string>
+	 */
+	private static function parse_meta_dates( string $meta ): array {
+		$parts    = preg_split( '/·/u', $meta );
+		$date_seg = is_array( $parts ) ? trim( (string) end( $parts ) ) : '';
+		if ( ! preg_match( '/(\d{4})\s*$/', $date_seg, $ym ) ) {
+			return array();
+		}
+		$year = $ym[1];
+		$out  = array();
+		if ( preg_match_all( '/(\d{1,2})\.(\d{1,2})(?:\.(\d{4}))?/', $date_seg, $mm, PREG_SET_ORDER ) ) {
+			foreach ( $mm as $d ) {
+				$y     = ( isset( $d[3] ) && '' !== $d[3] ) ? $d[3] : $year;
+				$out[] = sprintf( '%04d-%02d-%02d', (int) $y, (int) $d[2], (int) $d[1] );
+			}
+		}
+		return array_values( array_unique( $out ) );
 	}
 
 	/**
