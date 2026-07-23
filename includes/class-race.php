@@ -310,13 +310,14 @@ class RC_RCC_Race {
 			}
 		}
 
-		// „Nennung"-Button auf das MyRCM-Anmeldeformular statt die Event-Übersicht:
-		// /live/<id> ist nur die Übersicht, /subscription/<id>/entry das Nennformular.
-		// Nur wenn die Registrierungs-URL eine MyRCM-live-URL ist — merged
-		// myrcm+rck zeigt auf RCK, dort läuft die Nennung (unverändert lassen).
-		$reg_link = (string) ( $race->links['registration'] ?? '' );
-		if ( preg_match( '#myrcm\.ch/(?:de|en)/live/(\d+)#i', $reg_link, $sm ) ) {
-			$race->registration_url = 'https://www.myrcm.ch/' . rawurlencode( $lang ) . '/subscription/' . $sm[1] . '/entry';
+		// „Nennung"-Button aufs MyRCM-Anmeldeformular — ABER nur, wenn die
+		// Datenquelle eine direkte Nennung meldet (`registrationUrl`; der Scraper
+		// setzt sie NUR, wenn ein Entry-Button auf der MyRCM-Übersicht existiert).
+		// Fehlt sie (extern/EFRA-verwaltet, oder RCK-Nennung), bleibt es beim
+		// Event-Link — sonst landete man auf „Nennung nicht möglich".
+		$reg_data_url = isset( $data['registrationUrl'] ) ? (string) $data['registrationUrl'] : '';
+		if ( '' !== $reg_data_url ) {
+			$race->registration_url = self::localize_myrcm_url( esc_url_raw( $reg_data_url ), $lang );
 		}
 
 		return $race;
