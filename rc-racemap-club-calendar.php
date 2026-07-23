@@ -3,7 +3,7 @@
  * Plugin Name:       RC RaceMap Club Calendar
  * Plugin URI:        https://rc-racemap.com/
  * Description:       Displays a single RC model club's upcoming and past races automatically on its WordPress site. Configure the MyRCM organiser ID, drop in a shortcode, done.
- * Version:           1.0.63
+ * Version:           1.0.64
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            RC RaceMap
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Core plugin constants.
  */
-define( 'RC_RCC_VERSION', '1.0.63' );
+define( 'RC_RCC_VERSION', '1.0.64' );
 define( 'RC_RCC_FILE', __FILE__ );
 define( 'RC_RCC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RC_RCC_URL', plugin_dir_url( __FILE__ ) );

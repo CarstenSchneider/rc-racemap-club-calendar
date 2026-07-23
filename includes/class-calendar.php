@@ -71,7 +71,13 @@ class RC_RCC_Calendar {
 		// Nur bei fehlerfreiem Abruf archivieren – sonst würde eine kaputte
 		// oder leere Antwort den Bestand einfrieren bzw. verfälschen.
 		if ( null === $this->api->last_error() ) {
-			$this->archive_rows( $this->api->last_rows() );
+			// Erst anreichern, dann speichern *und* anzeigen: ein späterer Abruf
+			// kann ärmer sein als ein früherer (RCK führt nur kommende Rennen –
+			// nach dem Renntag fällt der Merge-Partner weg und übrig bleibt die
+			// MyRCM-Sicht mit 0 Nennungen und ohne Teilnehmerlisten).
+			$rows  = $this->enrich_rows( $this->api->last_rows() );
+			$races = self::races_from_rows( $rows );
+			$this->archive_rows( $rows );
 		}
 
 		$races = array_merge( $races, $this->archived_races( $races ) );
@@ -224,11 +230,212 @@ class RC_RCC_Calendar {
 	}
 
 	/**
+	 * Beschriftungen, die ein eigenes Dokument als Ergebnisliste kennzeichnen.
+	 *
+	 * Neben der übersetzten Beschriftung werden das deutsche Quellwort und die
+	 * englische Fassung akzeptiert – Vereine tippen die Bezeichnung selbst, und
+	 * eine Seite kann in einer anderen Sprache laufen als der Verein schreibt.
+	 *
+	 * @return string[] Normalisierte Beschriftungen.
+	 */
+	private static function results_labels(): array {
+		$labels = array(
+			__( 'Ergebnisse', 'rc-racemap-club-calendar' ),
+			'Ergebnisse',
+			'Ergebnis',
+			'Results',
+		);
+
+		return array_values( array_unique( array_map( array( self::class, 'fold_label' ), $labels ) ) );
+	}
+
+	/**
+	 * Beschriftung für den Vergleich härten.
+	 *
+	 * Wie `normalise_label()`, zusätzlich ohne Akzente und Sonderzeichen: die
+	 * übersetzten Beschriftungen tragen welche („Résultats", „Výsledky"), und
+	 * Vereine tippen sie erfahrungsgemäß auch ohne. Nur für den Ergebnis-Abgleich
+	 * – die Dokument-Dedup vergleicht weiterhin zeichengetreu, dort ist die
+	 * Beschriftung freier Text und soll nicht versehentlich verschmelzen.
+	 *
+	 * @param string $label Rohe Beschriftung.
+	 * @return string Kleingeschrieben, transliteriert, nur a–z und 0–9.
+	 */
+	private static function fold_label( string $label ): string {
+		$map = array(
+			'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ą' => 'a', 'ā' => 'a',
+			'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'ě' => 'e', 'ę' => 'e', 'ē' => 'e',
+			'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i',
+			'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ő' => 'o', 'ø' => 'o',
+			'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ů' => 'u', 'ű' => 'u', 'ū' => 'u',
+			'ý' => 'y', 'ÿ' => 'y',
+			'ç' => 'c', 'č' => 'c', 'ć' => 'c',
+			'ł' => 'l', 'ľ' => 'l',
+			'ñ' => 'n', 'ń' => 'n', 'ň' => 'n',
+			'ř' => 'r', 'ŕ' => 'r',
+			'š' => 's', 'ś' => 's', 'ş' => 's', 'ß' => 's',
+			'ž' => 'z', 'ź' => 'z', 'ż' => 'z',
+		);
+
+		return (string) preg_replace( '/[^a-z0-9]/', '', strtr( self::normalise_label( $label ), $map ) );
+	}
+
+	/**
+	 * Frische Zeilen feldweise mit dem Archiv anreichern.
+	 *
+	 * Datum, Titel und Nennstatus bleiben bewusst dem frischen Stand
+	 * überlassen – Korrekturen an der Quelle sollen ankommen. Nur dort, wo der
+	 * frische Wert leer bzw. 0 ist und der gespeicherte Information trägt,
+	 * gewinnt der gespeicherte.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Frische Zeilen.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function enrich_rows( array $rows ): array {
+		$archive = $this->archive_map();
+
+		if ( empty( $archive ) ) {
+			return $rows;
+		}
+
+		foreach ( $rows as $index => $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$id = isset( $row['id'] ) ? (string) $row['id'] : '';
+
+			if ( '' === $id || ! isset( $archive[ $id ] ) || ! is_array( $archive[ $id ] ) ) {
+				continue;
+			}
+
+			$rows[ $index ] = self::keep_richer( $archive[ $id ], $row );
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * Eine Zeile aus gespeichertem und frischem Stand zusammenführen.
+	 *
+	 * @param array<string, mixed> $stored Gespeicherte Zeile.
+	 * @param array<string, mixed> $fresh  Frische Zeile.
+	 * @return array<string, mixed>
+	 */
+	private static function keep_richer( array $stored, array $fresh ): array {
+		$merged = $fresh;
+
+		// Teilnehmerzahl: eine 0 (oder kein Wert) überschreibt keine Zahl.
+		$new_count = isset( $fresh['registrationCount'] ) ? (int) $fresh['registrationCount'] : 0;
+		$old_count = isset( $stored['registrationCount'] ) ? (int) $stored['registrationCount'] : 0;
+
+		if ( $new_count <= 0 && $old_count > 0 ) {
+			$merged['registrationCount'] = $old_count;
+		}
+
+		// Adressen und Dokumente nicht durch Leere ersetzen.
+		foreach ( array( 'url', 'registrationListUrl', 'documents' ) as $key ) {
+			if ( empty( $merged[ $key ] ) && ! empty( $stored[ $key ] ) ) {
+				$merged[ $key ] = $stored[ $key ];
+			}
+		}
+
+		$merged['classes'] = self::keep_richer_classes(
+			isset( $stored['classes'] ) && is_array( $stored['classes'] ) ? $stored['classes'] : array(),
+			isset( $fresh['classes'] ) && is_array( $fresh['classes'] ) ? $fresh['classes'] : array()
+		);
+
+		return $merged;
+	}
+
+	/**
+	 * Klassen zusammenführen: Nennzahl und Teilnehmer-Link je Klasse erhalten,
+	 * wenn der frische Stand sie nicht (mehr) trägt. Zuordnung über den
+	 * normalisierten Klassennamen.
+	 *
+	 * @param array<int, mixed> $stored Gespeicherte Klassen.
+	 * @param array<int, mixed> $fresh  Frische Klassen.
+	 * @return array<int, mixed>
+	 */
+	private static function keep_richer_classes( array $stored, array $fresh ): array {
+		if ( empty( $fresh ) ) {
+			return $stored;
+		}
+
+		if ( empty( $stored ) ) {
+			return $fresh;
+		}
+
+		$by_name = array();
+		foreach ( $stored as $class ) {
+			if ( is_array( $class ) && isset( $class['name'] ) ) {
+				$by_name[ self::normalise_label( (string) $class['name'] ) ] = $class;
+			}
+		}
+
+		foreach ( $fresh as $index => $class ) {
+			if ( ! is_array( $class ) || ! isset( $class['name'] ) ) {
+				continue;
+			}
+
+			$key = self::normalise_label( (string) $class['name'] );
+			$old = isset( $by_name[ $key ] ) && is_array( $by_name[ $key ] ) ? $by_name[ $key ] : null;
+
+			if ( null === $old ) {
+				continue;
+			}
+
+			$new_entries = isset( $class['entries'] ) ? (int) $class['entries'] : 0;
+			$old_entries = isset( $old['entries'] ) ? (int) $old['entries'] : 0;
+
+			if ( $new_entries <= 0 && $old_entries > 0 ) {
+				$fresh[ $index ]['entries'] = $old_entries;
+			}
+
+			if ( empty( $class['participantsUrl'] ) && ! empty( $old['participantsUrl'] ) ) {
+				$fresh[ $index ]['participantsUrl'] = $old['participantsUrl'];
+			}
+		}
+
+		return $fresh;
+	}
+
+	/**
+	 * Rennen aus Rohzeilen bauen – wie beim API-Abruf, nur aus den
+	 * angereicherten Daten.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Zeilen.
+	 * @return RC_RCC_Race[]
+	 */
+	private static function races_from_rows( array $rows ): array {
+		$races = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$race = RC_RCC_Race::from_array( $row );
+
+			// Ohne stabile ID nicht zuordenbar (Sichtbarkeit, Dokumente).
+			if ( '' === $race->id ) {
+				continue;
+			}
+
+			$races[] = $race;
+		}
+
+		return $races;
+	}
+
+	/**
 	 * Add the delivered rows to the local archive.
 	 *
 	 * Bereits archivierte Events werden überschrieben, damit spätere
 	 * Korrekturen der Quelle – etwa ein nachgetragenes Ergebnis oder ein
-	 * korrigierter Titel – ankommen.
+	 * korrigierter Titel – ankommen. Die Zeilen kommen bereits durch
+	 * `enrich_rows()` gelaufen, sonst würde ein ärmerer Abruf das Archiv
+	 * verarmen lassen.
 	 *
 	 * @param array<int, array<string, mixed>> $rows Rohdaten der API.
 	 * @return void
@@ -463,6 +670,16 @@ class RC_RCC_Calendar {
 				// hinterlegt, meint es so – womöglich ist es die korrigierte
 				// Fassung.
 				$normalised = self::normalise_label( $label );
+
+				// Ein eigenes „Ergebnisse"-Dokument füllt den Ergebnis-Button,
+				// statt in der Dokumentspalte zu landen. Damit können Vereine,
+				// deren Rennen über RCK laufen, ihr Ergebnis-PDF genauso
+				// prominent zeigen wie MyRCM-Vereine ihre Ergebnisseite – dort
+				// gibt es keine MyRCM-Ergebnisliste, weil über RCK genannt wird.
+				if ( in_array( self::fold_label( $label ), self::results_labels(), true ) ) {
+					$race->results_url = $url;
+					continue;
+				}
 
 				foreach ( $source_labels as $key => $source_label ) {
 					if ( self::normalise_label( $source_label ) === $normalised ) {

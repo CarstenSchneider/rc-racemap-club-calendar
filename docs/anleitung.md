@@ -107,6 +107,11 @@ Gibt es dort bereits ein Dokument mit derselben Bezeichnung — etwa eine
 Ausschreibung —, ersetzt deins es. So kannst du eine korrigierte Fassung
 nachreichen, ohne dass beide nebeneinander stehen.
 
+**Ein Ergebnis-PDF verlinken** — nenne das Dokument „Ergebnisse". Dann steht es
+nicht in der Dokumentspalte, sondern füllt den **Ergebnisse**-Knopf des Rennens.
+Das ist der Weg für Rennen, deren Ergebnisse nicht bei MyRCM liegen — etwa weil
+die Nennung über RCK lief.
+
 **Eigene Termine** — für Rennen, die weder bei MyRCM noch bei RCK oder DMC
 stehen: Clublauf, Vereinsmeisterschaft, Trainingstag. Im Abschnitt „Eigene
 Termine" Bezeichnung und Datum eintragen. Sie erscheinen im Kalender zwischen den

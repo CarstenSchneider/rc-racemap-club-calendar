@@ -8,7 +8,7 @@ vollständig ins aktive Theme ein.
 > Wahrheit.
 
 **Repo:** `CarstenSchneider/rc-racemap-club-calendar` (öffentlich, Branch `main`)
-**Stand:** v1.0.43
+**Stand:** v1.0.64
 **Im Einsatz:** tsvm-racing.de/rcracemap (`18244`), rcspeedracer.de/rcracemap (`45925`)
 **Anleitung für Vereine:** [`docs/anleitung.md`](docs/anleitung.md)
 **Sprachen:** de (Quelle), en, fr, nl, it, es, cs, pl — folgt `get_locale()`
@@ -50,12 +50,13 @@ docs/                          anleitung.md · api-contract.md · rc-racemap-dat
 **`Calendar::all_races()` ist die zentrale Stelle.** Die Reihenfolge ist relevant:
 
 1. API abrufen
-2. archivieren — **nur bei fehlerfreiem Abruf**
-3. archivierte Rennen ergänzen, die die API nicht mehr liefert
-4. Titel-Überschreibungen anwenden
-5. DMC-Schatten unterdrücken
-6. eigene Termine anhängen
-7. eigene Dokumente anhängen
+2. **feldweise anreichern** (`enrich_rows()`) — vor Anzeige *und* Archivierung
+3. archivieren — **nur bei fehlerfreiem Abruf**
+4. archivierte Rennen ergänzen, die die API nicht mehr liefert
+5. Titel-Überschreibungen anwenden
+6. DMC-Schatten unterdrücken
+7. eigene Termine anhängen
+8. eigene Dokumente anhängen
 
 ## Speicherung
 
@@ -154,6 +155,39 @@ Daten-Problem (steht die URL wirklich gespeichert?). In v1.0.62 wieder entfernt;
 die Version bleibt als `data-rc-rcc-version` am `.rc-rcc`-Wrapper.
 
 ---
+
+## Drei Vereinsmuster — und was jedes braucht (v1.0.64)
+
+Die Logik muss für **alle** Vereine tragen, nicht nur für MyRCM-Vereine:
+
+| Muster | Klassen / Teilnehmer | Ergebnisse |
+|---|---|---|
+| Nennung über **MyRCM** | von MyRCM, Pillen verlinkt | MyRCM-Ergebnisseite (`results_url` aus der eventId) |
+| Nennung über **RCK** (der Normalfall) | RCK liefert die Zahl; MyRCM führt das Event oft mit Klassen, aber 0 Nennungen | **eigenes PDF**, Bezeichnung „Ergebnisse" |
+| nur **DMC** gemeldet | keine | eigenes PDF |
+
+**Feldweise Anreicherung (`enrich_rows` / `keep_richer`).** RCK führt nur
+*kommende* Rennen. Nach dem Renntag fällt der Merge-Partner weg, übrig bleibt die
+MyRCM-Sicht mit 0 Nennungen und ohne Teilnehmerlisten — ein späterer Abruf ist
+also **ärmer** als ein früherer. Deshalb wird jede frische Zeile vor Anzeige *und*
+Archivierung gegen das Archiv gehalten: `registrationCount` 0/fehlend
+überschreibt kein gespeichertes >0, leere `url`/`registrationListUrl`/`documents`
+überschreiben nichts, und `keep_richer_classes()` bewahrt je Klasse `entries` und
+`participantsUrl` (Zuordnung über `normalise_label()` des Klassennamens).
+**Datum, Titel und Nennstatus bleiben bewusst frisch** — Korrekturen an der Quelle
+sollen ankommen. Das repariert rückwirkend nichts, verhindert aber jeden weiteren
+Verlust.
+
+**Eigenes Dokument „Ergebnisse" füllt den Knopf.** In `attach_custom_documents()`
+setzt eine passende Bezeichnung `results_url` und landet **nicht** in der
+Dokumentspalte. So zeigen RCK-Vereine ihr Ergebnis-PDF genauso prominent wie
+MyRCM-Vereine ihre Ergebnisseite. Erkannt werden die **übersetzte** Bezeichnung
+der Seitensprache sowie „Ergebnisse", „Ergebnis" und „Results"; der Vergleich
+läuft über `fold_label()` (kleingeschrieben, transliteriert, nur a–z0–9), damit
+auch „Resultats" ohne Akzent trifft. `normalise_label()` bleibt für die
+Dokument-Dedup zeichengetreu — dort ist die Bezeichnung freier Text und soll nicht
+versehentlich verschmelzen. Der Sonderfall steht als Hinweis am Eingabefeld und in
+`docs/anleitung.md`, sonst findet ihn niemand.
 
 ## Entscheidungen und ihre Gründe
 
@@ -310,8 +344,15 @@ Listenelement. Hat in dieser Sitzung zweimal Dateien zerschnitten.
 - `docs/anleitung.md` auf `rcracemap.com/#wordpress-plugin` übernehmen.
 - **Free/Paid + Ads:** „free" zeigt RC-RaceMap-Ads, „paid" nicht. Die API soll
   perspektivisch `tier`/`ads` je Verein liefern.
-- Teilnehmerzahlen fehlen bei reinen RCK-Rennen — die Nennung läuft über RCK,
-  MyRCM führt keine Liste, RCK hält keine Historie vor.
+- **Map/API briefen:** Klassen, Nennzahlen und per-Klasse `participantsUrl` für
+  *jedes* Event, das auf MyRCM existiert — auch für `myrcm+rck`-Merges und reine
+  RCK-Events. Belege: TSV 25.07.2026 hat 37 Nennungen und 4 Klassen, aber keine
+  `participantsUrl`; das RCK-Rennen vom 21.06.2026 steht auf der
+  MyRCM-Veranstalterseite. Ein Scrape zentral in der Map hilft allen Vereinen —
+  im Plugin wäre es 400× dasselbe.
+- Teilnehmerzahlen reiner RCK-Rennen hält RCK nur für kommende Rennen vor. Seit
+  v1.0.64 bleiben sie im Archiv erhalten; **vor** v1.0.64 verlorene Zahlen sind
+  weg (einmaliges Nachtragen wäre denkbar, nicht beauftragt).
 - **Archiv-Teilnehmer-Links Restfälle** (>12 Mon. + PDF-`url` + id ohne
   `myrcm-event-<n>`) bleiben stumm — siehe „Auto-Archiv & Teilnehmer-Links".
   Bewusst offen gelassen (2026-07-23). Kandidaten: Datei-Import robuster machen

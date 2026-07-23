@@ -157,6 +157,8 @@ $ctx = RC_RCC_Admin::view_context();
 								<?php endforeach; ?>
 								<p class="description rc-rcc-doc-hint">
 									<?php echo esc_html__( 'Leer lassen, wenn nichts hinterlegt werden soll. Eine Zeile leeren entfernt das Dokument.', 'rc-racemap-club-calendar' ); ?>
+									<?php // Der Sonderfall gehört an das Eingabefeld, sonst findet ihn niemand. ?>
+									<?php echo esc_html__( 'Ein Dokument mit der Bezeichnung „Ergebnisse“ erscheint nicht in der Dokumentspalte, sondern als Ergebnisse-Knopf des Rennens.', 'rc-racemap-club-calendar' ); ?>
 								</p>
 							</td>
 						</tr>
