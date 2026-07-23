@@ -28,12 +28,15 @@ $event_url  = $race->links['registration'] ?? '';
 // „Nennung" führt aufs MyRCM-Anmeldeformular, wo vorhanden (reine MyRCM-Events);
 // sonst auf die Event-/RCK-URL.
 $nennung_url = ( '' !== $race->registration_url ) ? $race->registration_url : $event_url;
-// Label: ist eine direkte Nennung möglich (registration_url gesetzt) →
-// „Nennung"; sonst führt der Link nur zur Event-Übersicht (z. B. EFRA/extern
-// verwaltete Events) → „Event auf MyRCM".
-$rc_nennung_label = ( '' !== $race->registration_url )
-	? __( 'Nennung', 'rc-racemap-club-calendar' )
-	: __( 'Event auf MyRCM', 'rc-racemap-club-calendar' );
+// Label: „Nennung" wenn direkt nennbar (registration_url) ODER der Link eine
+// echte Nennseite ist (z. B. RCK). „Event auf MyRCM" NUR, wenn wir bloß auf die
+// MyRCM-Event-Übersicht zurückfallen (EFRA/extern verwaltet, event_url =
+// myrcm.ch/…/live/<id>).
+$rc_is_myrcm_overview = ( '' === $race->registration_url )
+	&& (bool) preg_match( '#myrcm\.ch/(?:de|en)/live/#i', $event_url );
+$rc_nennung_label = $rc_is_myrcm_overview
+	? __( 'Event auf MyRCM', 'rc-racemap-club-calendar' )
+	: __( 'Nennung', 'rc-racemap-club-calendar' );
 
 // Spalte 5 bestimmen: es gibt nur drei Zustände – Ergebnisse (vorbei),
 // Nennung (Button) oder „Nennung ab …" (verlinkter Hinweis). Kein „Zum Rennen".
