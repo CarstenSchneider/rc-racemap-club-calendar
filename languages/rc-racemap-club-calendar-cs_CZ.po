@@ -520,3 +520,7 @@ msgstr "Vybrat rok"
 
 #~ msgid "Zum Rennen"
 #~ msgstr "Na závod"
+
+#: templates/race-item.php:38
+msgid "Event auf MyRCM"
+msgstr "Událost na MyRCM"

@@ -523,3 +523,7 @@ msgstr "Elegir año"
 
 #~ msgid "Zum Rennen"
 #~ msgstr "Ver la carrera"
+
+#: templates/race-item.php:38
+msgid "Event auf MyRCM"
+msgstr "Evento en MyRCM"

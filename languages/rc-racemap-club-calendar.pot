@@ -463,3 +463,7 @@ msgstr[1] ""
 #: templates/year-groups.php:29
 msgid "Jahr wählen"
 msgstr ""
+
+#: templates/race-item.php:38
+msgid "Event auf MyRCM"
+msgstr ""

@@ -649,3 +649,7 @@ msgstr "Select year"
 #, php-format
 #~ msgid "%1$s, %2$s"
 #~ msgstr "%1$s, %2$s"
+
+#: templates/race-item.php:38
+msgid "Event auf MyRCM"
+msgstr "Event on MyRCM"
