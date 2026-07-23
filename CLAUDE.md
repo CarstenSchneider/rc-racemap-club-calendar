@@ -344,18 +344,42 @@ Listenelement. Hat in dieser Sitzung zweimal Dateien zerschnitten.
 - `docs/anleitung.md` auf `rcracemap.com/#wordpress-plugin` übernehmen.
 - **Free/Paid + Ads:** „free" zeigt RC-RaceMap-Ads, „paid" nicht. Die API soll
   perspektivisch `tier`/`ads` je Verein liefern.
-- **Map/API briefen:** Klassen, Nennzahlen und per-Klasse `participantsUrl` für
-  *jedes* Event, das auf MyRCM existiert — auch für `myrcm+rck`-Merges und reine
-  RCK-Events. Belege: TSV 25.07.2026 hat 37 Nennungen und 4 Klassen, aber keine
-  `participantsUrl`; das RCK-Rennen vom 21.06.2026 steht auf der
-  MyRCM-Veranstalterseite. Ein Scrape zentral in der Map hilft allen Vereinen —
-  im Plugin wäre es 400× dasselbe.
+- ~~Map/API briefen: Klassen und per-Klasse `participantsUrl` fehlen bei
+  `myrcm+rck`-Merges und reinen RCK-Events~~ → **erledigt in der Map am
+  2026-07-23**, live auf `rcracemap.com`:
+  - **Merge-Fix:** `mergeRaceClasses` in `api/clubs.php` nahm das RCK-Klassen-Array
+    (wegen der Nennzahlen) und verwarf die MyRCM-Objekte samt `participantsUrl`.
+    Jetzt feldweise — RCK gewinnt bei `entries`, MyRCM bei `participantsUrl`.
+    TSV 25.07.2026: vorher 0/4, jetzt **4/4** bei `cnt=37`.
+  - **Retention:** `retainDroppedRaces()` in `import-rck.js` behält Rennen, die RCK
+    nicht mehr listet (RCK führt nur *kommende*), mit ihren letzten Zahlen und
+    `registrationStatus` auf `closed` eingefroren. Die API bleibt zustandslos — die
+    Persistenz sitzt in `rck-races.json`, die der Import ohnehin committet.
+  - **Reine RCK-Events ohne MyRCM-Gegenstück:** bewusst **nicht** gebaut. Kein Fall
+    nachweisbar (vier geprüft, keiner auf der jeweiligen Veranstalterseite);
+    „reines RCK-Event" heißt in der Praxis „MyRCM führt es nicht", und dann ist
+    leer korrekt. Wieder aufmachen nur mit Gegenbeispiel.
+  - **Der 21.06.2026-Beleg war falsch:** das Rennen kam schon vorher als
+    `source=myrcm` mit `myrcm-event-98412` und 4/4 `participantsUrl` durch. Stumm
+    waren die Pillen wegen `entries: 0` (das Plugin verlinkt nur bei `entries > 0`),
+    nicht wegen fehlender URLs.
 - Teilnehmerzahlen reiner RCK-Rennen hält RCK nur für kommende Rennen vor. Seit
-  v1.0.64 bleiben sie im Archiv erhalten; **vor** v1.0.64 verlorene Zahlen sind
-  weg (einmaliges Nachtragen wäre denkbar, nicht beauftragt).
+  v1.0.64 bleiben sie im Plugin-Archiv erhalten, und die Map hält sie seit
+  2026-07-23 auch quellseitig. **Die Zahlen des TSV-Rennens 21.06.2026 wurden in
+  der Map einmalig nachgetragen** (aus dem Stand vom Renntag: `cnt=27`, GT-Sport 4,
+  Porsche Cup 16, LMH 3, M-Chassis 4) — die vier Pillen sind auf
+  `tsvm-racing.de/rcracemap` verifiziert klickbar. Andere vor v1.0.64 verlorene
+  Zahlen sind weg; derselbe Weg (Rekonstruktion aus einem Map-Commit vom Renntag)
+  wäre wiederholbar, ist aber nicht beauftragt.
 - **Archiv-Teilnehmer-Links Restfälle** (>12 Mon. + PDF-`url` + id ohne
   `myrcm-event-<n>`) bleiben stumm — siehe „Auto-Archiv & Teilnehmer-Links".
   Bewusst offen gelassen (2026-07-23). Kandidaten: Datei-Import robuster machen
   bzw. WAF-Verdacht beim Textarea-Import prüfen.
+  **Gemessene Grundlinie auf `tsvm-racing.de/rcracemap` (2026-07-23): 88 Pillen
+  verlinkt, 8 stumm** — und die 8 sind vollständig erklärt: 7 beim TEC 05.07.2025
+  (genau dieser Restfall) und 1 beim BTM FINALE 26.09.2026 (DMC-Eintrag, MyRCM
+  führt dort keine Klassenliste — korrekt stumm, kein Bug). Wer die Zahl künftig
+  prüft: auf `rc-rcc__item` splitten, **nicht** per `</li>`-Regex — die Pillen sind
+  selbst `<li>`.
 - Ideen, nicht beauftragt: iCal-Export, Serien-Filter, Gutenberg-Block, volle
   Adresse (sobald die API ein Feld dafür hat).
