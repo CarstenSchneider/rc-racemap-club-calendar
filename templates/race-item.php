@@ -120,8 +120,14 @@ $arrow = RC_RCC_Shortcode::icon( 'arrow' );
 						// Report-Seite öffnet dann mit einer Default-Klasse, nicht der
 						// angeklickten. Fehlt die per-Klasse-URL (Archiv-Import, DMC,
 						// RCK) → gedämpfte, nicht klickbare Pille (Zahl bleibt sichtbar).
+						// Verlinken, wenn eine Teilnehmer-URL vorliegt UND es sich
+						// lohnt: bei kommenden Events erst ab >0 Nennungen (Liste sonst
+						// leer), bei vergangenen immer (die Teilnehmerliste ist gefüllt,
+						// auch wenn keine Nennzahl gespeichert ist — z. B. nachträglich
+						// aus MyRCM ergänzte Klassen).
 						$rc_has_entries = null !== $class['entries'] && (int) $class['entries'] > 0;
-						$rc_class_url   = ( $rc_has_entries && ! empty( $class['participantsUrl'] ) ) ? (string) $class['participantsUrl'] : '';
+						$rc_can_link    = ! empty( $class['participantsUrl'] ) && ( $rc_has_entries || $rc_is_past );
+						$rc_class_url   = $rc_can_link ? (string) $class['participantsUrl'] : '';
 						if ( '' !== $rc_class_url ) :
 						?>
 						<li class="rc-rcc__class rc-rcc__class--link"><a class="rc-rcc__class-link" href="<?php echo esc_url( $rc_class_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php echo esc_attr__( 'Teilnehmer dieser Klasse', 'rc-racemap-club-calendar' ); ?>"><?php echo $rc_class_inner . $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapte Werte + konstantes Inline-SVG. ?></a></li>

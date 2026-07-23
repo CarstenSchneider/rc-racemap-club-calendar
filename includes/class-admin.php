@@ -742,25 +742,33 @@ class RC_RCC_Admin {
 		$org_map = '' !== $club_id ? $this->fetch_myrcm_org_datemap( $club_id ) : array();
 
 		foreach ( $archive as $id => $row ) {
-			if ( ! is_array( $row ) || empty( $row['classes'] ) || ! is_array( $row['classes'] ) ) {
+			if ( ! is_array( $row ) ) {
 				continue;
 			}
 
-			// Event-ID: aus id/url, sonst per Datum über die Organizer-Seite.
+			// Event-ID: aus id/url, sonst per from- ODER to-Datum über die
+			// Organizer-Seite (RCK-Wertungstag == MyRCMs `to`, daher beide prüfen).
 			$event_id = self::myrcm_event_id_from( (string) $id, $row );
 			if ( '' === $event_id ) {
-				$from = isset( $row['from'] ) ? (string) $row['from'] : '';
-				if ( '' !== $from && isset( $org_map[ $from ] ) ) {
-					$event_id = (string) $org_map[ $from ];
+				foreach ( array( 'from', 'to' ) as $df ) {
+					$d = isset( $row[ $df ] ) ? (string) $row[ $df ] : '';
+					if ( '' !== $d && isset( $org_map[ $d ] ) ) {
+						$event_id = (string) $org_map[ $d ];
+						break;
+					}
 				}
 			}
 			if ( '' === $event_id ) {
 				continue;
 			}
 
-			// Fehlt an mindestens einer Klasse die URL? Sonst überspringen.
-			$needs = false;
-			foreach ( $row['classes'] as $class ) {
+			$classes = ( isset( $row['classes'] ) && is_array( $row['classes'] ) ) ? $row['classes'] : array();
+
+			// Braucht das Event MyRCM-Klassen? Ja, wenn es (a) gar keine hat
+			// (RCK-Events, die als reiner Import ohne Klassen ankamen) oder
+			// (b) eine Klasse ohne Teilnehmer-URL trägt.
+			$needs = empty( $classes );
+			foreach ( $classes as $class ) {
 				if ( is_array( $class ) && empty( $class['participantsUrl'] ) ) {
 					$needs = true;
 					break;
@@ -779,18 +787,48 @@ class RC_RCC_Admin {
 			}
 
 			$changed = false;
-			foreach ( $row['classes'] as $i => $class ) {
+
+			// 1. Vorhandene Klassen mit ihrer Teilnehmer-URL versehen.
+			foreach ( $classes as $i => $class ) {
 				if ( ! is_array( $class ) || ! empty( $class['participantsUrl'] ) ) {
 					continue;
 				}
 				$class_id = self::match_class_id( (string) ( $class['name'] ?? '' ), $map );
 				if ( '' !== $class_id ) {
-					$row['classes'][ $i ]['participantsUrl'] = 'https://www.myrcm.ch/de/report/' . $event_id . '/' . $class_id . '?reportKey=100&reportType=participants';
-					$changed = true;
+					$classes[ $i ]['participantsUrl'] = self::participants_url( $event_id, $class_id );
+					$changed                          = true;
+				}
+			}
+
+			// 2. MyRCM-Klassen ergänzen, die im Datensatz fehlen — so bekommen
+			//    RCK-Events ohne Klassen ihre Klassen-Pillen + Teilnehmerlisten.
+			$have = array();
+			foreach ( $classes as $class ) {
+				$nm = is_array( $class ) ? (string) ( $class['name'] ?? '' ) : (string) $class;
+				$have[ self::normalise_class_name( $nm ) ] = true;
+			}
+			foreach ( $map as $norm => $entry ) {
+				$present = isset( $have[ $norm ] );
+				if ( ! $present ) {
+					foreach ( array_keys( $have ) as $hn ) {
+						if ( '' !== $hn && levenshtein( $norm, $hn ) <= 2 ) {
+							$present = true;
+							break;
+						}
+					}
+				}
+				if ( ! $present ) {
+					$classes[]     = array(
+						'name'            => $entry['name'],
+						'participantsUrl' => self::participants_url( $event_id, (string) $entry['id'] ),
+					);
+					$have[ $norm ] = true;
+					$changed       = true;
 				}
 			}
 
 			if ( $changed ) {
+				$row['classes'] = $classes;
 				$archive[ $id ] = $row;
 				++$updated;
 			}
@@ -866,9 +904,12 @@ class RC_RCC_Admin {
 			$html = (string) wp_remote_retrieve_body( $response );
 			if ( preg_match_all( '/<option[^>]*value="(\d+)"[^>]*>([^<]*)<\/option>/i', $html, $matches, PREG_SET_ORDER ) ) {
 				foreach ( $matches as $mm ) {
-					$name = self::normalise_class_name( html_entity_decode( $mm[2], ENT_QUOTES ) );
-					if ( '' !== $name && ! isset( $map[ $name ] ) ) {
-						$map[ $name ] = $mm[1];
+					$display = trim( html_entity_decode( $mm[2], ENT_QUOTES ) );
+					$norm    = self::normalise_class_name( $display );
+					if ( '' !== $norm && ! isset( $map[ $norm ] ) ) {
+						// Anzeigename mitführen, damit fehlende Klassen mit ihrem
+						// echten Namen ergänzt werden können (nicht nur die id).
+						$map[ $norm ] = array( 'id' => $mm[1], 'name' => $display );
 					}
 				}
 			}
@@ -953,19 +994,30 @@ class RC_RCC_Admin {
 			return '';
 		}
 		if ( isset( $map[ $n ] ) ) {
-			return $map[ $n ];
+			return (string) $map[ $n ]['id'];
 		}
 		// Kleine Editdistanz zulassen (z. B. „Gentlemen" vs „Gentleman").
-		$best    = '';
-		$best_d  = PHP_INT_MAX;
-		foreach ( $map as $key => $cid ) {
+		$best   = '';
+		$best_d = PHP_INT_MAX;
+		foreach ( $map as $key => $entry ) {
 			$d = levenshtein( $n, $key );
 			if ( $d < $best_d ) {
 				$best_d = $d;
-				$best   = $cid;
+				$best   = (string) $entry['id'];
 			}
 		}
 		return ( $best_d <= 2 ) ? $best : '';
+	}
+
+	/**
+	 * Teilnehmer-Report-URL einer Klasse bauen.
+	 *
+	 * @param string $event_id MyRCM-Event-ID.
+	 * @param string $class_id MyRCM-Klassen-ID.
+	 * @return string
+	 */
+	private static function participants_url( string $event_id, string $class_id ): string {
+		return 'https://www.myrcm.ch/de/report/' . $event_id . '/' . $class_id . '?reportKey=100&reportType=participants';
 	}
 
 	/**
