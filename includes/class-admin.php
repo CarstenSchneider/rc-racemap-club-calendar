@@ -730,6 +730,15 @@ class RC_RCC_Admin {
 
 		check_admin_referer( self::ACTION_ENRICH_PARTICIPANTS );
 
+		// Das Nachladen der Teilnehmerzahlen kostet je Klasse eine Abfrage —
+		// bei viel Historie summiert sich das. Zeitlimit heben (best effort) und
+		// ein Budget setzen, damit ein Klick nicht unbegrenzt fetcht; der Rest
+		// kommt beim nächsten Klick (Zahlen werden gecacht).
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
+		$count_budget = 300;
+
 		$archive   = $this->calendar->archive_map();
 		$updated   = 0;
 		$classmaps = array();
@@ -816,6 +825,15 @@ class RC_RCC_Admin {
 				if ( '' !== $class_id ) {
 					$classes[ $i ]['participantsUrl'] = self::participants_url( $event_id, $class_id );
 					$changed                          = true;
+					// Teilnehmerzahl nachtragen, falls keine gespeichert ist.
+					$has_entries = isset( $class['entries'] ) && '' !== $class['entries'] && null !== $class['entries'];
+					if ( ! $has_entries && $count_budget > 0 ) {
+						--$count_budget;
+						$cnt = $this->fetch_myrcm_class_count( $event_id, $class_id );
+						if ( null !== $cnt ) {
+							$classes[ $i ]['entries'] = $cnt;
+						}
+					}
 				}
 			}
 
@@ -837,10 +855,19 @@ class RC_RCC_Admin {
 					}
 				}
 				if ( ! $present ) {
-					$classes[]     = array(
+					$new_class = array(
 						'name'            => $entry['name'],
 						'participantsUrl' => self::participants_url( $event_id, (string) $entry['id'] ),
 					);
+					// Teilnehmerzahl der ergänzten Klasse gleich mitziehen.
+					if ( $count_budget > 0 ) {
+						--$count_budget;
+						$cnt = $this->fetch_myrcm_class_count( $event_id, (string) $entry['id'] );
+						if ( null !== $cnt ) {
+							$new_class['entries'] = $cnt;
+						}
+					}
+					$classes[]     = $new_class;
 					$have[ $norm ] = true;
 					$changed       = true;
 				}
@@ -1152,6 +1179,47 @@ class RC_RCC_Admin {
 	 */
 	private static function participants_url( string $event_id, string $class_id ): string {
 		return 'https://www.myrcm.ch/de/report/' . $event_id . '/' . $class_id . '?reportKey=100&reportType=participants';
+	}
+
+	/**
+	 * Teilnehmerzahl einer Klasse von der MyRCM-Report-Seite holen.
+	 *
+	 * Die Report-Übersicht führt keine Zahlen; die per-Klasse-Teilnehmerliste
+	 * trägt „N Teilnehmer" (Fallback: tbody-Zeilen zählen). Ergebnis wird als
+	 * Transient gecacht (`rc_rcc_pcnt_<eid>_<cid>`), damit jede Klasse nur einmal
+	 * abgefragt wird. Gibt null bei Fehlschlag/nicht ermittelbar.
+	 *
+	 * @param string $event_id MyRCM-Event-ID.
+	 * @param string $class_id MyRCM-Klassen-ID.
+	 * @return int|null
+	 */
+	private function fetch_myrcm_class_count( string $event_id, string $class_id ): ?int {
+		$cache_key = 'rc_rcc_pcnt_' . $event_id . '_' . $class_id;
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return ( '' === $cached ) ? null : (int) $cached;
+		}
+
+		$response = wp_remote_get(
+			self::participants_url( $event_id, $class_id ),
+			array(
+				'timeout'    => 12,
+				'user-agent' => 'rc-racemap-club-calendar',
+			)
+		);
+
+		$count = null;
+		if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+			$html = (string) wp_remote_retrieve_body( $response );
+			if ( preg_match( '/(\d+)\s*Teilnehmer\b/u', $html, $m ) ) {
+				$count = (int) $m[1];
+			} elseif ( preg_match( '#<tbody[^>]*>(.*?)</tbody>#is', $html, $tb ) ) {
+				$count = (int) preg_match_all( '/<tr\b/i', $tb[1] );
+			}
+		}
+
+		set_transient( $cache_key, ( null === $count ) ? '' : (string) $count, ( null === $count ) ? HOUR_IN_SECONDS : MONTH_IN_SECONDS );
+		return $count;
 	}
 
 	/**
