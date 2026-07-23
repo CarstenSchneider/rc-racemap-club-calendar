@@ -25,6 +25,9 @@ if ( ! isset( $race ) || ! $race instanceof RC_RCC_Race ) {
 
 $rc_is_past = ! $race->is_upcoming();
 $event_url  = $race->links['registration'] ?? '';
+// „Nennung" führt aufs MyRCM-Anmeldeformular, wo vorhanden (reine MyRCM-Events);
+// sonst auf die Event-/RCK-URL.
+$nennung_url = ( '' !== $race->registration_url ) ? $race->registration_url : $event_url;
 
 // Spalte 5 bestimmen: es gibt nur drei Zustände – Ergebnisse (vorbei),
 // Nennung (Button) oder „Nennung ab …" (verlinkter Hinweis). Kein „Zum Rennen".
@@ -44,7 +47,7 @@ if ( $rc_is_past ) {
 	}
 } elseif ( $race->is_registration_open() ) {
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
-	$cta_url   = $event_url;
+	$cta_url   = $nennung_url;
 } elseif ( null !== $race->registration_opens && $race->registration_opens > time() ) {
 	// Nennung startet erst später → verlinkter Hinweis auf MyRCM.
 	$cta_note     = sprintf(
@@ -59,7 +62,7 @@ if ( $rc_is_past ) {
 	// Kommend, aber (noch) nicht als „offen" gemeldet (z. B. nur nach Login) →
 	// trotzdem zur Nennung führen.
 	$cta_label = __( 'Nennung', 'rc-racemap-club-calendar' );
-	$cta_url   = $event_url;
+	$cta_url   = $nennung_url;
 }
 
 // Dokumente.

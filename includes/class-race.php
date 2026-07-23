@@ -166,6 +166,16 @@ class RC_RCC_Race {
 	public string $results_url = '';
 
 	/**
+	 * Direct link to the MyRCM registration form (/…/subscription/<id>/entry) for
+	 * pure MyRCM events. The event `url` points only to the overview (/live/<id>);
+	 * the „Nennung"-Button should open the actual entry form. Empty for non-MyRCM
+	 * or merged (myrcm+rck) events — there registration runs via RCK.
+	 *
+	 * @var string
+	 */
+	public string $registration_url = '';
+
+	/**
 	 * Build a Race from a raw associative array (as returned by the API).
 	 *
 	 * Unknown keys are ignored; missing keys fall back to safe defaults.
@@ -298,6 +308,15 @@ class RC_RCC_Race {
 			if ( '' !== $participants_report ) {
 				$race->links['participants'] = $participants_report;
 			}
+		}
+
+		// „Nennung"-Button auf das MyRCM-Anmeldeformular statt die Event-Übersicht:
+		// /live/<id> ist nur die Übersicht, /subscription/<id>/entry das Nennformular.
+		// Nur wenn die Registrierungs-URL eine MyRCM-live-URL ist — merged
+		// myrcm+rck zeigt auf RCK, dort läuft die Nennung (unverändert lassen).
+		$reg_link = (string) ( $race->links['registration'] ?? '' );
+		if ( preg_match( '#myrcm\.ch/(?:de|en)/live/(\d+)#i', $reg_link, $sm ) ) {
+			$race->registration_url = 'https://www.myrcm.ch/' . rawurlencode( $lang ) . '/subscription/' . $sm[1] . '/entry';
 		}
 
 		return $race;
